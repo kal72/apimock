@@ -70,6 +70,8 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Changed
 
+- Enrich Light mode with layered cloud artwork, a softly glowing sun and subtle rays, plus a warmer sky gradient. Decoration remains static behind content; Night styling and editor behavior are unchanged.
+
 - Display independent condition scenarios as direct Incoming Request branches with no visible No edges, and one Table row per scenario plus default. Keep scoped node editing, editable response destinations, and bounded zoom. Existing linear fallback graphs use the new presentation without changing evaluation semantics; nested graphs and legacy header/delay chains retain their original graph editor. The optional flow.layout field stores canvas presentation; no database migration is required.
 
 - Simplify the Table Conditions column by hiding condition names; retain match outcomes and rules.
@@ -131,6 +133,8 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 - Local binding by default and loopback host port mappings in development Compose. Production uses a TLS proxy and a shared administrator boundary; per-user authorization is not available yet.
 
 ### Verification notes and limitations
+
+- Daylight artwork build and desktop browser review passed: Light mode shows layered clouds, soft sunlight, and readable solid table/editor surfaces. Screenshot: docs/screenshots/daylight-theme.jpg.
 
 - Scenario-priority checks passed: 53 JavaScript tests, Go race tests, go vet, and application build. Browser QA covered Node/Table priority controls, undo, and persisted order after reload. A real mock with two matching conditions changed from 201 to 202 after raising the second condition; unmatched requests retained default 404. Screenshot: docs/screenshots/scenario-priority.jpg.
 

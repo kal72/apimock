@@ -66,7 +66,7 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | U09 | Table flow | One node path per row | Done | Request Path shows endpoint name, HTTP method and URL path. Conditions shows match outcomes and rules without condition names. The separate Node Flow column is removed; distinct paths that converge remain separate rows. |
 | U08 | Node editing | Scoped node forms | Done | Node Edit opens only its own Request, Condition, Response, Headers, or Delay form. Table retains the complete path popup. |
 | U07 | Appearance | Light / Night / System | Done | Persistent browser preference, automatic system appearance, and Moonlight night surfaces with static stars and a crescent moon. |
-| U06 | Visual design | Cloudline theme | Done | Navy sidebar, azure actions, sky gradients, subtle static cloud silhouettes, and unified editor/dialog colors. |
+| U06 | Visual design | Cloudline theme | Done | Navy sidebar, azure actions, sky gradients, layered static clouds and a softly glowing sun in Light mode, and unified editor/dialog colors. |
 | U05 | Node canvas | Bounded canvas zoom | Done | Zoom controls support 50%–200%, 25% steps, reset to 100%, viewport centering, and zoom-aware dragging. |
 | U04 | Interface language | English web interface | Done | Navigation, editors, dialogs, validation, notifications, and accessibility labels use English. User-authored content is preserved. |
 | U03 | UX | Flow-ordered Table rows with one complete editor | Done | Each row represents a request-to-response path; all field edits are in its Action popup. Nested legacy graphs remain intact and path projection is capped at 128. |

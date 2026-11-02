@@ -1,0 +1,36 @@
+services:
+  app:
+    build: .
+    ports:
+      - "127.0.0.1:${APP_PORT:-8080}:8080"
+    environment:
+      ADDR: 0.0.0.0:8080
+      DATABASE_URL: postgres://mocklab:mocklab@db:5432/mocklab?sslmode=disable
+      APP_ENV: ${APP_ENV:-development}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      MOCK_CORS_ORIGINS: ${MOCK_CORS_ORIGINS:-}
+      MOCK_CORS_HEADERS: ${MOCK_CORS_HEADERS:-Content-Type,Authorization,X-Api-Key}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: mocklab
+      POSTGRES_USER: mocklab
+      POSTGRES_PASSWORD: mocklab
+    ports:
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mocklab -d mocklab"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+    restart: unless-stopped
+volumes:
+  postgres_data:

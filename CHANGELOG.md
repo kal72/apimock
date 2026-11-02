@@ -8,6 +8,8 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Added
 
+- Add Light, Night, and System appearance modes with a saved browser preference and automatic device-theme updates. Moonlight uses dark navy surfaces, static stars, and a softly lit crescent moon outside the editor content. No data migration is required.
+
 - Add bounded Node canvas zoom (50%–200% in 25% steps), a percentage/reset control, and zoom-aware dragging and node reveal. Zoom preserves the viewport center and does not change saved node coordinates. No migration is required.
 
 - Typed Header, Query Params, Body, and Path Params condition groups with 1–50 fields, AND/OR matching, and per-field required checks.
@@ -64,6 +66,8 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Changed
 
+- Apply the Cloudline visual theme with a navy sidebar, azure actions, pale sky gradients, static cloud silhouettes, and consistent Node/Table/dialog styling. Preserve existing flows and editor behavior; no migration is required.
+
 - Standardize the web interface on English, including Node/Table editors, dialogs, validation, notifications, and accessibility labels. Existing user-created content and mock responses are preserved. No migration is required.
 
 - Preserve legacy single-field conditions in runtime; the editor represents them as typed one-rule groups with required disabled. No database migration is required.
@@ -113,6 +117,10 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 - Local binding by default and loopback host port mappings in development Compose. Production uses a TLS proxy and a shared administrator boundary; per-user authorization is not available yet.
 
 ### Verification notes and limitations
+
+- Appearance verification passed: 44 JavaScript tests, application build, and desktop browser checks of Light/Night switching, reload persistence, Node canvas, Table surfaces, and response dialogs. System-theme changes and blocked storage are covered by unit tests. Screenshot: docs/screenshots/moonlight-theme.jpg.
+
+- Cloudline application build and desktop browser review passed for Node canvas, zoom controls, Table layout, and the shared response popup. Screenshot: docs/screenshots/cloudline-theme.jpg. Full mobile/accessibility audits remain pending.
 
 - Canvas zoom verification passed: 42 JavaScript tests and application build. Browser checks confirmed 50%/200% limits disable the corresponding controls, reset returns to 100%, and zoom leaves the endpoint saved. Screenshot: docs/screenshots/canvas-zoom.jpg.
 

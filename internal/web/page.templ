@@ -7,6 +7,9 @@ templ Page() {
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Mocklab — API workspace</title>
+  <script>
+   try { const value = localStorage.getItem('mocklab-theme'); const night = value === 'night' || !['light','night'].includes(value) && matchMedia('(prefers-color-scheme: dark)').matches; document.documentElement.dataset.theme = night ? 'night' : 'light'; document.documentElement.style.colorScheme = night ? 'dark' : 'light'; } catch { document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'light'; }
+  </script>
   <link rel="stylesheet" href="/assets/app.css"/>
   <script type="module" src="/assets/app.js"></script>
  </head>
@@ -42,7 +45,7 @@ templ Page() {
 
 templ Sidebar() {
  <aside class="sidebar">
-  <a href="/app" class="brand"><span class="brand-symbol">m</span><span>mocklab<span class="brand-period">.</span></span><span class="badge">BETA</span></a>
+  <a href="/app" class="brand"><span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M9 24h15a6 6 0 0 0 .4-12A9 9 0 0 0 7 11a6.6 6.6 0 0 0 2 13Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="m13 15-3 3 3 3m6-6 3 3-3 3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>mocklab<span class="brand-period">.</span></span><span class="badge">BETA</span></a>
   <div class="sidebar-label">WORKSPACE <button aria-label="Add workspace" @click="openWorkspace()">+</button></div>
   <select class="workspace-select" aria-label="Select workspace" x-model="workspaceID" @change="selectWorkspace(workspaceID)"><option value="">Select workspace</option><template x-for="w in workspaces" :key="w.id"><option :value="w.id" x-text="w.name"></option></template></select>
   <div class="workspace-actions" x-show="workspace"><button @click="openWorkspace(workspace)">Edit workspace</button><button @click="removeWorkspace()">Delete</button></div>
@@ -56,7 +59,7 @@ templ Sidebar() {
 }
 
 templ Toolbar() {
- <header class="toolbar"><div class="breadcrumbs"><span>Workspaces</span><span>/</span><strong x-text="workspace?.name || 'Overview'"></strong><span class="unsaved" x-show="dirty" x-cloak>Unsaved</span></div><div class="flex gap-2 items-center"><span class="local-badge">● LOCAL</span><button class="btn primary" :disabled="!readyToSave" @click="saveEndpoint()" x-text="busy ? 'Saving…' : dirty ? 'Save changes' : 'Saved'"></button></div></header>
+ <header class="toolbar"><div class="breadcrumbs"><span>Workspaces</span><span>/</span><strong x-text="workspace?.name || 'Overview'"></strong><span class="unsaved" x-show="dirty" x-cloak>Unsaved</span></div><div class="flex gap-2 items-center"><label class="theme-picker"><span aria-hidden="true">◐</span><select aria-label="Color theme" x-model="$store.theme.preference" @change="$store.theme.set($event.target.value)"><option value="light">Light</option><option value="night">Night</option><option value="system">System</option></select></label><span class="local-badge">● LOCAL</span><button class="btn primary" :disabled="!readyToSave" @click="saveEndpoint()" x-text="busy ? 'Saving…' : dirty ? 'Save changes' : 'Saved'"></button></div></header>
 }
 
 templ EndpointBar() {

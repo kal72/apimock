@@ -1,6 +1,6 @@
 # Mocklab roadmap
 
-Last updated: **2026-10-31**.
+Last updated: **2026-11-02**.
 
 This roadmap tracks implementation scope, not promised release dates. No version or Git tag has been released. Available features remain part of an MVP. Internal deployment uses the application host and /public/{workspace-slug}; no domain is provisioned by the application.
 
@@ -61,6 +61,8 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | --- | --- | --- | --- | --- |
 | U01 | Response setup | Unconditional default response | Done | Every new endpoint includes one connected default response; edit it from the row Action without adding conditions. |
 | U02 | Response setup | Condition-only creation and templates | Done | Node selects a type from a catalog and creates a connected draft immediately; Table uses the complete popup. Each typed node supports multiple fields, AND/OR, required, and response/default presets. |
+| U07 | Appearance | Light / Night / System | Done | Persistent browser preference, automatic system appearance, and Moonlight night surfaces with static stars and a crescent moon. |
+| U06 | Visual design | Cloudline theme | Done | Navy sidebar, azure actions, sky gradients, subtle static cloud silhouettes, and unified editor/dialog colors. |
 | U05 | Node canvas | Bounded canvas zoom | Done | Zoom controls support 50%–200%, 25% steps, reset to 100%, viewport centering, and zoom-aware dragging. |
 | U04 | Interface language | English web interface | Done | Navigation, editors, dialogs, validation, notifications, and accessibility labels use English. User-authored content is preserved. |
 | U03 | UX | Flow-ordered Table rows with one complete editor | Done | Each row represents a request-to-response path; all field edits are in its Action popup. Nested legacy graphs remain intact and path projection is capped at 128. |

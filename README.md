@@ -185,3 +185,7 @@ References: [Go releases](https://go.dev/dl/), [templ tooling](https://templ.gui
 The web interface uses English for navigation, editors, validation, and notifications. Workspace names, endpoint labels, and mock response content remain user-defined.
 
 In Node mode, use the canvas −/+ controls to zoom from 50% to 200% in 25% steps. Click the percentage to reset to 100%. Zoom affects only the view; dragging remains accurate and saved node coordinates are unchanged by zooming.
+
+The Cloudline interface combines a navy sidebar, azure controls, soft sky gradients, and static cloud silhouettes. Tables and dialogs retain solid surfaces for readability; decorative patterns never intercept editor input.
+
+Use the toolbar Color theme selector for Light (Cloudline), Night (Moonlight), or System. The default follows your device; explicit preferences are saved in this browser. Night uses solid dark editor surfaces and static moon/stars behind the workspace. Theme changes do not affect mock flows or responses.

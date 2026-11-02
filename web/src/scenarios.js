@@ -123,7 +123,7 @@ export function scenarioForm(endpoint, flow, row) {
     fallback: fallbackResponse && fallbackResponse.id !== row.responseID ? responseForm(fallbackResponse) : null,
     legacyHeaders: row.headerIDs.map(id => ({ id, label: flow.nodes.find(node => node.id === id).label, headers: Object.entries(flow.nodes.find(node => node.id === id).config.headers || {}).map(([key, value]) => ({ key, value })) })),
     legacyDelays: row.delayIDs.map(id => ({ id, label: flow.nodes.find(node => node.id === id).label, delay_ms: flow.nodes.find(node => node.id === id).config.delay_ms })),
-    connections: row.pathIDs.slice(0, -1).map((id, index) => clone(flow.edges.find(edge => edge.from === id && edge.to === row.pathIDs[index + 1] && (flow.nodes.find(node => node.id === id).type !== 'condition' || edge.branch === String(row.conditions.find(item => item.id === id).matched))))),
+    connections: row.pathIDs.slice(0, -1).map((id, index) => flow.edges.find(edge => edge.from === id && edge.to === row.pathIDs[index + 1] && (flow.nodes.find(node => node.id === id).type !== 'condition' || edge.branch === String(row.conditions.find(item => item.id === id)?.matched)))).filter(Boolean).map(clone),
     isDefault: row.isDefault, label: row.label
   };
 }

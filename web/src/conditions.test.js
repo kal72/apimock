@@ -36,12 +36,12 @@ test('Node palette selection creates and connects immediately without opening an
   state.quickAddCondition('header');assert.ok(flowConditionWarnings(state.endpoint.flow).some(warning=>warning.includes('equivalent')));
 });
 
-test('a selected matching output inserts an additional typed check before success',()=>{
+test('new conditions remain independent scenarios even if an old output was selected',()=>{
   const state=editor();state.quickAddCondition('header');const header=state.conditions[0];const previous=state.targetFor(header.id,'true');
   state.connecting={from:header.id,branch:'true'};state.quickAddCondition('query');
   const query=state.conditions.find(node=>node.config.condition_type==='query');
-  assert.equal(state.targetFor(header.id,'true'),query.id);assert.equal(state.targetFor(query.id,'true'),previous);
-  assert.deepEqual(state.flowIssues,[]);assert.equal(state.responses.length,2);
+  assert.equal(state.targetFor(header.id,'true'),previous);assert.equal(state.targetFor(header.id,'false'),query.id);
+  assert.deepEqual(state.flowIssues,[]);assert.equal(state.responses.length,3);
 });
 
 test('path quick-add is disabled and does not mutate a route without parameters',()=>{

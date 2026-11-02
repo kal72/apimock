@@ -27,8 +27,9 @@ type Endpoint struct {
 	Flow        Flow   `json:"flow"`
 }
 type Flow struct {
-	Nodes []Node `json:"nodes"`
-	Edges []Edge `json:"edges"`
+	Layout string `json:"layout,omitempty"`
+	Nodes  []Node `json:"nodes"`
+	Edges  []Edge `json:"edges"`
 }
 type Node struct {
 	ID     string  `json:"id"`

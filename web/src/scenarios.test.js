@@ -87,12 +87,15 @@ test('default editing retains existing condition paths', () => {
   assert.equal(state.scenarioRows[0].status, 200); assert.deepEqual(state.flowIssues, []);
 });
 
-test('node edits open the same complete scenario popup as table actions', () => {
+test('node edits scope the popup to the selected node and Table keeps the full editor', () => {
   const state = editor(); addConditionScenario(state.endpoint.flow, 'custom');
   state.editNodeScenario(state.conditions[0]);
-  assert.equal(state.modal, 'scenario'); assert.ok(state.scenarioForm.response);
+  assert.equal(state.modal, 'scenario'); assert.equal(state.scenarioForm.response,null);
+  assert.equal(state.scenarioTab,'conditions');assert.equal(state.scenarioForm.conditions.length,1);
+  assert.deepEqual(state.scenarioForm.connections,[]);
   assert.ok(state.scenarioForm.conditions.some(item => item.matched));
-  state.editNodeScenario(state.requestNode); assert.equal(state.scenarioForm.isDefault, true);
+  state.editNodeScenario(state.requestNode); assert.equal(state.scenarioTab,'request');assert.equal(state.scenarioScope.type,'request');
+  state.editScenario(state.scenarioRows[0]);assert.equal(state.scenarioScope,null);assert.ok(state.scenarioForm.response);
 });
 
 test('removing a condition retains default and subsequent rules', () => {
@@ -118,4 +121,26 @@ test('path enumeration is bounded while default traversal stays available', () =
   const projection = projectScenarios(flow, 8);
   assert.equal(projection.rows.length, 8); assert.equal(projection.truncated, true);
   assert.equal(defaultScenario(flow).responseID, 'response');
+});
+
+test('editing one condition node preserves every other node and all connections',()=>{
+  const state=editor();addConditionScenario(state.endpoint.flow,'header');addConditionScenario(state.endpoint.flow,'query');
+  const selected=state.conditions[1],before=structuredClone(state.endpoint.flow);
+  state.editNodeScenario(selected);state.scenarioForm.conditions[0].label='Updated query';state.saveScenario();
+  assert.equal(state.modal,null);assert.deepEqual(state.endpoint.flow.edges,before.edges);
+  for(const node of before.nodes){if(node.id!==selected.id)assert.deepEqual(state.endpoint.flow.nodes.find(item=>item.id===node.id),node);}
+  assert.equal(state.endpoint.flow.nodes.find(item=>item.id===selected.id).label,'Updated query');
+});
+
+test('Table keeps distinct node paths that converge on one response',()=>{
+  const state=editor();addConditionScenario(state.endpoint.flow,'header');
+  const condition=state.conditions[0],response=state.responses[0];
+  state.endpoint.flow.edges.filter(edge=>edge.from===condition.id).forEach(edge=>edge.to=response.id);
+  const rows=projectScenarios(state.endpoint.flow).rows;
+  assert.equal(rows.length,2);assert.equal(rows[0].responseID,rows[1].responseID);
+  assert.notEqual(rows[0].key,rows[1].key);
+  assert.equal(state.scenarioConditionDetails(rows[0])[0].matched,true);
+  assert.equal(state.scenarioConditionDetails(rows[1])[0].matched,false);
+  assert.equal(state.scenarioConditionDetails(rows[0])[0].name,condition.label);
+  assert.ok(state.scenarioConditionDetails(rows[0])[0].summary.includes('Authorization'));
 });

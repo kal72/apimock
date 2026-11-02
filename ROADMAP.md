@@ -61,6 +61,10 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | --- | --- | --- | --- | --- |
 | U01 | Response setup | Unconditional default response | Done | Every new endpoint includes one connected default response; edit it from the row Action without adding conditions. |
 | U02 | Response setup | Condition-only creation and templates | Done | Node selects a type from a catalog and creates a connected draft immediately; Table uses the complete popup. Each typed node supports multiple fields, AND/OR, required, and response/default presets. |
+| U11 | Scenario priority | First-match branch canvas | Done | Independent conditions branch from Incoming Request, priorities are reorderable in Node/Table, default stays last, and response destinations remain editable. Nested legacy graphs retain their original editor. |
+| U10 | Table preview | Four-column read-only View | Done | View shows Request, Conditions, effective Response Headers, and formatted Response Body; adapts to two/one columns on smaller screens. |
+| U09 | Table flow | One node path per row | Done | Request Path shows endpoint name, HTTP method and URL path. Conditions shows match outcomes and rules without condition names. The separate Node Flow column is removed; distinct paths that converge remain separate rows. |
+| U08 | Node editing | Scoped node forms | Done | Node Edit opens only its own Request, Condition, Response, Headers, or Delay form. Table retains the complete path popup. |
 | U07 | Appearance | Light / Night / System | Done | Persistent browser preference, automatic system appearance, and Moonlight night surfaces with static stars and a crescent moon. |
 | U06 | Visual design | Cloudline theme | Done | Navy sidebar, azure actions, sky gradients, subtle static cloud silhouettes, and unified editor/dialog colors. |
 | U05 | Node canvas | Bounded canvas zoom | Done | Zoom controls support 50%–200%, 25% steps, reset to 100%, viewport centering, and zoom-aware dragging. |

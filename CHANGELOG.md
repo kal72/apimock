@@ -8,6 +8,10 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Added
 
+- Add first-match scenario branches using the existing Incoming Request, Condition, and Response nodes. Conditions have reorderable priorities in Node and Table; default response is always last and cannot be prioritized. Priority changes update the persisted execution order and are undoable.
+
+- Add a read-only Table View action with four detail columns: Request, Conditions, effective Response Headers, and formatted Response Body. Include status, accumulated delay, request examples, and draft indication; no API request is executed. Smaller screens use two or one column.
+
 - Add Light, Night, and System appearance modes with a saved browser preference and automatic device-theme updates. Moonlight uses dark navy surfaces, static stars, and a softly lit crescent moon outside the editor content. No data migration is required.
 
 - Add bounded Node canvas zoom (50%–200% in 25% steps), a percentage/reset control, and zoom-aware dragging and node reveal. Zoom preserves the viewport center and does not change saved node coordinates. No migration is required.
@@ -66,6 +70,14 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Changed
 
+- Display independent condition scenarios as direct Incoming Request branches with no visible No edges, and one Table row per scenario plus default. Keep scoped node editing, editable response destinations, and bounded zoom. Existing linear fallback graphs use the new presentation without changing evaluation semantics; nested graphs and legacy header/delay chains retain their original graph editor. The optional flow.layout field stores canvas presentation; no database migration is required.
+
+- Simplify the Table Conditions column by hiding condition names; retain match outcomes and rules.
+
+- Remove Node Flow from Table mode. Conditions now display each condition name, match outcome, and rules while preserving one request-to-response path per row.
+
+- Present each Table row as one complete request-to-response node chain with explicit Yes/No branches. Request Path now shows the endpoint name, HTTP method, and URL path. Distinct paths remain separate even when they share a response; Action Edit retains full path editing.
+
 - Apply the Cloudline visual theme with a navy sidebar, azure actions, pale sky gradients, static cloud silhouettes, and consistent Node/Table/dialog styling. Preserve existing flows and editor behavior; no migration is required.
 
 - Standardize the web interface on English, including Node/Table editors, dialogs, validation, notifications, and accessibility labels. Existing user-created content and mock responses are preserved. No migration is required.
@@ -92,6 +104,8 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Fixed
 
+- Scope Node Edit to the selected node instead of opening the complete path editor. Preserve other nodes and connections; Table Action Edit retains the full path popup. No migration is required.
+
 - Restore a missing direct success response without requiring a condition or manual edge repair.
 - Allow response templates to update terminal responses through an unconditional header/delay chain.
 - Preserve newer local edits and endpoint selection when an earlier save request completes.
@@ -117,6 +131,16 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 - Local binding by default and loopback host port mappings in development Compose. Production uses a TLS proxy and a shared administrator boundary; per-user authorization is not available yet.
 
 ### Verification notes and limitations
+
+- Scenario-priority checks passed: 53 JavaScript tests, Go race tests, go vet, and application build. Browser QA covered Node/Table priority controls, undo, and persisted order after reload. A real mock with two matching conditions changed from 201 to 202 after raising the second condition; unmatched requests retained default 404. Screenshot: docs/screenshots/scenario-priority.jpg.
+
+- Table View checks passed: 48 JavaScript tests, application build, and desktop browser verification of all four read-only columns, formatted JSON, and unchanged saved state after closing View. Screenshot: docs/screenshots/table-view.jpg.
+
+- Named-condition Table checks passed: 46 JavaScript tests, application build, and browser verification of the removed Node Flow column and condition names, outcomes, and rules. Screenshot: docs/screenshots/table-named-conditions.jpg.
+
+- Table node-flow verification passed: 46 JavaScript tests, application build, and desktop browser review of endpoint name/path, single-line node chains, and distinct Yes/No rows. Wide chains scroll horizontally without overlapping adjacent columns. Screenshot: docs/screenshots/table-node-flow.jpg.
+
+- Scoped-node verification passed: 45 JavaScript tests, application/container builds, and browser checks of Condition, Request, and Response node forms plus the full Table popup. Screenshot: docs/screenshots/scoped-node-editor.jpg.
 
 - Appearance verification passed: 44 JavaScript tests, application build, and desktop browser checks of Light/Night switching, reload persistence, Node canvas, Table surfaces, and response dialogs. System-theme changes and blocked storage are covered by unit tests. Screenshot: docs/screenshots/moonlight-theme.jpg.
 

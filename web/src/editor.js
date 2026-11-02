@@ -1,3 +1,5 @@
+import { scenarioBranches, arrangeBranches, branchEdges, branchRows, setPriority } from './branches.js';
+import { formatValue, pathPreview } from './preview.js';
 import { conditionKinds, pathParameters, typedCondition, normalizeCondition, conditionDiagnostics, conditionSummary, conditionKindLabel, flowConditionWarnings } from './conditions.js';
 import { conditionTemplates, responseTemplates, projectScenarios, defaultScenario, addConditionScenario, applyResponseTemplate, responseForm, scenarioForm, removeScenario } from './scenarios.js';
 import { clone, defaultExample, defaultFlow, outgoingBranches, setConnection, insertBlock, graphIssues, nodeRows, connectionPoints, parseObject, headersFromRows, preferredResponse, directResponseFlow, removeConfiguration } from './flow.js';
@@ -5,7 +7,8 @@ import { clone, defaultExample, defaultFlow, outgoingBranches, setConnection, in
 export const createEditor = () => ({
   workspaces:[], endpoints:[], workspaceID:'', workspace:null, endpoint:null, publicOrigin:'',
   methods:['GET','POST','PUT','PATCH','DELETE','HEAD','OPTIONS'],
-  conditionKinds, conditionTemplates, responseTemplates, scenarioForm:null, scenarioDraft:null, scenarioTab:'response', scenarioTemplate:'header', scenarioIsNew:false,
+  preview:null, formatValue,
+  conditionKinds, conditionTemplates, responseTemplates, scenarioForm:null, scenarioDraft:null, scenarioScope:null, scenarioTab:'response', scenarioTemplate:'header', scenarioIsNew:false,
   highlightedNodeID:null, mode:'table', search:'', modal:null, dialogError:'', notice:'', busy:false, dirty:false,
   workspaceForm:{}, endpointForm:{}, nodeForm:null, headerRows:[], connecting:null, drag:null, zoom:1, minZoom:0.5, maxZoom:2, zoomStep:0.25,
   nodeSection:'all', directResponseID:'', pendingSummary:'', undoSnapshot:null, requestRoute:{}, paramsText:'{}', queryText:'{}', requestBodyText:'{}',
@@ -23,7 +26,11 @@ export const createEditor = () => ({
   get conditionWarnings(){return this.endpoint ? flowConditionWarnings(this.endpoint.flow) : [];},
   get scenarioConditionWarnings(){return (this.scenarioForm?.conditions || []).flatMap(condition => conditionDiagnostics(condition.config,this.scenarioForm.route.path).warnings);},
   get availablePathFields(){return pathParameters(this.scenarioForm?.route.path || this.endpoint?.path || '');},
-  get scenarioProjection(){return this.endpoint ? projectScenarios(this.endpoint.flow) : {rows:[],truncated:false};},
+  get branchModel(){return this.endpoint?scenarioBranches(this.endpoint.flow):null;},
+  get canvasEdges(){return this.endpoint?branchEdges(this.endpoint.flow):[];},
+  get scenarioProjection(){const rows=this.endpoint?branchRows(this.endpoint.flow):null;return rows?{rows,truncated:false}:this.endpoint?projectScenarios(this.endpoint.flow):{rows:[],truncated:false};},
+  priorityFor(id){return this.branchModel?.branches.find(item=>item.condition.id===id)?.priority || null;},
+  changePriority(id,value){if(this.priorityFor(id)===Number(value))return;try{const flow=clone(this.endpoint.flow);setPriority(flow,id,Number(value));this.rememberChange();this.endpoint.flow=flow;this.dirty=true;this.trace=[];this.testResult=null;this.connecting=null;}catch(error){this.notify(error.message);}},
   get scenarioRows(){return this.scenarioProjection.rows;},
   get fallbackRow(){return this.endpoint ? defaultScenario(this.endpoint.flow) : null;},
   get filteredEndpoints(){return this.endpoints.filter(e=>(e.path+' '+e.name+' '+e.method).toLowerCase().includes(this.search.toLowerCase()));},
@@ -41,7 +48,7 @@ export const createEditor = () => ({
   get flowIssues(){return this.endpoint ? graphIssues(this.endpoint.flow) : [];},
   get insertionSources(){return this.orderedNodes.filter(node => node.type !== 'response');},
   get baseURL(){return `${this.publicOrigin || location.origin}/public/${this.workspace?.slug || ''}`;},
-  get modalTitle(){return {workspace:this.workspaceForm.id?'Edit workspace':'New workspace',endpoint:'New endpoint',templates:'Add configuration',node:this.nodeForm?.type === 'request' ? 'Edit incoming request' : 'Edit configuration',connection:'Edit connection',direct:'Use an unconditional response',palette:'Add condition node',scenario:this.scenarioIsNew ? 'Add condition' : 'Edit path · ' + (this.scenarioForm?.label || '')}[this.modal] || '';},
+  get modalTitle(){return {view:'View request path',workspace:this.workspaceForm.id?'Edit workspace':'New workspace',endpoint:'New endpoint',templates:'Add configuration',node:this.nodeForm?.type === 'request' ? 'Edit incoming request' : 'Edit configuration',connection:'Edit connection',direct:'Use an unconditional response',palette:'Add condition node',scenario:this.scenarioScope ? 'Edit node · '+this.scenarioScope.label : this.scenarioIsNew ? 'Add condition' : 'Edit path · ' + (this.scenarioForm?.label || '')}[this.modal] || '';},
   async request(url,method='GET',data){
     const response=await fetch(url,{method,headers:{'Content-Type':'application/json'},body:data===undefined?undefined:JSON.stringify(data)});
     const result=await response.json();if(!response.ok)throw Error(result.error || 'Request failed');return result;
@@ -57,7 +64,7 @@ export const createEditor = () => ({
     if(!this.mayDiscard()){this.workspaceID=this.workspace?.id || '';return;}
     try{const endpoints=id?await this.request(`/api/workspaces/${id}/endpoints`):[];this.workspaceID=id;this.workspace=this.workspaces.find(w=>w.id===id)||null;this.endpoints=endpoints;this.endpoint=null;this.dirty=false;this.trace=[];this.testResult=null;if(endpoints.length)this.selectEndpoint(endpoints[0]);}catch(error){this.workspaceID=this.workspace?.id || '';this.notify(error.message);}
   },
-  selectEndpoint(endpoint){if(!this.mayDiscard())return;this.endpoint=clone(endpoint);this.dirty=false;this.trace=[];this.testResult=null;this.connecting=null;this.pendingFlow=null;this.pendingSummary='';this.undoSnapshot=null;this.highlightedNodeID=null;this.insertAfter=this.requestNode?.id || '';this.testInput=JSON.stringify(this.requestNode?.config.example || defaultExample(),null,2);},
+  selectEndpoint(endpoint){if(!this.mayDiscard())return;this.endpoint=clone(endpoint);if(this.endpoint.flow.layout!=='scenarios')arrangeBranches(this.endpoint.flow);this.dirty=false;this.trace=[];this.testResult=null;this.connecting=null;this.pendingFlow=null;this.pendingSummary='';this.undoSnapshot=null;this.highlightedNodeID=null;this.insertAfter=this.requestNode?.id || '';this.testInput=JSON.stringify(this.requestNode?.config.example || defaultExample(),null,2);},
   openWorkspace(workspace){this.workspaceForm=workspace?clone(workspace):{name:'',slug:''};this.modal='workspace';},
   async saveWorkspace(){this.busy=true;try{const w=this.workspaceForm;const saved=await this.request('/api/workspaces'+(w.id?`/${w.id}`:''),w.id?'PUT':'POST',w);this.workspaces=await this.request('/api/workspaces');this.modal=null;if(this.workspace?.id===saved.id){this.workspace=saved;}else{await this.selectWorkspace(saved.id);}this.notify('Workspace saved.');}catch(error){this.dialogError=error.message;}finally{this.busy=false;}},
   async removeWorkspace(){if(!this.workspace||!window.confirm(`Delete workspace "${this.workspace.name}" and all its endpoints?`))return;try{await this.request(`/api/workspaces/${this.workspace.id}`,'DELETE');this.workspaces=this.workspaces.filter(w=>w.id!==this.workspace.id);this.dirty=false;await this.selectWorkspace(this.workspaces[0]?.id || '');}catch(error){this.notify(error.message);}},
@@ -98,20 +105,21 @@ export const createEditor = () => ({
   },
   async removeEndpoint(){if(!window.confirm('Delete this endpoint?'))return;try{await this.request(`/api/workspaces/${this.workspace.id}/endpoints/${this.endpoint.id}`,'DELETE');this.endpoints=this.endpoints.filter(e=>e.id!==this.endpoint.id);this.endpoint=null;this.dirty=false;this.trace=[];this.testResult=null;if(this.endpoints.length)this.selectEndpoint(this.endpoints[0]);}catch(error){this.notify(error.message);}},
   openAddScenario(){
+    this.scenarioScope=null;
     try{
       if(this.mode === 'node'){this.modal='palette';this.dialogError='';return;}
       this.scenarioIsNew=true;this.scenarioTemplate='header';this.scenarioTab='conditions';
       const candidate=clone(this.endpoint.flow);
       const row=addConditionScenario(candidate,'header',{path:this.endpoint.path,example:this.requestNode?.config.example});
-      this.scenarioDraft=candidate;this.scenarioForm=scenarioForm(this.endpoint,candidate,row);this.modal='scenario';this.dialogError='';
+      this.scenarioDraft=candidate;this.scenarioForm=scenarioForm(this.endpoint,candidate,this.branchRowFor(candidate,row));if(this.branchModel){arrangeBranches(candidate);this.scenarioForm.connections=this.scenarioForm.connections.filter(edge=>candidate.nodes.find(node=>node.id===edge.from)?.type==='condition');}this.modal='scenario';this.dialogError='';
     }catch(error){this.notify(error.message);}
   },
   quickAddCondition(kind){
     try{
       const candidate=clone(this.endpoint.flow);
-      const row=addConditionScenario(candidate,kind,{path:this.endpoint.path,example:this.requestNode?.config.example,source:this.connecting});
+      const row=addConditionScenario(candidate,kind,{path:this.endpoint.path,example:this.requestNode?.config.example,source:this.branchModel?null:this.connecting});
       const issues=graphIssues(candidate);if(issues.length)throw Error(issues.join(' '));
-      this.rememberChange();this.endpoint.flow=candidate;this.dirty=true;this.trace=[];this.testResult=null;this.modal=null;this.connecting=null;
+      if(this.branchModel)arrangeBranches(candidate);this.rememberChange();this.endpoint.flow=candidate;this.dirty=true;this.trace=[];this.testResult=null;this.modal=null;this.connecting=null;
       const added=candidate.nodes.find(node=>node.type==='condition' && !this.undoSnapshot.flow.nodes.some(old=>old.id===node.id));this.highlightedNodeID=added.id;
       this.$nextTick?.(()=>{this.$root?.querySelector('.canvas-scroll')?.scrollTo({left:Math.max(0,(added.x-80)*this.zoom),top:Math.max(0,(added.y-80)*this.zoom),behavior:'smooth'});});
       const warnings=flowConditionWarnings(candidate);this.notify(`${conditionKindLabel(added.config)} added and connected as a draft. Use Edit to add fields.${warnings.length ? ' '+warnings.at(-1) : ''}`);
@@ -130,17 +138,25 @@ export const createEditor = () => ({
     try{
       const candidate=clone(this.endpoint.flow);
       const row=addConditionScenario(candidate,key,{path:this.endpoint.path,example:this.requestNode?.config.example});
-      this.scenarioDraft=candidate;this.scenarioForm=scenarioForm(this.endpoint,candidate,row);this.scenarioTemplate=key;this.dialogError='';
+      this.scenarioDraft=candidate;this.scenarioForm=scenarioForm(this.endpoint,candidate,this.branchRowFor(candidate,row));if(this.branchModel)this.scenarioForm.connections=this.scenarioForm.connections.filter(edge=>candidate.nodes.find(node=>node.id===edge.from)?.type==='condition');this.scenarioTemplate=key;this.dialogError='';
     }catch(error){this.dialogError=error.message;}
   },
+  branchRowFor(flow,row){return branchRows(flow)?.find(item=>item.conditions.some(condition=>row.conditions?.some(old=>old.id===condition.id && old.matched))) || row;},
+  viewScenario(row){this.preview=pathPreview(this.endpoint,row,this.baseURL);this.modal='view';this.dialogError='';},
   editScenario(row){
     if(!row)return;
     const candidate=clone(this.endpoint.flow);
-    this.scenarioIsNew=false;this.scenarioDraft=candidate;this.scenarioForm=scenarioForm(this.endpoint,candidate,row);this.scenarioTab='response';this.modal='scenario';this.dialogError='';
+    this.scenarioScope=null;this.scenarioIsNew=false;this.scenarioDraft=candidate;this.scenarioForm=scenarioForm(this.endpoint,candidate,row);this.scenarioTab='response';if(this.branchModel)this.scenarioForm.connections=this.scenarioForm.connections.filter(edge=>candidate.nodes.find(node=>node.id===edge.from)?.type==='condition');this.modal='scenario';this.dialogError='';
   },
   editNodeScenario(node){
-    const row=node.type === 'request' ? this.fallbackRow : this.scenarioRows.find(item => node.type === 'condition' ? item.conditions.some(condition => condition.id === node.id && condition.matched) : item.pathIDs.includes(node.id));
-    this.editScenario(row);
+    const candidate=clone(this.endpoint.flow);
+    const row={conditions:node.type==='condition'?[{id:node.id,matched:true}]:[],responseID:node.type==='response'?node.id:this.responses[0]?.id,pathIDs:[node.id],headerIDs:node.type==='headers'?[node.id]:[],delayIDs:node.type==='delay'?[node.id]:[],isDefault:false,label:node.label};
+    this.scenarioIsNew=false;this.scenarioScope={id:node.id,type:node.type,label:node.label};
+    this.scenarioDraft=candidate;this.scenarioForm=scenarioForm(this.endpoint,candidate,row);
+    this.scenarioForm.fallback=null;this.scenarioForm.connections=[];
+    if(node.type!=='response')this.scenarioForm.response=null;
+    this.scenarioTab={request:'request',condition:'conditions',response:'response',headers:'advanced',delay:'advanced'}[node.type];
+    this.modal='scenario';this.dialogError='';
   },
   selectScenarioResponseTemplate(section,key){
     try{
@@ -153,6 +169,7 @@ export const createEditor = () => ({
     let validationSection='request';
     try{
       const form=this.scenarioForm, candidate=clone(this.scenarioDraft);
+      if(!this.scenarioScope || this.scenarioScope.type==='request'){
       if(!form.route.name.trim() || !form.route.path.startsWith('/') || !this.methods.includes(form.route.method))throw Error('Endpoint name, method, and path must be valid.');
       const params=parseObject(form.params,'Path parameters'), query=parseObject(form.query,'Query parameters');
       let body={},rawBody='',formFields={};
@@ -160,6 +177,7 @@ export const createEditor = () => ({
       if(Object.values(params).some(value=>typeof value!=='string'))throw Error('Path parameters must be strings.');
       if(Object.values(query).some(value=>!Array.isArray(value)||value.some(item=>typeof item!=='string')))throw Error('Query parameters must be arrays of strings.');
       candidate.nodes.find(node=>node.id===form.requestID).config.example={params,query,body,headers:headersFromRows(form.headers),body_mode:form.bodyMode,raw_body:rawBody,form:formFields};
+      }
       validationSection='conditions';
       for(const condition of form.conditions){
         const diagnostics=conditionDiagnostics(condition.config,form.route.path);if(!condition.label.trim() || diagnostics.errors.length)throw Error(diagnostics.errors.join(' ') || 'Condition name is required.');
@@ -177,9 +195,11 @@ export const createEditor = () => ({
       for(const block of form.legacyHeaders)candidate.nodes.find(node=>node.id===block.id).config.headers=headersFromRows(block.headers);
       for(const block of form.legacyDelays){if(!Number.isInteger(block.delay_ms)||block.delay_ms<0||block.delay_ms>10000)throw Error('Delay must be 0–10000 ms.');candidate.nodes.find(node=>node.id===block.id).config.delay_ms=block.delay_ms;}
       for(const edge of form.connections)setConnection(candidate,edge.from,edge.branch || '',edge.to);
+      if(this.branchModel){const seen=new Set();const visit=id=>{if(seen.has(id))return;seen.add(id);candidate.edges.filter(edge=>edge.from===id).forEach(edge=>visit(edge.to));};visit(this.requestNode.id);candidate.nodes=candidate.nodes.filter(node=>node.type!=='response'||seen.has(node.id));}
       const issues=graphIssues(candidate);if(issues.length)throw Error(issues.join(' '));
       validationSection='conditions';for(const node of candidate.nodes.filter(item=>item.type==='condition' && item.config.condition_type)){const errors=conditionDiagnostics(node.config,form.route.path).errors;if(errors.length)throw Error(node.label+': '+errors.join(' '));}
-      this.rememberChange();this.endpoint={...this.endpoint,...form.route,flow:candidate};this.testInput=JSON.stringify(candidate.nodes.find(node=>node.type==='request').config.example,null,2);this.dirty=true;this.trace=[];this.testResult=null;this.modal=null;this.scenarioDraft=null;
+      if(this.scenarioIsNew && this.branchModel)arrangeBranches(candidate);
+      this.rememberChange();this.endpoint={...this.endpoint,...(!this.scenarioScope || this.scenarioScope.type==='request'?form.route:{}),flow:candidate};this.testInput=JSON.stringify(candidate.nodes.find(node=>node.type==='request').config.example,null,2);this.dirty=true;this.trace=[];this.testResult=null;this.modal=null;this.scenarioDraft=null;
     }catch(error){this.scenarioTab=validationSection;this.dialogError=error.message;}
   },
   removeScenarioCondition(id){
@@ -188,6 +208,7 @@ export const createEditor = () => ({
       const candidate=clone(this.endpoint.flow);removeScenario(candidate,id);this.rememberChange();this.endpoint.flow=candidate;this.dirty=true;this.trace=[];this.modal=null;
     }catch(error){this.dialogError=error.message;}
   },
+  scenarioConditionDetails(row){return row.conditions.map(condition=>{const node=this.endpoint.flow.nodes.find(item=>item.id===condition.id);return {id:condition.id,name:node.label,matched:condition.matched,summary:conditionSummary(node.config)};});},
   scenarioPath(row){return row.pathIDs.map(id=>this.endpoint.flow.nodes.find(node=>node.id===id)?.label || id).join(' → ');},
   scenarioConditionSummary(row){return row.isDefault ? (row.conditions.length ? 'When no previous conditions match' : 'All incoming requests · no conditions') : row.conditions.map(item=>{const node=this.endpoint.flow.nodes.find(node=>node.id===item.id);return `${item.matched?'':'No match: '}${conditionSummary(node.config)}`;}).join(' · ');},
   scenarioHeaderCount(row){const nodes=[...row.headerIDs,row.responseID].map(id=>this.endpoint.flow.nodes.find(node=>node.id===id));return new Set(nodes.flatMap(node=>Object.keys(node.config.headers || {}).map(key=>key.toLowerCase()))).size;},
@@ -270,18 +291,33 @@ export const createEditor = () => ({
   targetFor(id,branch){return this.endpoint.flow.edges.find(edge => edge.from === id && (edge.branch || '') === branch)?.to || '';},
   branchesFor(id){const node=this.endpoint.flow.nodes.find(item => item.id === id);return node ? outgoingBranches(node) : [];},
   editConnection(edge){
+    if(this.branchModel){this.editScenarioConnection(edge.branch==='default'?null:edge.scenario?edge.to:edge.from);return;}
     this.originalConnection={...edge};this.connectionForm={from:edge.from,to:edge.to,branch:edge.branch || ''};this.modal='connection';this.dialogError='';
   },
   editNodeConnections(node){
+    if(this.branchModel){this.editScenarioConnection(node.type==='condition'?node.id:null);return;}
     const branch=outgoingBranches(node)[0];if(branch===undefined)return;
     const edge=this.endpoint.flow.edges.find(item => item.from === node.id && (item.branch || '') === branch);
     this.originalConnection=edge?{...edge}:null;this.connectionForm={from:node.id,to:edge?.to || '',branch};this.modal='connection';this.dialogError='';
   },
+  editScenarioConnection(conditionID){const model=this.branchModel;const item=model.branches.find(item=>item.condition.id===conditionID);this.connectionForm={from:conditionID || model.request.id,to:item?.response.id || model.fallback.id,branch:item?'true':'default'};this.originalConnection=null;this.modal='connection';this.dialogError='';},
   connectionSourceChanged(){this.connectionForm.branch=this.branchesFor(this.connectionForm.from)[0] || '';this.connectionBranchChanged();},
   connectionBranchChanged(){const edge=this.endpoint.flow.edges.find(item => item.from === this.connectionForm.from && (item.branch || '') === this.connectionForm.branch);this.originalConnection=edge?{...edge}:null;this.connectionForm.to=edge?.to || '';},
   saveConnection(){
     try{
       const flow=clone(this.endpoint.flow);
+      if(this.branchModel){
+        const target=flow.nodes.find(node=>node.id===this.connectionForm.to);
+        if(target?.type!=='response')throw Error('Choose a response node.');
+        const model=scenarioBranches(flow),id=this.connectionForm.from;
+        if(this.connectionForm.branch==='default'){
+          const last=model.branches.at(-1)?.condition.id || model.request.id;
+          flow.edges.find(edge=>edge.from===last && (edge.branch || '')===(model.branches.length?'false':'')).to=target.id;
+        }else flow.edges.find(edge=>edge.from===id && edge.branch==='true').to=target.id;
+        const reachable=new Set();const visit=id=>{if(reachable.has(id))return;reachable.add(id);flow.edges.filter(edge=>edge.from===id).forEach(edge=>visit(edge.to));};visit(model.request.id);
+        flow.nodes=flow.nodes.filter(node=>reachable.has(node.id));flow.edges=flow.edges.filter(edge=>reachable.has(edge.from)&&reachable.has(edge.to));
+        arrangeBranches(flow);this.rememberChange();this.endpoint.flow=flow;this.dirty=true;this.trace=[];this.modal=null;this.connecting=null;return;
+      }
       if(this.originalConnection)flow.edges=flow.edges.filter(edge => !(edge.from === this.originalConnection.from && (edge.branch || '') === (this.originalConnection.branch || '')));
       setConnection(flow,this.connectionForm.from,this.connectionForm.branch,this.connectionForm.to);
       this.rememberChange();this.endpoint.flow=flow;this.dirty=true;this.trace=[];this.modal=null;this.connecting=null;
@@ -293,10 +329,10 @@ export const createEditor = () => ({
     this.endpoint.flow.edges=this.endpoint.flow.edges.filter(edge => !(edge.from === this.originalConnection.from && (edge.branch || '') === (this.originalConnection.branch || '')));
     this.dirty=true;this.trace=[];this.modal=null;
   },
-  edgePoints(edge){return connectionPoints(this.endpoint.flow,edge);},
+  edgePoints(edge){const p=connectionPoints(this.endpoint.flow,edge);if(this.branchModel){const from=this.endpoint.flow.nodes.find(node=>node.id===edge.from);p.y1=from.y+110;}return p;},
   edgePath(edge){const p=this.edgePoints(edge);const bend=Math.max(70,Math.abs(p.x2-p.x1)/2);return `M${p.x1},${p.y1} C${p.x1+bend},${p.y1} ${p.x2-bend},${p.y2} ${p.x2},${p.y2}`;},
   edgeMid(edge){const p=this.edgePoints(edge);return{x:(p.x1+p.x2)/2,y:(p.y1+p.y2)/2-10};},
-  edgeTraced(edge){const index=this.trace.indexOf(edge.from);return index>=0&&this.trace[index+1]===edge.to;},
+  edgeTraced(edge){if(edge.scenario)return edge.branch==='default'?this.trace.includes(edge.to)&&!this.trace.some(id=>this.branchModel?.branches.some(item=>item.response.id===id)):this.trace.includes(edge.to)&&this.trace.includes(this.branchModel?.branches.find(item=>item.condition.id===edge.to)?.response.id);const index=this.trace.indexOf(edge.from);return index>=0&&this.trace[index+1]===edge.to;},
   conditionIcon(config){const c=normalizeCondition(config);return conditionKinds.find(kind=>kind.key===c.condition_type)?.icon || '◇';},
   conditionMeta(config){const c=normalizeCondition(config);return `${conditionKindLabel(c)}${c.condition_type==='body' ? ' · '+(c.body_mode==='form'?'Form':c.raw_format==='text'?'Raw Text':'Raw JSON') : ''} · ${c.match==='any'?'OR':'AND'} · ${c.rules.length} field`;},
   nodeIcon(type){return {request:'↳',condition:'◇',response:'↗',headers:'≡',delay:'◷'}[type] || '◇';},

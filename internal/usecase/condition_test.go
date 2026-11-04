@@ -2,8 +2,10 @@ package usecase
 
 import (
 	"apimock/internal/domain"
+	"context"
 	"encoding/json"
 	"net/http"
+	"strings"
 	"testing"
 )
 
@@ -80,5 +82,42 @@ func TestBodyFormRawAndJSONArrays(t *testing.T) {
 	r.RawBody = "   "
 	if conditionMatches(text, r, nil) {
 		t.Fatal("required text must reject whitespace")
+	}
+}
+
+func TestExplainConditionsPreservesExecution(t *testing.T) {
+	f := domain.DefaultFlow()
+	for i, id := range []string{"broad", "specific"} {
+		rule := domain.ConditionRule{Field: "status", Operator: "exists"}
+		if i == 1 {
+			rule.Operator = "equals"
+			rule.Value = "active"
+		}
+		f.Nodes = append(f.Nodes, domain.Node{ID: id, Type: "condition", Label: id, Config: group("query", "all", rule)})
+	}
+	f.Edges = []domain.Edge{{From: "request", To: "broad"}, {From: "broad", To: "response", Branch: "true"}, {From: "broad", To: "specific", Branch: "false"}, {From: "specific", To: "response", Branch: "true"}, {From: "specific", To: "response", Branch: "false"}}
+	for _, tc := range []struct {
+		query   map[string][]string
+		matched bool
+		visited bool
+	}{{map[string][]string{"status": {"active"}}, true, false}, {map[string][]string{}, false, true}} {
+		r := Request{Query: tc.query}
+		result, err := Evaluate(context.Background(), f, r, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		checks := ExplainConditions(f, r, nil, result.Trace)
+		if len(checks) != 2 || checks[1].Matched != tc.matched || checks[1].Evaluated != tc.visited || len(checks[1].Rules) != 1 {
+			t.Fatalf("unexpected diagnostics: %+v", checks)
+		}
+		again, err := Evaluate(context.Background(), f, r, nil)
+		if err != nil || again.Body != result.Body || len(again.Trace) != len(result.Trace) {
+			t.Fatal("diagnostics changed execution")
+		}
+	}
+	c := group("body", "all", domain.ConditionRule{Field: "id", Operator: "exists", Required: true})
+	checks := ExplainConditions(domain.Flow{Nodes: []domain.Node{{ID: "body", Type: "condition", Config: c}}}, Request{BodyFormat: "form"}, nil, nil)
+	if checks[0].Matched || !strings.Contains(checks[0].Reason, "format") {
+		t.Fatalf("format mismatch: %+v", checks)
 	}
 }

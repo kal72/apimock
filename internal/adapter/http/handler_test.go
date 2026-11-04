@@ -84,6 +84,14 @@ func TestPlayground(t *testing.T) {
 	if w.Code != 200 || result.Status != 200 || len(result.Trace) != 2 {
 		t.Fatalf("unexpected response %d: %s", w.Code, w.Body.String())
 	}
+	var explanation struct {
+		ResponseID string                   `json:"response_id"`
+		Conditions []usecase.ConditionCheck `json:"conditions"`
+	}
+	if err := json.Unmarshal(w.Body.Bytes(), &explanation); err != nil || explanation.ResponseID != "response" || explanation.Conditions == nil {
+		t.Fatalf("missing playground diagnostics: %s", w.Body.String())
+	}
+
 }
 
 func TestCreateEndpointWithoutFlowStartsConnected(t *testing.T) {

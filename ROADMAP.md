@@ -1,6 +1,6 @@
 # Mocklab roadmap
 
-Last updated: **2026-11-02**.
+Last updated: **2026-11-04**.
 
 This roadmap tracks implementation scope, not promised release dates. No version or Git tag has been released. Available features remain part of an MVP. Internal deployment uses the application host and /public/{workspace-slug}; no domain is provisioned by the application.
 
@@ -24,6 +24,8 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | F06 | Build | npm + Vite for asset builds only | Done | No npm server is required at runtime; assets are embedded with go:embed. |
 | F07 | Operations | Makefile, multi-stage Dockerfile, and Compose | Done | Binary/image builds passed; container runtime and health endpoint were checked. |
 | F08 | Operations | Structured logging, timeouts, and graceful shutdown | Done | Uses slog and the Go server lifecycle. |
+| CFX01 | Conditions | Priority conflict warnings and Playground diagnosis | Done | Conservative duplicate/shadow/possible-overlap analysis in independent typed scenarios; staged popup preview; chosen response and field checks distinguish actual execution from diagnostic-only checks. Nested legacy graphs and collective coverage are outside scope. |
+| WUX01 | Workspace UX | Compact workspace settings popover | Done | Owner settings beside selector; separate access label; grouped editing/membership and separated destructive action. |
 | M01 | Workspace | Create, read, update, and delete workspaces | Done | Unique slugs; deleting a workspace cascades to its endpoints. |
 | M02 | Workspace | Workspace slug as the mock base path | Done | Uses /public/{slug}; display names and slugs can be changed independently. |
 | M03 | Endpoint | REST endpoint CRUD | Done | The API stores method, path, name, and flow; the UI supports creation, selection, method/path/flow updates, and deletion. |
@@ -61,11 +63,14 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | --- | --- | --- | --- | --- |
 | U01 | Response setup | Unconditional default response | Done | Every new endpoint includes one connected default response; edit it from the row Action without adding conditions. |
 | U02 | Response setup | Condition-only creation and templates | Done | Node selects a type from a catalog and creates a connected draft immediately; Table uses the complete popup. Each typed node supports multiple fields, AND/OR, required, and response/default presets. |
+| U14 | Table clarity | Quiet heading and uniform rows | Done | One Response scenarios heading with a count, no repeated flow summary, a compact condition-count/default-order footer, uniform row colors, thin dividers, subtle hover, and a Default badge. Existing columns and actions are retained; View/Edit use compact blue/amber soft buttons. |
+| U13 | Navigation | Compact account top bar | Done | The Light/Night switch stays directly in the top bar; the account trigger shows the first name and groups account/admin actions in one popover. Save is shown only for drafts. |
+| U12 | Identity | Login and admin-only user management | Done | Session login, first-admin setup/bootstrap, admin/user roles, account CRUD/deactivation/password reset, CSRF checks, session revocation, last-admin protection, and own-password change. Workspace access follows explicit Viewer/Editor/Owner membership. Passwords require at least 8 characters. |
 | U11 | Scenario priority | First-match branch canvas | Done | Independent conditions branch from Incoming Request, priorities are reorderable in Node/Table, default stays last, and response destinations remain editable. Nested legacy graphs retain their original editor. |
 | U10 | Table preview | Four-column read-only View | Done | View shows Request, Conditions, effective Response Headers, and formatted Response Body; adapts to two/one columns on smaller screens. |
 | U09 | Table flow | One node path per row | Done | Request Path shows endpoint name, HTTP method and URL path. Conditions shows match outcomes and rules without condition names. The separate Node Flow column is removed; distinct paths that converge remain separate rows. |
 | U08 | Node editing | Scoped node forms | Done | Node Edit opens only its own Request, Condition, Response, Headers, or Delay form. Table retains the complete path popup. |
-| U07 | Appearance | Light / Night / System | Done | Persistent browser preference, automatic system appearance, and Moonlight night surfaces with static stars and a crescent moon. |
+| U07 | Appearance | Light / Night switch | Done | Persistent browser preference, device-based initial appearance, and Moonlight night surfaces with static stars and a crescent moon, including login and setup. |
 | U06 | Visual design | Cloudline theme | Done | Navy sidebar, azure actions, sky gradients, layered static clouds and a softly glowing sun in Light mode, and unified editor/dialog colors. |
 | U05 | Node canvas | Bounded canvas zoom | Done | Zoom controls support 50%–200%, 25% steps, reset to 100%, viewport centering, and zoom-aware dragging. |
 | U04 | Interface language | English web interface | Done | Navigation, editors, dialogs, validation, notifications, and accessibility labels use English. User-authored content is preserved. |
@@ -91,7 +96,7 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | P01 | URLs | Separate base URL and endpoint copy controls | Done | Workspace URLs are available in the sidebar; endpoint URLs retain path placeholders until replaced by the caller. |
 | P02 | URLs | Configured public origin | Done | PUBLIC_BASE_URL is returned through authenticated settings and used by the editor instead of assuming the browser origin. |
 | P03 | Browser clients | Mock CORS and preflights | Done | Exact origins/headers, optional wildcard origins, supported methods, error responses, and explicit OPTIONS handling; credentialed CORS is disabled. |
-| P04 | Security | Administrator management access boundary | Done | Shared Basic authentication protects pages/assets/APIs; mock requests are independent. Internal/production modes require credentials and check the configured Host; production additionally requires HTTPS. |
+| P04 | Security | Administrator management access boundary | Done | Session login protects management pages/APIs; mock requests and login assets are independent. Internal/production modes require credentials and check the configured Host; production additionally requires HTTPS. |
 | P05 | Deployment | Internal-domain deployment configuration | Done | Go + PostgreSQL only, /public/{workspace-slug}, managed internal mode, private host binding, optional existing HTTPS ingress, environment examples, Makefile targets, and English instructions. |
 | P06 | Deployment | Verify internal hostname and network reachability | Todo | Requires the target internal hostname/server and client-side DNS or hosts resolution; local runtime can be tested without changing machine DNS. |
 
@@ -109,8 +114,8 @@ These items form the development backlog; their order and scope can be adjusted.
 | N06 | Interoperability | OpenAPI import | Todo | Generate endpoints and example responses from specifications. |
 | N07 | Editor | User-defined templates | Todo | Save and reuse custom configurations. |
 | N08 | Versioning | Persistent drafts, version history, and rollback | Todo | Separate draft changes from active versions. |
-| N09 | Security | Login and workspace authorization | Partial | Shared administrator HTTP Basic authentication protects management UI/API; per-user accounts and workspace authorization remain unavailable. |
-| N10 | Collaboration | Membership, roles, and user data isolation | Todo | Share workspaces with explicit access permissions. |
+| N09 | Security | Login and workspace authorization | Done | Admin/user session login, admin-only user management, and Viewer/Editor/Owner workspace permissions are enforced by the server. |
+| N10 | Collaboration | Membership, roles, and user data isolation | Done | Viewer/Editor/Owner permissions, filtered workspace lists, owner-only membership UI/API, admin recovery access, legacy ownership migration, and last-active-owner protection. Public mocks remain callable; email invitations are outside this scope. |
 | N11 | Security | Rate limiting and persistent audit logs | Todo | Control traffic and trace configuration changes. |
 
 ## Maintenance rules

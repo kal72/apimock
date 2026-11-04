@@ -22,7 +22,7 @@ func (h Handler) access(next http.Handler) http.Handler {
 			return
 		}
 		w.Header().Set("Cache-Control", "no-store")
-		if h.Config.AdminUsername != "" {
+		if h.Auth == nil && h.Config.AdminUsername != "" {
 			username, password, ok := r.BasicAuth()
 			gotUser, gotPassword := sha256.Sum256([]byte(username)), sha256.Sum256([]byte(password))
 			wantUser, wantPassword := sha256.Sum256([]byte(h.Config.AdminUsername)), sha256.Sum256([]byte(h.Config.AdminPassword))
@@ -42,6 +42,13 @@ func (h Handler) access(next http.Handler) http.Handler {
 			}
 			if r.Header.Get("Sec-Fetch-Site") == "cross-site" {
 				http.Error(w, "cross-site management write denied", http.StatusForbidden)
+				return
+			}
+		}
+		if h.Auth != nil {
+			var ok bool
+			r, ok = h.identityAccess(w, r)
+			if !ok {
 				return
 			}
 		}

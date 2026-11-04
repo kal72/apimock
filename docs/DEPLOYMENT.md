@@ -47,13 +47,13 @@ Configure these values:
 | PUBLIC_BASE_URL | Application origin only, such as http://apimock.internal:8080. Do not append /public or a workspace path. |
 | APP_BIND | Host interface to publish Go on; defaults to 127.0.0.1. Set a private interface IP for direct LAN access. |
 | APP_PORT | Published Go port; defaults to 8080. Include it in PUBLIC_BASE_URL unless your existing infrastructure serves a standard port. |
-| ADMIN_USERNAME | Shared administrator username. |
-| ADMIN_PASSWORD | Required administrator password, 16–1024 bytes without line breaks. |
+| ADMIN_USERNAME | First administrator bootstrap username (3–64 lowercase letters/numbers/dots/underscores/hyphens). |
+| ADMIN_PASSWORD | First administrator bootstrap password, at least 8 characters and at most 1024 bytes without line breaks. Used only while the user table is empty. |
 | POSTGRES_PASSWORD | Required independent database password; use at least 32 URL-safe characters because it is embedded in a PostgreSQL URL. |
 | MOCK_CORS_ORIGINS | Exact comma-separated frontend origins. Empty allows same-origin browser calls; * alone allows any origin without browser credentials. |
 | MOCK_CORS_HEADERS | Allowed preflight headers; defaults to Content-Type,Authorization,X-Api-Key. |
 
-Generate independent strong administrator and database passwords before starting. Never commit `.env.production`. Internal mode requires administrator credentials and a configured origin and enforces the configured Host and management Origin boundaries. HTTP does not encrypt Basic credentials or request data; use your existing internal HTTPS infrastructure when transport confidentiality is required. Go does not terminate TLS in this setup.
+Generate independent strong administrator and database passwords before starting. Never commit `.env.production`. Internal mode requires administrator credentials and a configured origin and enforces the configured Host and management Origin boundaries. HTTP does not encrypt login credentials, session cookies, or request data; use your existing internal HTTPS infrastructure when transport confidentiality is required. Go does not terminate TLS in this setup.
 
 ```sh
 make production-up
@@ -72,7 +72,7 @@ Shared URLs will then use `https://apimock.internal/public/demo-store`. No Caddy
 
 ## Management and mock access
 
-Management pages/assets and `/api/...` require administrator HTTP Basic authentication when credentials are configured. The browser prompts for the shared administrator credentials. This is not a multi-user login system; the administrator can manage all workspaces. Browsers cache Basic credentials, and session-based logout is not implemented.
+Management pages and APIs require session login. Open `/login` and sign in using the bootstrap admin account. Only admins have access to user management; regular users only see workspaces where they are members. Owners manage membership using Workspace settings → Manage members; Editors manage endpoints and Viewers can browse/test. Administrators retain recovery access to all workspaces. Migration `003_workspace_members.sql` assigns legacy workspaces to the earliest active administrator; grant existing regular users membership after upgrading. Public mock execution remains unauthenticated. Assets and the login page are public. Sign out revokes the current session. Username, role, password, and active-status changes revoke the affected user sessions. Bootstrap environment credentials do not overwrite existing accounts on restart.
 
 `/public/...` mock endpoints do not require administrator credentials. Do not give those credentials to mock consumers. Configure request conditions for scenarios that should return 401/403 for mock tokens. CORS governs browser access; it is not caller authentication or a restriction on server-to-server clients without an Origin header.
 
@@ -104,11 +104,13 @@ Add the calling frontend origin to `MOCK_CORS_ORIGINS` when it differs from the 
 ```sh
 curl -i http://apimock.internal:8080/healthz
 curl -i http://apimock.internal:8080/api/workspaces
-curl -i -u "$ADMIN_USERNAME" http://apimock.internal:8080/api/workspaces
+curl -i http://apimock.internal:8080/login
+# Sign in through the browser, or POST JSON credentials to /api/auth/login,
+# retain its cookie, and send the returned csrf_token as X-CSRF-Token for writes.
 curl -i http://apimock.internal:8080/public/demo-store/products/123
 ```
 
-Expected results are health 200, unauthenticated management 401, authenticated management 200 after entering the password, and the configured mock response. Test hostname resolution and reachability from each intended client; those depend on your infrastructure.
+Expected results are health 200, unauthenticated management 401, authenticated management 200 after signing in, and the configured mock response. Test hostname resolution and reachability from each intended client; those depend on your infrastructure.
 
 **Breaking route change:** `/mock/{workspace}/...` has been replaced by `/public/{workspace}/...`; there is no compatibility alias. Update consumer base URLs. Endpoint paths and stored flow data do not need migration.
 
@@ -135,3 +137,5 @@ podman compose --project-name mocklab-production --env-file .env.production -f c
 ```
 
 Use the configured PUBLIC_BASE_URL to access the internal installation. Keep persistent volumes when stopping unless you intend to remove stored workspaces.
+
+The identity migration adds account and session tables without changing workspace data. Fresh development installations may create their first administrator through the setup form. Internal/production installations must provide bootstrap credentials; browser setup is disabled there. Back up account tables along with workspace data.

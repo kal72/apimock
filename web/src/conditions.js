@@ -1,3 +1,4 @@
+import { scenarioBranches } from './branches.js';
 import { clone } from './flow.js';
 
 export const conditionKinds = [
@@ -61,14 +62,77 @@ export function conditionKindLabel(config) {
   return conditionKinds.find(kind => kind.key === c.condition_type)?.name || 'Condition';
 }
 
-export function flowConditionWarnings(flow) {
-  const seen = new Map(), warnings = [];
-  for (const node of flow.nodes.filter(item => item.type === 'condition')) {
-    const c = normalizeCondition(node.config);
-    warnings.push(...conditionDiagnostics(c).warnings.map(message => `${node.label}: ${message}`));
-    const key = JSON.stringify([c.condition_type, c.match, c.condition_type==='body' ? c.body_mode : '', c.condition_type==='body' && c.body_mode==='raw' ? c.raw_format : '', c.rules.map(rule => [c.condition_type === 'header' ? rule.field.toLowerCase() : rule.field, rule.operator, ['exists','empty'].includes(rule.operator) ? '' : rule.value || '', !!rule.required]).sort()]);
-    if (seen.has(key)) warnings.push(`${node.label} is equivalent to ${seen.get(key)}. Review priority; the first matching rule is used.`);
-    else seen.set(key, node.label);
+// Implication is conservative: only proven relationships produce unreachable warnings.
+const sourceKey = c => c.condition_type === 'body' ? `body:${c.body_mode}:${c.body_mode === 'raw' ? c.raw_format : ''}` : c.condition_type;
+const terms = c => c.match === 'any' ? c.rules.map(rule => [rule]) : [c.rules];
+const sameField = (c,a,b) => c.condition_type === 'header' ? a.field.toLowerCase() === b.field.toLowerCase() : a.field === b.field;
+function nonemptyLiteral(c,value) {
+  if (!String(value).trim()) return false;
+  // A JSON field may also be a string containing the same text as an empty JSON value.
+  if (sourceKey(c) === 'body:raw:json') {
+    try { const parsed=JSON.parse(value); if (parsed===null || Array.isArray(parsed)&&!parsed.length || typeof parsed==='object'&&!Object.keys(parsed).length) return false; } catch {}
   }
-  return warnings;
+  return true;
+}
+function impliesRule(c,a,b) {
+  if (!sameField(c,a,b)) return false;
+  const nonempty=a.required || a.operator==='equals'&&nonemptyLiteral(c,a.value || '');
+  if (b.required && !nonempty) return false;
+  if (a.operator===b.operator && (['exists','empty'].includes(a.operator) || (a.value || '')===(b.value || ''))) return true;
+  if (b.operator==='exists' && a.operator!=='empty') return true;
+  if (a.operator==='equals') {
+    if (b.operator==='contains') return (a.value || '').includes(b.value || '');
+    if (b.operator==='not_equals') return a.value!==b.value;
+  }
+  if (a.operator==='contains' && b.operator==='contains') return (a.value || '').includes(b.value || '');
+  return false;
+}
+function implies(later,earlier) {
+  if (sourceKey(later)!==sourceKey(earlier)) return false;
+  return terms(later).every(term => terms(earlier).some(target => target.every(rule => term.some(candidate => impliesRule(later,candidate,rule)))));
+}
+function incompatible(c,a,b) {
+  if (!sameField(c,a,b)) return false;
+  if (a.operator==='equals' && b.operator==='equals') return a.value!==b.value;
+  if (a.operator==='equals' && b.operator==='not_equals' || a.operator==='not_equals' && b.operator==='equals') return a.value===b.value;
+  if (a.operator==='equals' && b.operator==='contains') return !(a.value || '').includes(b.value || '');
+  if (b.operator==='equals' && a.operator==='contains') return !(b.value || '').includes(a.value || '');
+  if (a.operator==='empty') return b.required || b.operator==='equals'&&nonemptyLiteral(c,b.value || '');
+  if (b.operator==='empty') return a.required || a.operator==='equals'&&nonemptyLiteral(c,a.value || '');
+  return false;
+}
+function mayOverlap(a,b) {
+  if (a.condition_type==='body' && b.condition_type==='body' && sourceKey(a)!==sourceKey(b)) return false;
+  if (sourceKey(a)!==sourceKey(b)) return true;
+  return terms(a).some(x => terms(b).some(y => !x.some(left => y.some(right => incompatible(a,left,right)))));
+}
+export function flowConditionConflicts(flow) {
+  const model=scenarioBranches(flow);
+  // Nested legacy graphs do not share a single first-match priority list.
+  if (!model) return [];
+  const conflicts=[];
+  for (let j=1;j<model.branches.length;j++) {
+    const later=model.branches[j], b=normalizeCondition(later.condition.config);
+    if (!later.condition.config.condition_type) continue;
+    if (conditionDiagnostics(b).errors.length) continue;
+    for (let i=0;i<j;i++) {
+      const earlier=model.branches[i], a=normalizeCondition(earlier.condition.config);
+      if (!earlier.condition.config.condition_type) continue;
+      if (conditionDiagnostics(a).errors.length) continue;
+      const covered=implies(b,a), duplicate=covered&&implies(a,b);
+      if (!covered && !mayOverlap(a,b)) continue;
+      const prefix=`#${j+1} ${later.condition.label}`;
+      conflicts.push({kind:duplicate?'duplicate':covered?'shadowed':'overlap',conditionID:later.condition.id,earlierID:earlier.condition.id,
+        message:duplicate?`${prefix} is equivalent to #${i+1} ${earlier.condition.label}. This duplicate cannot win at its current priority.`:
+        covered?`${prefix} is covered by #${i+1} ${earlier.condition.label} and cannot win at its current priority. Move the more specific condition earlier or refine its rules.`:
+        `${prefix} may overlap with #${i+1} ${earlier.condition.label}. If both match, #${i+1} wins. Verify the intended result in Playground.`});
+    }
+  }
+  return conflicts;
+}
+export function flowConditionWarnings(flow) {
+  const warnings=flow.nodes.filter(node=>node.type==='condition').flatMap(node=>conditionDiagnostics(node.config).warnings.map(message=>`${node.label}: ${message}`));
+  warnings.push(...flowConditionConflicts(flow).map(conflict=>conflict.message));
+  const limit=30;
+  return warnings.length>limit?[...warnings.slice(0,limit),`${warnings.length-limit} more warnings. Resolve earlier conflicts and review again.`]:warnings;
 }

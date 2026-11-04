@@ -13,16 +13,13 @@ function browser(saved, dark = false, blocked = false) {
   return { environment, media, listeners, saved: () => saved };
 }
 
-test('theme defaults to system and tracks device changes only in system mode', () => {
-  const b = browser(null, true), theme = createTheme(b.environment);
-  assert.equal(theme.preference, 'system');
+test('theme switch resolves the initial device theme and saves only Light or Night', () => {
+  const b = browser('system', true), theme = createTheme(b.environment);
+  assert.equal(theme.preference, 'night');assert.equal(theme.isNight,true);
   assert.equal(b.environment.document.documentElement.dataset.theme, 'night');
-  b.media.matches = false; b.listeners.system();
-  assert.equal(b.environment.document.documentElement.dataset.theme, 'light');
-  theme.set('night'); b.listeners.system();
-  assert.equal(b.environment.document.documentElement.dataset.theme, 'night');
-  assert.equal(b.saved(), 'night');
-  theme.set('invalid'); assert.equal(theme.preference, 'night');
+  theme.set('light');assert.equal(theme.isNight,false);assert.equal(b.saved(),'light');
+  theme.set('night');assert.equal(b.saved(),'night');
+  theme.set('system');assert.equal(theme.preference,'night');
 });
 
 test('explicit preferences survive reload and blocked storage remains usable', () => {

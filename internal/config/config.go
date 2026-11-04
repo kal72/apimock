@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"unicode/utf8"
 )
 
 type Config struct {
@@ -45,8 +46,8 @@ func (c Config) Validate() error {
 	if strings.ContainsAny(c.AdminUsername, ":\r\n") || len(c.AdminUsername) > 128 {
 		return errors.New("ADMIN_USERNAME is invalid")
 	}
-	if c.AdminPassword != "" && (len(c.AdminPassword) < 16 || len(c.AdminPassword) > 1024 || strings.ContainsAny(c.AdminPassword, "\r\n")) {
-		return errors.New("ADMIN_PASSWORD must contain 16–1024 bytes without line breaks")
+	if c.AdminPassword != "" && (utf8.RuneCountInString(c.AdminPassword) < 8 || len(c.AdminPassword) > 1024 || strings.ContainsAny(c.AdminPassword, "\r\n")) {
+		return errors.New("ADMIN_PASSWORD must contain at least 8 characters and at most 1024 bytes without line breaks")
 	}
 	if c.Environment == "production" && (c.AdminUsername == "" || !strings.HasPrefix(c.PublicBaseURL, "https://")) {
 		return errors.New("production requires administrator credentials and an https PUBLIC_BASE_URL")

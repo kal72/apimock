@@ -15,6 +15,7 @@ import (
 )
 
 type Handler struct {
+	Auth    *Identity
 	Config  config.Config
 	Service usecase.Service
 	Assets  http.Handler
@@ -23,6 +24,9 @@ type Handler struct {
 
 func (h Handler) Routes() http.Handler {
 	mux := http.NewServeMux()
+	h.identityRoutes(mux)
+	h.workspaceRoutes(mux)
+	workspaceRoute := func(pattern string, handler http.HandlerFunc) { mux.HandleFunc(pattern, h.workspaceGuard(handler)) }
 	mux.HandleFunc("GET /api/config", func(w http.ResponseWriter, r *http.Request) {
 		respond(w, map[string]string{"public_base_url": h.Config.PublicBaseURL}, nil)
 	})
@@ -47,20 +51,30 @@ func (h Handler) Routes() http.Handler {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.Write([]byte(`<span class="status-dot"></span> Server connected`))
 	})
-	mux.HandleFunc("GET /api/workspaces", func(w http.ResponseWriter, r *http.Request) {
+	workspaceRoute("GET /api/workspaces", func(w http.ResponseWriter, r *http.Request) {
+		if h.Auth != nil {
+			items, err := h.Service.WorkspaceRepository().VisibleWorkspaces(r.Context(), principal(r).User)
+			respond(w, items, err)
+			return
+		}
 		items, err := h.Service.Repo.Workspaces(r.Context())
 		respond(w, items, err)
 	})
-	mux.HandleFunc("POST /api/workspaces", func(w http.ResponseWriter, r *http.Request) {
+	workspaceRoute("POST /api/workspaces", func(w http.ResponseWriter, r *http.Request) {
 		var item domain.Workspace
 		if !decode(w, r, &item) {
 			return
 		}
 		item.ID = ""
+		if h.Auth != nil {
+			saved, err := h.Service.CreateWorkspace(r.Context(), item, principal(r).User)
+			respond(w, saved, err)
+			return
+		}
 		saved, err := h.Service.SaveWorkspace(r.Context(), item)
 		respond(w, saved, err)
 	})
-	mux.HandleFunc("PUT /api/workspaces/{wid}", func(w http.ResponseWriter, r *http.Request) {
+	workspaceRoute("PUT /api/workspaces/{wid}", func(w http.ResponseWriter, r *http.Request) {
 		var item domain.Workspace
 		if !decode(w, r, &item) {
 			return
@@ -69,10 +83,10 @@ func (h Handler) Routes() http.Handler {
 		saved, err := h.Service.SaveWorkspace(r.Context(), item)
 		respond(w, saved, err)
 	})
-	mux.HandleFunc("DELETE /api/workspaces/{wid}", func(w http.ResponseWriter, r *http.Request) {
+	workspaceRoute("DELETE /api/workspaces/{wid}", func(w http.ResponseWriter, r *http.Request) {
 		respond(w, map[string]bool{"deleted": true}, h.Service.Repo.DeleteWorkspace(r.Context(), r.PathValue("wid")))
 	})
-	mux.HandleFunc("GET /api/workspaces/{wid}/endpoints", func(w http.ResponseWriter, r *http.Request) {
+	workspaceRoute("GET /api/workspaces/{wid}/endpoints", func(w http.ResponseWriter, r *http.Request) {
 		items, err := h.Service.Repo.Endpoints(r.Context(), r.PathValue("wid"))
 		respond(w, items, err)
 	})
@@ -86,9 +100,9 @@ func (h Handler) Routes() http.Handler {
 		saved, err := h.Service.SaveEndpoint(r.Context(), item)
 		respond(w, saved, err)
 	}
-	mux.HandleFunc("POST /api/workspaces/{wid}/endpoints", save)
-	mux.HandleFunc("PUT /api/workspaces/{wid}/endpoints/{eid}", save)
-	mux.HandleFunc("DELETE /api/workspaces/{wid}/endpoints/{eid}", func(w http.ResponseWriter, r *http.Request) {
+	workspaceRoute("POST /api/workspaces/{wid}/endpoints", save)
+	workspaceRoute("PUT /api/workspaces/{wid}/endpoints/{eid}", save)
+	workspaceRoute("DELETE /api/workspaces/{wid}/endpoints/{eid}", func(w http.ResponseWriter, r *http.Request) {
 		respond(w, map[string]bool{"deleted": true}, h.Service.Repo.DeleteEndpoint(r.Context(), r.PathValue("wid"), r.PathValue("eid")))
 	})
 	mux.HandleFunc("POST /api/test", func(w http.ResponseWriter, r *http.Request) {
@@ -121,7 +135,19 @@ func (h Handler) Routes() http.Handler {
 		request.Headers = headers
 		request.Query = input.Query
 		result, err := usecase.Evaluate(r.Context(), input.Flow, request, input.Params)
-		respond(w, result, err)
+		if err != nil {
+			respond(w, nil, err)
+			return
+		}
+		selected := ""
+		if len(result.Trace) > 0 {
+			selected = result.Trace[len(result.Trace)-1]
+		}
+		respond(w, struct {
+			usecase.Result
+			Conditions []usecase.ConditionCheck `json:"conditions"`
+			ResponseID string                   `json:"response_id"`
+		}{result, usecase.ExplainConditions(input.Flow, request, input.Params, result.Trace), selected}, nil)
 	})
 	mock := func(w http.ResponseWriter, r *http.Request) {
 		request, err := parseMockRequest(w, r)
@@ -157,7 +183,7 @@ func decode(w http.ResponseWriter, r *http.Request, v any) bool {
 		return false
 	}
 	if err := d.Decode(new(any)); err != io.EOF {
-		respond(w, nil, validationError{"request hanya boleh berisi satu JSON"})
+		respond(w, nil, validationError{"request must contain exactly one JSON value"})
 		return false
 	}
 	return true
@@ -171,6 +197,14 @@ func respond(w http.ResponseWriter, v any, err error) {
 	if err != nil {
 		status := 400
 		switch {
+		case errors.Is(err, usecase.ErrUnauthorized), errors.Is(err, usecase.ErrCredentials):
+			status = 401
+		case errors.Is(err, usecase.ErrWorkspaceAccess), errors.Is(err, usecase.ErrForbidden), errors.Is(err, errCSRF):
+			status = 403
+		case errors.Is(err, usecase.ErrSetupClosed), errors.Is(err, usecase.ErrLastAdmin):
+			status = 409
+		case errors.Is(err, errRateLimited):
+			status = 429
 		case errors.Is(err, domain.ErrNotFound):
 			status = 404
 		case errors.Is(err, domain.ErrConflict):
@@ -184,7 +218,7 @@ func respond(w http.ResponseWriter, v any, err error) {
 		w.WriteHeader(status)
 		message := err.Error()
 		if status == 500 {
-			message = "Terjadi kesalahan server"
+			message = "Internal server error"
 		}
 		json.NewEncoder(w).Encode(map[string]string{"error": message})
 		return

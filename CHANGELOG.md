@@ -6,7 +6,35 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ## [Unreleased]
 
+### Workspace navigation refinement
+
+- Verification: standalone build and desktop browser checks passed in Light and Night, including opening Edit/Members, keyboard entry with Arrow Down, Escape, and outside-click dismissal.
+
+- Replaced the crowded workspace action row with a single settings button beside the workspace selector. The popover groups Edit workspace and Manage members, separates Delete workspace, and keeps access level as quiet read-only information. Viewer/Editor accounts do not see owner controls. Supports Escape, outside-click dismissal, keyboard entry, and focus leaving the panel. Existing deletion confirmation remains in place.
+
+
+### Condition conflict diagnostics
+
+- Verification: 64 JavaScript tests, Go race tests and vet, standalone build, and desktop browser checks passed. Browser checks confirmed warnings in Node/Table, real first-match diagnosis, priority changes, and saving valid overlapping scenarios.
+
+- Added advisory checks for equivalent conditions, conditions covered by an earlier priority, and potential overlap in independent scenario flows. Node/Table and staged condition editors share diagnostics; warnings never reorder nodes, block valid overlapping branches, or change default execution. Priority warnings above the editor are collapsible.
+- Added Playground explanations showing the selected response, per-condition match results, per-field pass/fail, body format mismatches, and whether a node was actually visited. Later conditions are checked diagnostically without changing first-match execution. The existing result fields remain available alongside additive `conditions` and `response_id` fields in `/api/test`.
+- Analysis is conservative: unsupported legacy conditions and nested graphs do not receive priority claims; warnings are capped to keep the editor usable. Arbitrary JSON field dependencies and collective coverage by several earlier branches are not proven. Existing contradiction and Required validation remains enforced by both UI and server.
+
+
+### Workspace access management
+
+- Verification: Go race tests, vet, PostgreSQL integration tests (including permission boundaries, legacy migration and concurrent owner protection), 57 JavaScript tests, and standalone build passed. Desktop browser checks covered member creation and read-only Table/Node controls.
+- Added workspace membership with Viewer (browse/test), Editor (endpoint CRUD), and Owner (workspace and member administration) permissions, enforced by management APIs and reflected in the editor UI. Administrators retain recovery access to all workspaces.
+- Added an owner-only Members dialog for assigning existing accounts by username, changing roles, and removing members. Concurrent membership changes and user deletion/deactivation cannot remove the last active workspace owner.
+- **Breaking change:** regular users no longer have global workspace management access. Migration `003_workspace_members.sql` assigns legacy workspaces to the earliest active administrator; an owner/admin must explicitly grant other accounts access. First-admin setup claims existing unowned workspaces when upgrading an installation without accounts. Public mock URLs and flow configurations are preserved.
+
+
 ### Added
+
+- Add a compact Table footer showing the condition count and a default-response ordering hint, with a thin divider and neutral Light/Night surfaces.
+
+- Add PostgreSQL-backed user accounts, session login/logout, admin/user roles, first-admin setup/bootstrap, admin-only user management, and own-password changes. Admins can create/edit/deactivate/delete accounts and reset passwords; shared workspace data is preserved.
 
 - Add first-match scenario branches using the existing Incoming Request, Condition, and Response nodes. Conditions have reorderable priorities in Node and Table; default response is always last and cannot be prioritized. Priority changes update the persisted execution order and are undoable.
 
@@ -41,7 +69,7 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 - Separate workspace base URL and endpoint URL copy actions, including workspace URL access from the sidebar.
 - Explicit PUBLIC_BASE_URL configuration and an authenticated settings endpoint so shared URLs use the configured public origin.
 - Configurable mock-only CORS with exact origin/header allowlists, optional wildcard origins, preflight handling, and CORS headers on mock errors.
-- Shared administrator HTTP Basic authentication for management pages, assets, and APIs while mock endpoints remain independent of administrator credentials.
+- Management authentication keeps mock endpoints independent of administrator credentials; session login supersedes the earlier shared Basic authentication.
 - A standalone managed internal Compose stack containing only Go and PostgreSQL, configurable host binding, environment examples, Makefile targets, and deployment instructions.
 - Configuration and access tests covering production startup requirements, administrator boundaries, CORS/preflight behavior, explicit OPTIONS mocks, and reserved response headers.
 
@@ -69,6 +97,22 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 - CONTRIBUTING.md and AGENTS.md requiring feature, bug fix, refactor, and roadmap updates in the same change.
 
 ### Changed
+
+- Make Table View/Edit actions compact 29px soft buttons: blue for View and amber for Edit, with matching Light/Night hover and focus behavior. Keep visible labels and the primary Add condition action.
+
+- Simplify Table mode to a Response scenarios heading with a small count and Add condition action. Remove repeated flow-summary and footer text; use uniform row backgrounds, thin dividers, subtle hover, and a Default badge without a separate default-row tint. Existing columns, priority, View, and Edit behavior remain unchanged.
+
+- Replace theme dropdowns with an accessible Light/Night switch in the top bar and login/setup pages. Remove System from the UI; existing System preferences resolve to the device theme on load, while explicit Light/Night choices remain saved.
+
+- Keep the Light/Night/System selector directly in the top bar and show the account first name beside its avatar. Account actions remain grouped in the popover.
+
+- Simplify the top bar to workspace breadcrumbs, a quiet saved indicator (or primary Save action for drafts), and one account popover. Group appearance, admin user management, password changes, and sign out inside the account menu with keyboard/Escape and outside-click support.
+
+- Reuse Cloudline daylight clouds/sun and Moonlight stars/crescent artwork on login and initial setup, with static decoration behind the readable authentication form.
+
+- Lower the minimum password length to 8 characters for initial setup, administrator bootstrap, user creation/reset, and own-password changes. Keep the 1024-byte maximum and existing password hashes/sessions.
+
+- **Breaking change:** the running server replaces shared HTTP Basic authentication with session login, including development. Existing workspaces remain shared by authenticated users. Migration 002_identity.sql adds users and sessions automatically. ADMIN_USERNAME/ADMIN_PASSWORD seed only an empty user table and never reset existing accounts; management API clients must retain login cookies and send X-CSRF-Token on writes.
 
 - Enrich Light mode with layered cloud artwork, a softly glowing sun and subtle rays, plus a warmer sky gradient. Decoration remains static behind content; Night styling and editor behavior are unchanged.
 
@@ -123,6 +167,8 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Security
 
+- Hash passwords with individually salted PBKDF2-HMAC-SHA256 (600,000 iterations), store only hashed session tokens, expire sessions after 12 hours, use HttpOnly/SameSite cookies with Secure on HTTPS, and require session-bound CSRF tokens. Apply bounded in-process sign-in throttling, revoke sessions after identity changes, serialize role changes to preserve the last admin, and prevent self-deletion/demotion/deactivation.
+
 - Require administrator credentials and an HTTPS public origin in production; reject unexpected public hosts and cross-origin management writes.
 - Reserve Access-Control-* flow headers for server-managed policy and disable credentialed cross-origin mock requests. **Breaking change:** flows that previously configured those headers must remove them and configure MOCK_CORS_ORIGINS/MOCK_CORS_HEADERS instead.
 - Exclude local and production environment files from source control and Docker build contexts while retaining examples.
@@ -130,9 +176,25 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 - Graph validation rejects cycles, unreachable nodes, and incomplete condition branches.
 - JSON and header validation, restricted HTTP framing/Set-Cookie headers, and a 1 MiB request payload limit.
 - Reject management API writes with a different Origin when an Origin header is supplied.
-- Local binding by default and loopback host port mappings in development Compose. Production uses a TLS proxy and a shared administrator boundary; per-user authorization is not available yet.
+- Local binding by default and loopback host port mappings in development Compose. Production uses existing HTTPS infrastructure and a session/role boundary; workspace ownership/tenancy is not available yet.
 
 ### Verification notes and limitations
+
+- Table footer build/container and desktop browser verification passed: the condition count and default-order hint render below the table. Screenshot: docs/screenshots/table-footer.jpg.
+
+- Compact Table action build and browser checks passed in Light/Night: View/Edit measure 29px high, have blue/amber surfaces, and open their original dialogs. Screenshot: docs/screenshots/table-compact-actions.jpg.
+
+- Table clarity build/container verification and desktop browser review passed in Light/Night. Computed backgrounds match across normal/default rows in both themes, the compact heading/count is present, and repeated summary/footer elements are absent. Screenshots: docs/screenshots/table-quiet-light.jpg and docs/screenshots/table-quiet-night.jpg.
+
+- Light/Night switch verification passed: 56 JavaScript tests, build, and browser checks of accessible switch state and both theme transitions. Screenshot: docs/screenshots/theme-switch.jpg.
+
+- Revised top-bar build and browser QA passed: the theme selector is visible outside the account menu, the trigger displays the first name, and the menu contains only account/admin actions. Screenshot: docs/screenshots/topbar-theme-name.jpg.
+
+- Compact top-bar build and browser QA passed in Light/Night: account menu, Arrow Down focus, Escape dismissal, appearance changes, admin navigation, and Save/Saved transitions after persisting a draft. Screenshots: docs/screenshots/account-topbar.jpg and docs/screenshots/account-topbar-light.jpg.
+
+- Login sky-theme build and browser review passed in Light and Night. Screenshots: docs/screenshots/login-light.jpg and docs/screenshots/login-night.jpg.
+
+- Identity verification passed: 56 JavaScript tests, Go race tests, PostgreSQL integration in isolated schemas, and go vet. Tests cover initial setup, bootstrap without reset, login/logout, CSRF, admin/user API separation, expiration, session revocation, stale credential rejection, public mock access, and concurrent last-admin protection. Browser QA in a disposable database verified admin login, profile editing, user-only UI, logout, and persisted sessions after restart. Screenshots: docs/screenshots/login.jpg and docs/screenshots/user-management.jpg.
 
 - Daylight artwork build and desktop browser review passed: Light mode shows layered clouds, soft sunlight, and readable solid table/editor surfaces. Screenshot: docs/screenshots/daylight-theme.jpg.
 
@@ -165,4 +227,4 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 - New access checks passed against a live local Go server and PostgreSQL: administrator authentication, mock access without administrator credentials, public URL settings, CORS/preflights, rejected origins, and management isolation.
 - Earlier HTTPS configuration checks have been superseded by the internal deployment configuration. Internal hostname resolution and LAN reachability depend on deployment infrastructure.
 - Desktop browser QA verified visible initial connections, connection dialogs, Node/Table switching, condition insertion, request/header edits, saved examples after reload, playground responses, and line updates while dragging. No JavaScript errors were observed in the tested path. Screenshots are available under docs/screenshots; mobile and full accessibility QA remain incomplete.
-- Response bodies remain static JSON; per-user authorization, collaboration, stateful data CRUD, and version history are not available yet. Internal deployment configuration is available; target internal DNS and client reachability have not been verified because the actual hostname/server has not been provided.
+- Response bodies remain static JSON; workspace ownership/tenancy, collaboration, stateful data CRUD, and version history are not available yet. Internal deployment configuration is available; target internal DNS and client reachability have not been verified because the actual hostname/server has not been provided.

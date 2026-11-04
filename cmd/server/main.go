@@ -48,11 +48,15 @@ func run() error {
 	if err = repo.Migrate(startup); err != nil {
 		return err
 	}
+	auth := usecase.AuthService{Repo: repo}
+	if err = auth.Bootstrap(startup, settings.AdminUsername, settings.AdminPassword); err != nil {
+		return err
+	}
 	addr := os.Getenv("ADDR")
 	if addr == "" {
 		addr = "127.0.0.1:8080"
 	}
-	h := httpadapter.Handler{Config: settings, Service: usecase.Service{Repo: repo}, Assets: http.StripPrefix("/assets/", http.FileServer(http.FS(web.Assets))), Ready: func(r *http.Request) error {
+	h := httpadapter.Handler{Auth: &httpadapter.Identity{Service: auth}, Config: settings, Service: usecase.Service{Repo: repo}, Assets: http.StripPrefix("/assets/", http.FileServer(http.FS(web.Assets))), Ready: func(r *http.Request) error {
 		c, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 		defer cancel()
 		return pool.Ping(c)

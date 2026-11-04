@@ -1,3 +1,5 @@
+import { workspaceEditor } from './workspace.js';
+import { identityEditor } from './identity.js';
 import { scenarioBranches, arrangeBranches, branchEdges, branchRows, setPriority } from './branches.js';
 import { formatValue, pathPreview } from './preview.js';
 import { conditionKinds, pathParameters, typedCondition, normalizeCondition, conditionDiagnostics, conditionSummary, conditionKindLabel, flowConditionWarnings } from './conditions.js';
@@ -5,6 +7,10 @@ import { conditionTemplates, responseTemplates, projectScenarios, defaultScenari
 import { clone, defaultExample, defaultFlow, outgoingBranches, setConnection, insertBlock, graphIssues, nodeRows, connectionPoints, parseObject, headersFromRows, preferredResponse, directResponseFlow, removeConfiguration } from './flow.js';
 
 export const createEditor = () => ({
+  ...identityEditor,
+  ...workspaceEditor,
+  get canManageWorkspace(){return this.workspace?.role === 'owner';},
+  get canEditWorkspace(){return ['owner','editor'].includes(this.workspace?.role);},
   workspaces:[], endpoints:[], workspaceID:'', workspace:null, endpoint:null, publicOrigin:'',
   methods:['GET','POST','PUT','PATCH','DELETE','HEAD','OPTIONS'],
   preview:null, formatValue,
@@ -23,8 +29,15 @@ export const createEditor = () => ({
     {key:'unauthorized',type:'response',name:'Unauthorized',description:'HTTP 401 for unauthorized access.',config:{status:401,headers:{'Content-Type':'application/json'},body:'{\n  "error": "Unauthorized"\n}'}},
     {key:'delay',type:'delay',name:'Response delay',description:'Simulate network latency.',config:{delay_ms:500}}
   ],
+  get testResponseLabel(){return this.endpoint?.flow.nodes.find(node=>node.id===this.testResult?.response_id)?.label || this.testResult?.response_id || '';},
+  get testConditionChecks(){return [...(this.testResult?.conditions || [])].sort((a,b)=>(this.priorityFor(a.id)||100)-(this.priorityFor(b.id)||100));},
   get conditionWarnings(){return this.endpoint ? flowConditionWarnings(this.endpoint.flow) : [];},
-  get scenarioConditionWarnings(){return (this.scenarioForm?.conditions || []).flatMap(condition => conditionDiagnostics(condition.config,this.scenarioForm.route.path).warnings);},
+  get scenarioConditionWarnings(){
+    if(!this.scenarioForm || !this.scenarioDraft)return [];
+    const candidate=clone(this.scenarioDraft);
+    for(const condition of this.scenarioForm.conditions){const node=candidate.nodes.find(n=>n.id===condition.id);if(node){node.config=clone(condition.config);node.label=condition.label;}}
+    return flowConditionWarnings(candidate);
+  },
   get availablePathFields(){return pathParameters(this.scenarioForm?.route.path || this.endpoint?.path || '');},
   get branchModel(){return this.endpoint?scenarioBranches(this.endpoint.flow):null;},
   get canvasEdges(){return this.endpoint?branchEdges(this.endpoint.flow):[];},
@@ -48,16 +61,16 @@ export const createEditor = () => ({
   get flowIssues(){return this.endpoint ? graphIssues(this.endpoint.flow) : [];},
   get insertionSources(){return this.orderedNodes.filter(node => node.type !== 'response');},
   get baseURL(){return `${this.publicOrigin || location.origin}/public/${this.workspace?.slug || ''}`;},
-  get modalTitle(){return {view:'View request path',workspace:this.workspaceForm.id?'Edit workspace':'New workspace',endpoint:'New endpoint',templates:'Add configuration',node:this.nodeForm?.type === 'request' ? 'Edit incoming request' : 'Edit configuration',connection:'Edit connection',direct:'Use an unconditional response',palette:'Add condition node',scenario:this.scenarioScope ? 'Edit node · '+this.scenarioScope.label : this.scenarioIsNew ? 'Add condition' : 'Edit path · ' + (this.scenarioForm?.label || '')}[this.modal] || '';},
+  get modalTitle(){return {members:'Workspace members',users:'User management',user:this.userForm?.id?'Edit user':'Create user',password:'Change password',view:'View request path',workspace:this.workspaceForm.id?'Edit workspace':'New workspace',endpoint:'New endpoint',templates:'Add configuration',node:this.nodeForm?.type === 'request' ? 'Edit incoming request' : 'Edit configuration',connection:'Edit connection',direct:'Use an unconditional response',palette:'Add condition node',scenario:this.scenarioScope ? 'Edit node · '+this.scenarioScope.label : this.scenarioIsNew ? 'Add condition' : 'Edit path · ' + (this.scenarioForm?.label || '')}[this.modal] || '';},
   async request(url,method='GET',data){
-    const response=await fetch(url,{method,headers:{'Content-Type':'application/json'},body:data===undefined?undefined:JSON.stringify(data)});
-    const result=await response.json();if(!response.ok)throw Error(result.error || 'Request failed');return result;
+    const response=await fetch(url,{method,headers:{'Content-Type':'application/json',...(this.csrfToken?{'X-CSRF-Token':this.csrfToken}:{})},body:data===undefined?undefined:JSON.stringify(data)});
+    if(response.status===401 && url!=='/api/auth/password'){window.location.assign('/login');throw Error('Your session has expired. Sign in again.');}const result=await response.json();if(!response.ok)throw Error(result.error || 'Request failed');return result;
   },
   notify(message){this.notice=message;},
   async boot(){
-    this.$watch('modal',()=>{this.dialogError='';});
+    this.$watch('modal',value=>{this.dialogError='';if(value!=='password')this.passwordForm={current:'',next:'',confirmation:''};if(value!=='user'&&this.userForm)this.userForm.password='';});
     window.addEventListener('beforeunload',event=>{if(this.dirty){event.preventDefault();event.returnValue='';}});
-    try{const settings=await this.request('/api/config');this.publicOrigin=settings.public_base_url;this.workspaces=await this.request('/api/workspaces');if(this.workspaces.length)await this.selectWorkspace(this.workspaces[0].id);}catch(error){this.notify(error.message);}
+    try{await this.loadIdentity();const settings=await this.request('/api/config');this.publicOrigin=settings.public_base_url;this.workspaces=await this.request('/api/workspaces');if(this.workspaces.length)await this.selectWorkspace(this.workspaces[0].id);}catch(error){this.notify(error.message);}
   },
   mayDiscard(){return !this.dirty || window.confirm('You have unsaved changes. Continue and discard them?');},
   async selectWorkspace(id){
@@ -65,8 +78,8 @@ export const createEditor = () => ({
     try{const endpoints=id?await this.request(`/api/workspaces/${id}/endpoints`):[];this.workspaceID=id;this.workspace=this.workspaces.find(w=>w.id===id)||null;this.endpoints=endpoints;this.endpoint=null;this.dirty=false;this.trace=[];this.testResult=null;if(endpoints.length)this.selectEndpoint(endpoints[0]);}catch(error){this.workspaceID=this.workspace?.id || '';this.notify(error.message);}
   },
   selectEndpoint(endpoint){if(!this.mayDiscard())return;this.endpoint=clone(endpoint);if(this.endpoint.flow.layout!=='scenarios')arrangeBranches(this.endpoint.flow);this.dirty=false;this.trace=[];this.testResult=null;this.connecting=null;this.pendingFlow=null;this.pendingSummary='';this.undoSnapshot=null;this.highlightedNodeID=null;this.insertAfter=this.requestNode?.id || '';this.testInput=JSON.stringify(this.requestNode?.config.example || defaultExample(),null,2);},
-  openWorkspace(workspace){this.workspaceForm=workspace?clone(workspace):{name:'',slug:''};this.modal='workspace';},
-  async saveWorkspace(){this.busy=true;try{const w=this.workspaceForm;const saved=await this.request('/api/workspaces'+(w.id?`/${w.id}`:''),w.id?'PUT':'POST',w);this.workspaces=await this.request('/api/workspaces');this.modal=null;if(this.workspace?.id===saved.id){this.workspace=saved;}else{await this.selectWorkspace(saved.id);}this.notify('Workspace saved.');}catch(error){this.dialogError=error.message;}finally{this.busy=false;}},
+  openWorkspace(workspace){this.workspaceForm=workspace?{id:workspace.id,name:workspace.name,slug:workspace.slug}:{name:'',slug:''};this.modal='workspace';},
+  async saveWorkspace(){this.busy=true;try{const w=this.workspaceForm;const saved=await this.request('/api/workspaces'+(w.id?`/${w.id}`:''),w.id?'PUT':'POST',w);this.workspaces=await this.request('/api/workspaces');this.modal=null;if(this.workspace?.id===saved.id){this.workspace=this.workspaces.find(w=>w.id===saved.id);}else{await this.selectWorkspace(saved.id);}this.notify('Workspace saved.');}catch(error){this.dialogError=error.message;}finally{this.busy=false;}},
   async removeWorkspace(){if(!this.workspace||!window.confirm(`Delete workspace "${this.workspace.name}" and all its endpoints?`))return;try{await this.request(`/api/workspaces/${this.workspace.id}`,'DELETE');this.workspaces=this.workspaces.filter(w=>w.id!==this.workspace.id);this.dirty=false;await this.selectWorkspace(this.workspaces[0]?.id || '');}catch(error){this.notify(error.message);}},
   newEndpoint(){if(!this.mayDiscard())return;this.endpointForm={name:'',method:'GET',path:'/'};this.modal='endpoint';},
   async createEndpoint(){this.busy=true;try{const saved=await this.request(`/api/workspaces/${this.workspace.id}/endpoints`,'POST',{...this.endpointForm,flow:defaultFlow()});this.endpoints.push(saved);this.dirty=false;this.selectEndpoint(saved);this.modal=null;this.mode='table';this.notify('Endpoint active: Incoming request → Success response 200. Conditions are optional.');}catch(error){this.dialogError=error.message;}finally{this.busy=false;}},

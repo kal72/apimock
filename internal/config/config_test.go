@@ -69,3 +69,14 @@ func TestInternalDeploymentRequirements(t *testing.T) {
 		}
 	}
 }
+
+func TestBootstrapPasswordMinimumEightCharacters(t *testing.T) {
+	for _, password := range []string{"1234567", "密碼測試"} {
+		if err := (Config{Environment: "development", AdminUsername: "admin", AdminPassword: password}).Validate(); err == nil {
+			t.Fatal("short bootstrap password accepted")
+		}
+	}
+	if err := (Config{Environment: "development", AdminUsername: "admin", AdminPassword: "12345678"}).Validate(); err != nil {
+		t.Fatal(err)
+	}
+}

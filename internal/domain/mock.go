@@ -14,6 +14,7 @@ var ErrValidation = errors.New("validation failed")
 var slugPattern = regexp.MustCompile(`^[a-z0-9]+(?:-[a-z0-9]+)*$`)
 
 type Workspace struct {
+	Role string `json:"role,omitempty"`
 	ID   string `json:"id"`
 	Name string `json:"name"`
 	Slug string `json:"slug"`

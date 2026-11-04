@@ -145,3 +145,62 @@ func jsonField(value any, path string) (any, bool) {
 	}
 	return value, true
 }
+
+// ConditionCheck explains a playground request without changing execution order.
+type ConditionCheck struct {
+	ID        string      `json:"id"`
+	Label     string      `json:"label"`
+	Matched   bool        `json:"matched"`
+	Evaluated bool        `json:"evaluated"`
+	Reason    string      `json:"reason"`
+	Rules     []RuleCheck `json:"rules"`
+}
+type RuleCheck struct {
+	Field    string `json:"field"`
+	Operator string `json:"operator"`
+	Required bool   `json:"required"`
+	Matched  bool   `json:"matched"`
+	Exists   bool   `json:"exists"`
+}
+
+func ExplainConditions(f domain.Flow, r Request, params map[string]string, trace []string) []ConditionCheck {
+	visited := map[string]bool{}
+	for _, id := range trace {
+		visited[id] = true
+	}
+	checks := []ConditionCheck{}
+	for _, n := range f.Nodes {
+		if n.Type != "condition" {
+			continue
+		}
+		c := n.Config
+		check := ConditionCheck{ID: n.ID, Label: n.Label, Matched: conditionMatches(c, r, params), Evaluated: visited[n.ID], Rules: []RuleCheck{}}
+		if c.ConditionType != "" {
+			format := r.BodyFormat
+			if format == "" {
+				format = "json"
+			}
+			mismatch := c.ConditionType == "body" && (c.BodyMode == "form" && format != "form" || c.BodyMode == "raw" && c.RawFormat != format)
+			if mismatch {
+				check.Reason = "Request body format does not match this condition."
+			} else {
+				for _, rule := range c.Rules {
+					value, exists := conditionValue(c, rule.Field, r, params)
+					check.Rules = append(check.Rules, RuleCheck{Field: rule.Field, Operator: rule.Operator, Required: rule.Required, Matched: ruleMatches(rule, value, exists), Exists: exists})
+				}
+			}
+		}
+		if check.Reason == "" {
+			if check.Matched {
+				check.Reason = "Condition matches this request."
+			} else {
+				check.Reason = "Condition does not match this request."
+			}
+		}
+		if !check.Evaluated {
+			check.Reason += " Not visited during execution; this is a diagnostic check only."
+		}
+		checks = append(checks, check)
+	}
+	return checks
+}

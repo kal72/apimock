@@ -27,6 +27,6 @@ export function pathPreview(endpoint, row, baseURL) {
     name: endpoint.name, method: endpoint.method, path: endpoint.path, url: baseURL + endpoint.path,
     example: clone(request.config.example || {}),
     conditions: row.conditions.map(item => ({ matched: item.matched, ...normalizeCondition(nodes.get(item.id).config) })),
-    status: response.config.status, delay, headers, body: response.config.body || '', isDefault: row.isDefault
+    responseMode:response.config.response_mode || 'static', status: response.config.status, delay, headers, body: response.config.body || '', isDefault: row.isDefault
   };
 }

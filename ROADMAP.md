@@ -26,6 +26,7 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | F08 | Operations | Structured logging, timeouts, and graceful shutdown | Done | Uses slog and the Go server lifecycle. |
 | CFX01 | Conditions | Priority conflict warnings and Playground diagnosis | Done | Conservative duplicate/shadow/possible-overlap analysis in independent typed scenarios; staged popup preview; chosen response and field checks distinguish actual execution from diagnostic-only checks. Nested legacy graphs and collective coverage are outside scope. |
 | WUX01 | Workspace UX | Compact workspace settings popover | Done | Owner settings beside selector; separate access label; grouped editing/membership and separated destructive action. |
+| DOC-DYN01 | Documentation | Dynamic JSON usage guide | Done | English tutorial, template/source reference, type/default rules, generator and header examples, preview/save workflow, limits, and troubleshooting in docs/DYNAMIC_JSON.md. |
 | M01 | Workspace | Create, read, update, and delete workspaces | Done | Unique slugs; deleting a workspace cascades to its endpoints. |
 | M02 | Workspace | Workspace slug as the mock base path | Done | Uses /public/{slug}; display names and slugs can be changed independently. |
 | M03 | Endpoint | REST endpoint CRUD | Done | The API stores method, path, name, and flow; the UI supports creation, selection, method/path/flow updates, and deletion. |
@@ -36,7 +37,7 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | M08 | Editor | Unified scenario editing popup | Done | One popup edits request/route, conditions, response status/headers/body/delay, fallback, and advanced graph settings. Table has no inline editors. |
 | M09 | Runtime | Request, Condition, Headers, Delay, and Response nodes | Done | Conditions support equals, contains, and exists with true/false branches. |
 | M10 | Runtime | Read request headers, query, path parameters, and body | Done | Values can be referenced by conditions; request bodies are JSON objects. |
-| M11 | Runtime | Response status, headers, and body configuration | Done | Static JSON bodies; interpolation and data generation are not available yet. |
+| M11 | Runtime | Response status, headers, and body configuration | Done | Static JSON remains default; opt-in Dynamic JSON supports request interpolation, defaults, typed values, headers, generators, seeds and preview. |
 | M12 | Validation | Graphs, connections, JSON, headers, and size limits | Done | Rejects cycles, unreachable nodes, incomplete branches, invalid JSON, and unsafe headers. |
 | M13 | API testing | Playground responses and execution traces | Done | Tests unsaved flows; traces are displayed and highlight the canvas. |
 | M14 | UX | Unsaved-change indicator and navigation warning | Done | Drafts exist only in the browser; no autosave or persistent drafts. |
@@ -107,8 +108,8 @@ These items form the development backlog; their order and scope can be adjusted.
 | ID | Area | Work item | Status | Target capability |
 | --- | --- | --- | --- | --- |
 | N01 | Flow | Multi-field AND/OR and additional nesting | Partial | Flat AND/OR groups with required and five operators are available in each typed node. Nested subgroups remain future work. |
-| N02 | Flow | Set Variable and response interpolation | Todo | Use request values and earlier step outputs in responses. |
-| N03 | Data | Dummy data generator and pagination presets | Todo | Generate varied example responses. |
+| N02 | Flow | Set Variable and response interpolation | Partial | Typed request interpolation, defaults and response/header rendering implemented. Set Variable nodes and earlier step outputs remain future work. |
+| N03 | Data | Dummy data generator and pagination presets | Partial | UUID, timestamp, integer and choice generators with optional seed implemented. Faker datasets, list generation and pagination presets remain future work. |
 | N04 | Data | Stateful mock CRUD | Todo | POST/PATCH/DELETE requests update a simulated dataset. |
 | N05 | Interoperability | Workspace export/import | Todo | Transfer configurations using a validated format. |
 | N06 | Interoperability | OpenAPI import | Todo | Generate endpoints and example responses from specifications. |

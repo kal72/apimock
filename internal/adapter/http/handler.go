@@ -156,6 +156,12 @@ func (h Handler) Routes() http.Handler {
 			return
 		}
 		result, err := h.Service.Execute(r.Context(), r.PathValue("slug"), request)
+		if errors.Is(err, usecase.ErrResponseRender) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(500)
+			w.Write([]byte(`{"error":"Mock response could not be rendered; check its template in Playground"}`))
+			return
+		}
 		if err != nil {
 			respond(w, nil, err)
 			return
@@ -178,6 +184,7 @@ func (h Handler) Routes() http.Handler {
 func decode(w http.ResponseWriter, r *http.Request, v any) bool {
 	d := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<20))
 	d.DisallowUnknownFields()
+	d.UseNumber()
 	if err := d.Decode(v); err != nil {
 		respond(w, nil, validationError{"invalid JSON: " + err.Error()})
 		return false
@@ -197,6 +204,8 @@ func respond(w http.ResponseWriter, v any, err error) {
 	if err != nil {
 		status := 400
 		switch {
+		case errors.Is(err, usecase.ErrResponseRender):
+			status = 422
 		case errors.Is(err, usecase.ErrUnauthorized), errors.Is(err, usecase.ErrCredentials):
 			status = 401
 		case errors.Is(err, usecase.ErrWorkspaceAccess), errors.Is(err, usecase.ErrForbidden), errors.Is(err, errCSRF):

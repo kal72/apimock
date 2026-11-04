@@ -6,6 +6,21 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ## [Unreleased]
 
+### Documentation
+
+- Added a Dynamic JSON usage guide with Static/Dynamic mode selection, Node/Table workflows, type preservation, defaults, source reference, generators/seeds, header templates, preview versus full-flow tests, curl examples, limits, and troubleshooting. Linked it from README. Verified all 13 JSON examples, validated 10 dynamic templates against the current parser, checked quick-start rendered output, and checked guide links/anchors.
+
+
+### Static and Dynamic JSON responses
+
+- Verification: 67 JavaScript tests, Go race tests and vet, PostgreSQL integration (including mode/seed persistence), standalone build, and desktop browser checks passed. Browser checks covered literal Static templates, variable insertion, typed Dynamic output, default and missing-field behavior, saving, and real public mock execution.
+
+- Added opt-in Dynamic JSON rendering for request path/query/header/JSON/form/raw-body variables, JSON defaults for missing fields, type-preserving whole-value bindings, sentence interpolation, and dynamic response header values. Static JSON remains the default and retains literal template text and original formatting.
+- Added UUID v4, live UTC timestamp, bounded integer, and JSON choice generators. Optional seeds reproduce random values independently of key order; identical generator expressions reuse values within one response, including headers. Timestamps always remain live.
+- Added an Insert variable picker and isolated rendered preview in the shared Node/Table response editor, mode indicators, and template labeling in View. Existing status/delay and first-match/default behavior are preserved. Built-in response presets explicitly select Static JSON.
+- Added bounded, allowlisted template validation, safe JSON serialization, rendered-header validation, and descriptive Playground errors for missing variables. Public render failures return generic 500 responses. No SQL migration is needed; optional mode/seed fields use existing flow JSONB. Set Variable nodes, Faker datasets, list generators, pagination, and stateful storage remain outside this increment.
+
+
 ### Workspace navigation refinement
 
 - Verification: standalone build and desktop browser checks passed in Light and Night, including opening Edit/Members, keyboard entry with Arrow Down, Escape, and outside-click dismissal.

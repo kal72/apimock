@@ -41,6 +41,8 @@ type Node struct {
 	Config Config  `json:"config"`
 }
 type Config struct {
+	ResponseMode  string            `json:"response_mode,omitempty"`
+	ResponseSeed  string            `json:"response_seed,omitempty"`
 	ConditionType string            `json:"condition_type,omitempty"`
 	Match         string            `json:"match,omitempty"`
 	BodyMode      string            `json:"body_mode,omitempty"`
@@ -135,6 +137,9 @@ func (f Flow) Validate() error {
 				return errors.New("delay maksimal 10000 ms")
 			}
 		case "response":
+			if err := ValidateResponseTemplate(n.Config); err != nil {
+				return err
+			}
 			if n.Config.DelayMS < 0 || n.Config.DelayMS > 10000 {
 				return errors.New("response delay maksimal 10000 ms")
 			}

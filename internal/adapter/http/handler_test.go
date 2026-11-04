@@ -117,3 +117,35 @@ func TestCreateEndpointWithoutFlowStartsConnected(t *testing.T) {
 		t.Fatalf("initial endpoint is not callable: %d %s", w.Code, w.Body.String())
 	}
 }
+
+func TestDynamicPublicAndPlaygroundResponses(t *testing.T) {
+	h := configuredHandler(config.Config{})
+	repo := h.Service.Repo.(*testRepository)
+	e := &repo.endpoints[0]
+	e.Flow.Nodes[1].Config.ResponseMode = "dynamic"
+	e.Flow.Nodes[1].Config.Body = `{"id":"{{ request.path.id }}","name":"{{ request.query.name }}"}`
+	handler := h.Routes()
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, httptest.NewRequest("GET", "/public/demo/products/42?name=Alice", nil))
+	if w.Code != 200 || !strings.Contains(w.Body.String(), `"id":"42"`) || !strings.Contains(w.Body.String(), `"name":"Alice"`) {
+		t.Fatal(w.Code, w.Body.String())
+	}
+	w = httptest.NewRecorder()
+	handler.ServeHTTP(w, httptest.NewRequest("GET", "/public/demo/products/42", nil))
+	if w.Code != 500 || strings.Contains(w.Body.String(), "request.query.name") {
+		t.Fatal("public error exposed template internals", w.Code, w.Body.String())
+	}
+	payload, _ := json.Marshal(map[string]any{"flow": e.Flow, "params": map[string]string{"id": "42"}})
+	w = httptest.NewRecorder()
+	handler.ServeHTTP(w, httptest.NewRequest("POST", "/api/test", strings.NewReader(string(payload))))
+	if w.Code != 422 || !strings.Contains(w.Body.String(), "request.query.name") {
+		t.Fatal("playground error lacks details", w.Code, w.Body.String())
+	}
+	e.Flow.Nodes[1].Config.Body = `"{{ unknown.execute }}"`
+	payload, _ = json.Marshal(e)
+	w = httptest.NewRecorder()
+	handler.ServeHTTP(w, httptest.NewRequest("PUT", "/api/workspaces/w1/endpoints/e1", strings.NewReader(string(payload))))
+	if w.Code != 400 {
+		t.Fatal("invalid dynamic template saved", w.Code, w.Body.String())
+	}
+}

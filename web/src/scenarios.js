@@ -101,11 +101,11 @@ export function applyResponseTemplate(node, key) {
   const template = responseTemplates.find(item => item.key === key);
   if (!template) throw Error('Response template not found.');
   node.label = template.name.split(' · ')[0];
-  node.config = { ...node.config, status: template.status, body: template.body, headers: { 'Content-Type': 'application/json' }, delay_ms: 0 };
+  node.config = { ...node.config, response_mode: 'static', response_seed: '', status: template.status, body: template.body, headers: { 'Content-Type': 'application/json' }, delay_ms: 0 };
 }
 
 export function responseForm(node) {
-  return { id: node.id, label: node.label, status: node.config.status, body: node.config.body || '', delay_ms: node.config.delay_ms || 0, headers: Object.entries(node.config.headers || {}).map(([key, value]) => ({ key, value })), template: 'keep' };
+  return { response_mode: node.config.response_mode || 'static', response_seed: node.config.response_seed || '', previewResult:null, previewError:'', previewBusy:false, id: node.id, label: node.label, status: node.config.status, body: node.config.body || '', delay_ms: node.config.delay_ms || 0, headers: Object.entries(node.config.headers || {}).map(([key, value]) => ({ key, value })), template: 'keep' };
 }
 
 export function scenarioForm(endpoint, flow, row) {

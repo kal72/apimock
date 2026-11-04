@@ -7,6 +7,7 @@ A REST API mock builder with workspaces, a visual Node/Table editor, node templa
 - [Roadmap](ROADMAP.md): feature tables, Done/Partial/Todo status, and upcoming work.
 - [Changelog](CHANGELOG.md): available changes and the source for GitHub release notes.
 - [Contribution and release guide](CONTRIBUTING.md): documentation requirements for every feature, bug fix, and refactor.
+- [Dynamic JSON usage guide](docs/DYNAMIC_JSON.md): response modes, request variables, defaults, generators, previews, examples, and troubleshooting.
 - [Internal deployment](docs/DEPLOYMENT.md): internal host setup, administrator access, callable workspace URLs, and CORS.
 
 All project documentation and code comments must be written in English.
@@ -157,7 +158,7 @@ Each endpoint stores its flow as one JSONB document. Node coordinates are presen
 - Exactly one Request node; every node must be reachable and every path must end at a Response.
 - Conditions require exactly one `true` branch and one `false` branch; cycles are rejected.
 - Maximum 100 nodes and 50 field checks per condition node; each delay is limited to 10 seconds; the entire request body is limited to 1 MiB.
-- Response bodies are static JSON. User-supplied JavaScript/Go execution and template interpolation are not supported.
+- Response bodies support Static JSON (default) and opt-in Dynamic JSON with allowlisted request variables and generators. User-supplied JavaScript/Go execution is not supported.
 - Headers are validated; HTTP framing headers, `Set-Cookie`, and server-managed `Access-Control-*` headers cannot be configured.
 - Workspace/method/path combinations are unique, including parameter-name variants such as `/:id` and `/:productId`.
 - Routes with more static segments take priority.
@@ -247,3 +248,44 @@ Independent Incoming → Condition → Response scenarios use the saved priority
 The condition editor previews warnings against its staged changes. Existing impossible AND comparisons and Required/Empty combinations are rejected. Cross-branch analysis supports typed conditions, AND/OR, case-insensitive header names, body formats, and common operator implications. It deliberately avoids priority claims for nested legacy graphs or legacy untyped conditions. It does not attempt complete logical proof for arbitrary JSON paths or combined coverage by several earlier branches. **May overlap** means overlap has not been ruled out, not that every request matches both.
 
 Run the Playground to see the selected response and actual execution trace. Conditions show Matched, Not matched, or Not visited, with field checks and body-format mismatch reasons. Not-visited conditions are also evaluated diagnostically against the same input; their results do not affect execution. `/api/test` adds `conditions` and `response_id` while preserving status, headers, body, and trace. Public mock responses remain unchanged.
+
+## Static and Dynamic JSON responses
+
+See the [Dynamic JSON usage guide](docs/DYNAMIC_JSON.md) for a step-by-step tutorial, copyable examples, variable reference, generators, and troubleshooting.
+
+Every Response node defaults to **Static JSON**. Existing responses, including text containing `{{ ... }}`, are sent exactly as stored. Choose **Dynamic JSON** explicitly in the Node response editor or Table Edit popup to render variables in JSON values and response headers. Status, delay, conditions, and priority retain their existing behavior. Choosing a built-in response preset resets that response to Static JSON.
+
+A Dynamic body must remain valid JSON. Quote the template expression even when it will resolve to a number, boolean, array, object, or null. A single expression occupying the whole string preserves the source type; interpolation within a sentence becomes a string. Object keys and header names remain static. Request-derived strings are escaped by JSON serialization and never interpreted recursively as templates.
+
+```json
+{
+  "id": "{{ request.path.id }}",
+  "quantity": "{{ request.body.quantity }}",
+  "active": "{{ request.body.active }}",
+  "greeting": "Hello {{ request.body.name | default: \"Guest\" }}",
+  "transaction_id": "{{ generate.uuid }}",
+  "stock": "{{ generate.integer: [0, 100] }}",
+  "status": "{{ generate.choice: [\"pending\", \"paid\"] }}",
+  "created_at": "{{ generate.timestamp }}"
+}
+```
+
+| Source | Behavior |
+| --- | --- |
+| `request.path.id` | Matched route parameter, string |
+| `request.query.page` | First query value, string |
+| `request.headers.Authorization` | First header value; header name is case-insensitive |
+| `request.body.user.name` | Nested JSON field; array indices such as `items.0.id` are supported |
+| `request.body` | Whole JSON body, including arrays/scalars/null |
+| `request.form.email` | First form field value |
+| `request.raw_body` | Raw request body when available |
+
+Field paths support letters, numbers, dots, underscores, dollar signs and hyphens. There is no implicit type conversion for path/query/header/form strings. Use `| default: JSON` for missing request fields. Defaults do not replace present null, false, zero, or empty values. Missing variables without defaults fail rendering: Playground returns an explanatory 422; the public mock returns a generic 500 without exposing variable names.
+
+**Insert variable** offers a source picker, optional JSON default, and a destination in the top-level body object or a response header. Existing fields require confirmation before replacement. Arrays/scalar bodies and sentence interpolation can be edited directly in the JSON editor. **Preview rendered response** uses the current Playground input and the selected response only; it does not apply edits or choose a condition. The preview is the last rendered snapshot and must be rerun after changes. Playground still tests the complete flow. The read-only View dialog shows the template, not rendered data.
+
+Generators support UUID v4, current UTC timestamp, bounded integers (inclusive whole-number bounds within ±1,000,000,000), and a choice among 1–100 JSON values. Identical generator expressions reuse one value across the body and headers for each response. An optional seed (up to 256 bytes) repeats UUID/integer/choice values independently of JSON key order; without a seed each render uses fresh randomness. Timestamp always uses the live clock, including with a seed. Generated IDs are mock data, not credentials.
+
+Dynamic templates allow at most 200 expressions, at most 64 levels of template JSON nesting, and at most 1 MiB of rendered body plus headers. Rendered headers retain existing restrictions and reject newline injection. There is no arbitrary code execution, network access, file access, loop syntax, or recursive interpolation. Generated lists, pagination presets, fake names/addresses, explicit casts, and stateful persistence remain future work.
+
+No SQL migration is needed: optional `response_mode` and `response_seed` are persisted in existing flow JSONB. Missing/empty mode means Static JSON.

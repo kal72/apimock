@@ -294,7 +294,7 @@ func TableEditor() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<section class=\"flow-table-panel\" x-show=\"mode === 'table'\"><header class=\"flow-table-heading\"><div class=\"scenario-heading-title\"><h2 title=\"The first matching condition wins. Default response runs last.\">Response scenarios</h2><span class=\"scenario-count\" x-text=\"scenarioRows.length + (scenarioProjection.truncated ? '+' : '')\" :aria-label=\"scenarioRows.length + ' response scenarios, including default'\"></span></div><button x-show=\"canEditWorkspace\" class=\"btn primary\" @click=\"openAddScenario()\">+ Add condition</button></header><div class=\"table-overflow\"><table class=\"scenario-table\"><thead><tr><th>PRIORITY</th><th>REQUEST PATH</th><th>CONDITIONS</th><th>RESPONSE</th><th>HEADERS</th><th>ACTION</th></tr></thead><tbody><template x-for=\"row in scenarioRows\" :key=\"row.key\"><tr><td><div class=\"table-priority\"><span class=\"scenario-order\" x-text=\"branchModel && row.isDefault ? '—' : row.order\"></span><div x-show=\"branchModel && !row.isDefault\"><button x-show=\"canEditWorkspace\" aria-label=\"Increase condition priority\" :disabled=\"row.order === 1\" @click=\"changePriority(row.conditions[0]?.id,row.order-1)\">↑</button><button x-show=\"canEditWorkspace\" aria-label=\"Decrease condition priority\" :disabled=\"row.order === branchModel?.branches.length\" @click=\"changePriority(row.conditions[0]?.id,row.order+1)\">↓</button></div><span class=\"priority-fixed\" x-show=\"branchModel && row.isDefault\">Default</span></div></td><td><div class=\"scenario-request\"><strong x-text=\"endpoint.name\"></strong><code><span class=\"request-method\" x-text=\"endpoint.method\"></span> <span x-text=\"endpoint.path\"></span></code></div></td><td><div class=\"table-conditions\"><template x-for=\"condition in scenarioConditionDetails(row)\" :key=\"condition.id\"><div class=\"table-condition\"><span class=\"condition-outcome\" x-text=\"condition.matched ? 'Matches' : 'Does not match'\"></span><span class=\"scenario-condition\" x-text=\"condition.summary\"></span></div></template><span class=\"scenario-condition\" x-show=\"!row.conditions.length\" x-text=\"row.isDefault && conditions.length ? 'When no condition matches' : 'All incoming requests · no conditions'\"></span><span class=\"default-tag\" x-show=\"row.isDefault\">DEFAULT</span></div></td><td><span class=\"response-code\" x-text=\"row.status\"></span><code class=\"scenario-body-preview\" x-text=\"row.body || '(empty body)'\"></code></td><td><span class=\"header-count\" x-text=\"scenarioHeaderCount(row) + ' headers'\"></span></td><td><div class=\"table-row-actions\"><button class=\"btn scenario-view\" @click=\"viewScenario(row)\" :aria-label=\"'View path ' + row.label\">View</button><button x-show=\"canEditWorkspace\" class=\"btn scenario-edit\" @click=\"editScenario(row)\" :aria-label=\"'Edit path ' + row.label\">Edit ↗</button></div></td></tr></template></tbody></table></div><div class=\"config-empty\" x-show=\"!scenarioRows.length\">The flow is not connected to a response. Check connections in Node mode.</div><div class=\"flow-validation\" x-show=\"scenarioProjection.truncated\">The table displays up to 128 paths. Use Node mode to review more complex graphs.</div><footer class=\"scenario-summary-footer\"><span x-text=\"conditions.length + (conditions.length === 1 ? ' condition' : ' conditions')\"></span><span>Default response runs last</span></footer></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<section class=\"flow-table-panel\" x-show=\"mode === 'table'\"><header class=\"flow-table-heading\"><div class=\"scenario-heading-title\"><h2 title=\"The first matching condition wins. Default response runs last.\">Response scenarios</h2><span class=\"scenario-count\" x-text=\"scenarioRows.length + (scenarioProjection.truncated ? '+' : '')\" :aria-label=\"scenarioRows.length + ' response scenarios, including default'\"></span></div><button x-show=\"canEditWorkspace\" class=\"btn primary\" @click=\"openAddScenario()\">+ Add condition</button></header><div class=\"table-overflow\"><table class=\"scenario-table\"><thead><tr><th>PRIORITY</th><th>REQUEST PATH</th><th>CONDITIONS</th><th>RESPONSE</th><th>HEADERS</th><th>ACTION</th></tr></thead><tbody><template x-for=\"row in scenarioRows\" :key=\"row.key\"><tr><td><div class=\"table-priority\"><span class=\"scenario-order\" x-text=\"branchModel && row.isDefault ? '—' : row.order\"></span><div x-show=\"branchModel && !row.isDefault\"><button x-show=\"canEditWorkspace\" aria-label=\"Increase condition priority\" :disabled=\"row.order === 1\" @click=\"changePriority(row.conditions[0]?.id,row.order-1)\">↑</button><button x-show=\"canEditWorkspace\" aria-label=\"Decrease condition priority\" :disabled=\"row.order === branchModel?.branches.length\" @click=\"changePriority(row.conditions[0]?.id,row.order+1)\">↓</button></div><span class=\"priority-fixed\" x-show=\"branchModel && row.isDefault\">Default</span></div></td><td><div class=\"scenario-request\"><strong x-text=\"endpoint.name\"></strong><code><span class=\"request-method\" x-text=\"endpoint.method\"></span> <span x-text=\"endpoint.path\"></span></code></div></td><td><div class=\"table-conditions\"><template x-for=\"condition in scenarioConditionDetails(row)\" :key=\"condition.id\"><div class=\"table-condition\"><span class=\"condition-outcome\" x-text=\"condition.matched ? 'Matches' : 'Does not match'\"></span><span class=\"scenario-condition\" x-text=\"condition.summary\"></span></div></template><span class=\"scenario-condition\" x-show=\"!row.conditions.length\" x-text=\"row.isDefault && conditions.length ? 'When no condition matches' : 'All incoming requests · no conditions'\"></span><span class=\"default-tag\" x-show=\"row.isDefault\">DEFAULT</span></div></td><td><span class=\"response-code\" x-text=\"row.status\"></span><span class=\"type-pill\" x-show=\"endpoint.flow.nodes.find(node=>node.id===row.responseID)?.config.response_mode === 'dynamic'\">Dynamic</span><code class=\"scenario-body-preview\" x-text=\"row.body || '(empty body)'\"></code></td><td><span class=\"header-count\" x-text=\"scenarioHeaderCount(row) + ' headers'\"></span></td><td><div class=\"table-row-actions\"><button class=\"btn scenario-view\" @click=\"viewScenario(row)\" :aria-label=\"'View path ' + row.label\">View</button><button x-show=\"canEditWorkspace\" class=\"btn scenario-edit\" @click=\"editScenario(row)\" :aria-label=\"'Edit path ' + row.label\">Edit ↗</button></div></td></tr></template></tbody></table></div><div class=\"config-empty\" x-show=\"!scenarioRows.length\">The flow is not connected to a response. Check connections in Node mode.</div><div class=\"flow-validation\" x-show=\"scenarioProjection.truncated\">The table displays up to 128 paths. Use Node mode to review more complex graphs.</div><footer class=\"scenario-summary-footer\"><span x-text=\"conditions.length + (conditions.length === 1 ? ' condition' : ' conditions')\"></span><span>Default response runs last</span></footer></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -344,7 +344,7 @@ func Dialogs() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"modal-backdrop\" x-show=\"modal\" x-cloak @click.self=\"modal = null\" role=\"presentation\"><section class=\"modal\" :class=\"{'scenario-modal': modal === 'scenario', 'path-view-modal': modal === 'view', 'users-modal': modal === 'users'}\" role=\"dialog\" aria-modal=\"true\" :aria-label=\"modalTitle\" x-trap.noscroll=\"modal\" @keydown.ctrl.enter.prevent=\"commitModal()\"><header><div><span class=\"eyebrow\">MOCKLAB BUILDER</span><h2 x-text=\"modalTitle\"></h2></div><button @click=\"modal = null\" aria-label=\"Close dialog\">✕</button></header><template x-if=\"modal === 'view' && preview\"><div><div class=\"path-view-summary\"><strong x-text=\"preview.name\"></strong><code x-text=\"preview.method + ' ' + preview.path\"></code><span class=\"default-tag\" x-show=\"preview.isDefault\">DEFAULT</span><span class=\"view-draft-note\" x-show=\"dirty\">Draft preview</span></div><p class=\"help\">Read-only configuration preview. Request values are examples; no API request is executed.</p><div class=\"path-view-grid\"><section class=\"path-view-column\"><h3>Request</h3><label>Endpoint URL</label><code class=\"view-url\" x-text=\"preview.url\"></code><label>Path parameters</label><pre x-text=\"formatValue(preview.example.params || {})\"></pre><label>Query parameters</label><pre x-text=\"formatValue(preview.example.query || {})\"></pre><label>Request headers</label><pre x-text=\"formatValue(preview.example.headers || {})\"></pre><label x-text=\"'Body · ' + (preview.example.body_mode || 'json')\"></label><pre x-text=\"formatValue(preview.example.body_mode === 'form' ? preview.example.form || {} : preview.example.raw_body || preview.example.body || {})\"></pre></section><section class=\"path-view-column\"><h3>Conditions</h3><p class=\"help\" x-show=\"!preview.conditions.length\" x-text=\"preview.isDefault && conditions.length ? 'When no condition matches' : 'All incoming requests · no conditions'\"></p><template x-for=\"(condition,index) in preview.conditions\" :key=\"index\"><div class=\"view-condition\"><strong x-text=\"condition.condition_type + ' · ' + (condition.match === 'any' ? 'OR' : 'AND')\"></strong><span class=\"condition-outcome\" x-text=\"condition.matched ? 'Matches' : 'Does not match'\"></span><span class=\"help\" x-show=\"condition.condition_type === 'body'\" x-text=\"condition.body_mode + (condition.body_mode === 'raw' ? ' · ' + condition.raw_format : '')\"></span><template x-for=\"(rule,ruleIndex) in condition.rules\" :key=\"ruleIndex\"><div class=\"view-rule\"><code x-text=\"rule.field\"></code><span x-text=\"rule.operator + (rule.required ? ' · Required' : '')\"></span><pre x-show=\"!['exists','empty'].includes(rule.operator)\" x-text=\"formatValue(rule.value)\"></pre></div></template></div></template></section><section class=\"path-view-column\"><h3>Response headers</h3><label>Effective headers</label><pre x-text=\"formatValue(preview.headers)\"></pre><p class=\"help\">Includes header nodes along this path and the response node overrides.</p></section><section class=\"path-view-column\"><h3>Response body</h3><div class=\"view-response-meta\"><span class=\"response-code\" x-text=\"preview.status\"></span><span x-text=\"preview.delay + ' ms delay'\"></span></div><pre class=\"view-response-body\" x-text=\"preview.body ? formatValue(preview.body) : '(empty body)'\"></pre></section></div><div class=\"scenario-popup-footer\"><button type=\"button\" class=\"btn\" @click=\"modal=null\">Close</button></div></div></template><template x-if=\"modal === 'members'\"><div><p class=\"help\">Owners manage the workspace and members. Editors manage endpoints. Viewers can browse and test mocks. Administrators have recovery access to every workspace.</p><form @submit.prevent=\"saveMember()\"><label>Existing account username<input x-model=\"memberForm.username\" required placeholder=\"username\"></label><label>Workspace role<select x-model=\"memberForm.role\"><option value=\"viewer\">Viewer</option><option value=\"editor\">Editor</option><option value=\"owner\">Owner</option></select></label><button class=\"btn primary\" :disabled=\"busy\">Add or update member</button></form><div class=\"workspace-member-list\"><template x-for=\"member in members\" :key=\"member.user_id\"><div class=\"workspace-member-row\"><div><strong x-text=\"member.name\"></strong><small x-text=\"'@'+member.username+(member.active?'':' · Inactive')\"></small></div><select aria-label=\"Member role\" :value=\"member.role\" :disabled=\"busy\" @change=\"saveMember(member.username,$event.target.value)\"><option value=\"viewer\">Viewer</option><option value=\"editor\">Editor</option><option value=\"owner\">Owner</option></select><button class=\"btn\" :disabled=\"busy\" @click=\"removeMember(member)\">Remove</button></div></template></div></div></template><template x-if=\"modal === 'workspace'\"><form @submit.prevent=\"saveWorkspace()\"><label>Workspace name<input x-model=\"workspaceForm.name\" required placeholder=\"Demo Store\"></label><label>Slug / base path<input x-model=\"workspaceForm.slug\" required pattern=\"[a-z0-9]+(-[a-z0-9]+)*\" placeholder=\"demo-store\"></label><p class=\"help\">Mock URL: /public/<span x-text=\"workspaceForm.slug || 'workspace'\"></span>/…</p><button class=\"btn primary w-full\" :disabled=\"busy\">Save workspace</button></form></template><template x-if=\"modal === 'endpoint'\"><form @submit.prevent=\"createEndpoint()\"><label>Endpoint name<input x-model=\"endpointForm.name\" required placeholder=\"Get product\"></label><label>HTTP method<select x-model=\"endpointForm.method\"><template x-for=\"m in methods\"><option x-text=\"m\"></option></template></select></label><label>Path<input x-model=\"endpointForm.path\" required placeholder=\"/products/:id\"></label><div class=\"new-endpoint-hint\"><strong>✓ A default response is available</strong><p>Incoming request → Default response (HTTP 200). Add a condition template for another scenario; configure it through the row's Edit button.</p></div><button class=\"btn primary w-full\" :disabled=\"busy\">Create endpoint with response 200</button></form></template><template x-if=\"modal === 'palette'\"><div><p class=\"help\">Choose a type to create a connected node with one required field and AND matching. Configure details later using Edit.</p><div class=\"palette-context\" x-show=\"connecting\"><span x-text=\"'Insert at output: ' + (endpoint.flow.nodes.find(node => node.id === connecting?.from)?.label || '') + (connecting?.branch ? ' · ' + connecting.branch : '')\"></span></div><div class=\"condition-palette\"><template x-for=\"kind in conditionKinds\" :key=\"kind.key\"><button type=\"button\" @click=\"quickAddCondition(kind.key)\" :disabled=\"!canAddCondition(kind.key)\"><span class=\"palette-icon\" x-text=\"kind.icon\"></span><strong x-text=\"kind.name\"></strong><p x-text=\"kind.description\"></p><span class=\"palette-hint\" x-text=\"canAddCondition(kind.key) ? (kind.key === 'body' ? 'Default: Raw JSON · Edit for Form/Text' : 'Create node now →') : 'The route has no :parameter'\"></span></button></template></div></div></template><template x-if=\"modal === 'scenario' && scenarioForm\"><form class=\"scenario-form\" @submit.prevent=\"saveScenario()\"><p class=\"scenario-shared-note\" x-show=\"!scenarioScope\">Request settings apply to this endpoint. Changes to shared conditions or responses affect every related path. The active version is updated when you save the draft.</p><nav x-show=\"!scenarioScope\" class=\"scenario-tabs\" aria-label=\"Flow configuration sections\"><button type=\"button\" :class=\"scenarioTab === 'request' && 'active'\" @click=\"scenarioTab='request'\">Request</button><button type=\"button\" :class=\"scenarioTab === 'conditions' && 'active'\" @click=\"scenarioTab='conditions'\">Conditions</button><button type=\"button\" :class=\"scenarioTab === 'response' && 'active'\" @click=\"scenarioTab='response'\">Response</button><button type=\"button\" x-show=\"scenarioForm.fallback\" :class=\"scenarioTab === 'fallback' && 'active'\" @click=\"scenarioTab='fallback'\">Default response</button><button type=\"button\" :class=\"scenarioTab === 'advanced' && 'active'\" @click=\"scenarioTab='advanced'\">Advanced flow</button></nav><section x-show=\"scenarioTab === 'request'\"><label>Endpoint name<input x-model=\"scenarioForm.route.name\"></label><div class=\"insertion-controls\"><label>Method<select x-model=\"scenarioForm.route.method\"><template x-for=\"method in methods\" :key=\"method\"><option x-text=\"method\"></option></template></select></label><label>Path<input x-model=\"scenarioForm.route.path\" placeholder=\"/products/:id\"></label></div><label>Path parameters (JSON string values)<textarea class=\"code-editor short\" x-model=\"scenarioForm.params\" spellcheck=\"false\"></textarea></label><label>Query parameters (JSON arrays of strings)<textarea class=\"code-editor short\" x-model=\"scenarioForm.query\" spellcheck=\"false\"></textarea></label>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"modal-backdrop\" x-show=\"modal\" x-cloak @click.self=\"modal = null\" role=\"presentation\"><section class=\"modal\" :class=\"{'scenario-modal': modal === 'scenario', 'path-view-modal': modal === 'view', 'users-modal': modal === 'users'}\" role=\"dialog\" aria-modal=\"true\" :aria-label=\"modalTitle\" x-trap.noscroll=\"modal\" @keydown.ctrl.enter.prevent=\"commitModal()\"><header><div><span class=\"eyebrow\">MOCKLAB BUILDER</span><h2 x-text=\"modalTitle\"></h2></div><button @click=\"modal = null\" aria-label=\"Close dialog\">✕</button></header><template x-if=\"modal === 'view' && preview\"><div><div class=\"path-view-summary\"><strong x-text=\"preview.name\"></strong><code x-text=\"preview.method + ' ' + preview.path\"></code><span class=\"default-tag\" x-show=\"preview.isDefault\">DEFAULT</span><span class=\"view-draft-note\" x-show=\"dirty\">Draft preview</span></div><p class=\"help\">Read-only configuration preview. Request values are examples; no API request is executed.</p><div class=\"path-view-grid\"><section class=\"path-view-column\"><h3>Request</h3><label>Endpoint URL</label><code class=\"view-url\" x-text=\"preview.url\"></code><label>Path parameters</label><pre x-text=\"formatValue(preview.example.params || {})\"></pre><label>Query parameters</label><pre x-text=\"formatValue(preview.example.query || {})\"></pre><label>Request headers</label><pre x-text=\"formatValue(preview.example.headers || {})\"></pre><label x-text=\"'Body · ' + (preview.example.body_mode || 'json')\"></label><pre x-text=\"formatValue(preview.example.body_mode === 'form' ? preview.example.form || {} : preview.example.raw_body || preview.example.body || {})\"></pre></section><section class=\"path-view-column\"><h3>Conditions</h3><p class=\"help\" x-show=\"!preview.conditions.length\" x-text=\"preview.isDefault && conditions.length ? 'When no condition matches' : 'All incoming requests · no conditions'\"></p><template x-for=\"(condition,index) in preview.conditions\" :key=\"index\"><div class=\"view-condition\"><strong x-text=\"condition.condition_type + ' · ' + (condition.match === 'any' ? 'OR' : 'AND')\"></strong><span class=\"condition-outcome\" x-text=\"condition.matched ? 'Matches' : 'Does not match'\"></span><span class=\"help\" x-show=\"condition.condition_type === 'body'\" x-text=\"condition.body_mode + (condition.body_mode === 'raw' ? ' · ' + condition.raw_format : '')\"></span><template x-for=\"(rule,ruleIndex) in condition.rules\" :key=\"ruleIndex\"><div class=\"view-rule\"><code x-text=\"rule.field\"></code><span x-text=\"rule.operator + (rule.required ? ' · Required' : '')\"></span><pre x-show=\"!['exists','empty'].includes(rule.operator)\" x-text=\"formatValue(rule.value)\"></pre></div></template></div></template></section><section class=\"path-view-column\"><h3>Response headers</h3><label>Effective headers</label><pre x-text=\"formatValue(preview.headers)\"></pre><p class=\"help\">Includes header nodes along this path and the response node overrides.</p></section><section class=\"path-view-column\"><h3>Response body</h3><span class=\"type-pill\" x-text=\"preview.responseMode === 'dynamic' ? 'Dynamic JSON template' : 'Static JSON'\"></span><p class=\"help\" x-show=\"preview.responseMode === 'dynamic'\">Template only. Use Playground to see rendered values.</p><div class=\"view-response-meta\"><span class=\"response-code\" x-text=\"preview.status\"></span><span x-text=\"preview.delay + ' ms delay'\"></span></div><pre class=\"view-response-body\" x-text=\"preview.body ? formatValue(preview.body) : '(empty body)'\"></pre></section></div><div class=\"scenario-popup-footer\"><button type=\"button\" class=\"btn\" @click=\"modal=null\">Close</button></div></div></template><template x-if=\"modal === 'members'\"><div><p class=\"help\">Owners manage the workspace and members. Editors manage endpoints. Viewers can browse and test mocks. Administrators have recovery access to every workspace.</p><form @submit.prevent=\"saveMember()\"><label>Existing account username<input x-model=\"memberForm.username\" required placeholder=\"username\"></label><label>Workspace role<select x-model=\"memberForm.role\"><option value=\"viewer\">Viewer</option><option value=\"editor\">Editor</option><option value=\"owner\">Owner</option></select></label><button class=\"btn primary\" :disabled=\"busy\">Add or update member</button></form><div class=\"workspace-member-list\"><template x-for=\"member in members\" :key=\"member.user_id\"><div class=\"workspace-member-row\"><div><strong x-text=\"member.name\"></strong><small x-text=\"'@'+member.username+(member.active?'':' · Inactive')\"></small></div><select aria-label=\"Member role\" :value=\"member.role\" :disabled=\"busy\" @change=\"saveMember(member.username,$event.target.value)\"><option value=\"viewer\">Viewer</option><option value=\"editor\">Editor</option><option value=\"owner\">Owner</option></select><button class=\"btn\" :disabled=\"busy\" @click=\"removeMember(member)\">Remove</button></div></template></div></div></template><template x-if=\"modal === 'workspace'\"><form @submit.prevent=\"saveWorkspace()\"><label>Workspace name<input x-model=\"workspaceForm.name\" required placeholder=\"Demo Store\"></label><label>Slug / base path<input x-model=\"workspaceForm.slug\" required pattern=\"[a-z0-9]+(-[a-z0-9]+)*\" placeholder=\"demo-store\"></label><p class=\"help\">Mock URL: /public/<span x-text=\"workspaceForm.slug || 'workspace'\"></span>/…</p><button class=\"btn primary w-full\" :disabled=\"busy\">Save workspace</button></form></template><template x-if=\"modal === 'endpoint'\"><form @submit.prevent=\"createEndpoint()\"><label>Endpoint name<input x-model=\"endpointForm.name\" required placeholder=\"Get product\"></label><label>HTTP method<select x-model=\"endpointForm.method\"><template x-for=\"m in methods\"><option x-text=\"m\"></option></template></select></label><label>Path<input x-model=\"endpointForm.path\" required placeholder=\"/products/:id\"></label><div class=\"new-endpoint-hint\"><strong>✓ A default response is available</strong><p>Incoming request → Default response (HTTP 200). Add a condition template for another scenario; configure it through the row's Edit button.</p></div><button class=\"btn primary w-full\" :disabled=\"busy\">Create endpoint with response 200</button></form></template><template x-if=\"modal === 'palette'\"><div><p class=\"help\">Choose a type to create a connected node with one required field and AND matching. Configure details later using Edit.</p><div class=\"palette-context\" x-show=\"connecting\"><span x-text=\"'Insert at output: ' + (endpoint.flow.nodes.find(node => node.id === connecting?.from)?.label || '') + (connecting?.branch ? ' · ' + connecting.branch : '')\"></span></div><div class=\"condition-palette\"><template x-for=\"kind in conditionKinds\" :key=\"kind.key\"><button type=\"button\" @click=\"quickAddCondition(kind.key)\" :disabled=\"!canAddCondition(kind.key)\"><span class=\"palette-icon\" x-text=\"kind.icon\"></span><strong x-text=\"kind.name\"></strong><p x-text=\"kind.description\"></p><span class=\"palette-hint\" x-text=\"canAddCondition(kind.key) ? (kind.key === 'body' ? 'Default: Raw JSON · Edit for Form/Text' : 'Create node now →') : 'The route has no :parameter'\"></span></button></template></div></div></template><template x-if=\"modal === 'scenario' && scenarioForm\"><form class=\"scenario-form\" @submit.prevent=\"saveScenario()\"><p class=\"scenario-shared-note\" x-show=\"!scenarioScope\">Request settings apply to this endpoint. Changes to shared conditions or responses affect every related path. The active version is updated when you save the draft.</p><nav x-show=\"!scenarioScope\" class=\"scenario-tabs\" aria-label=\"Flow configuration sections\"><button type=\"button\" :class=\"scenarioTab === 'request' && 'active'\" @click=\"scenarioTab='request'\">Request</button><button type=\"button\" :class=\"scenarioTab === 'conditions' && 'active'\" @click=\"scenarioTab='conditions'\">Conditions</button><button type=\"button\" :class=\"scenarioTab === 'response' && 'active'\" @click=\"scenarioTab='response'\">Response</button><button type=\"button\" x-show=\"scenarioForm.fallback\" :class=\"scenarioTab === 'fallback' && 'active'\" @click=\"scenarioTab='fallback'\">Default response</button><button type=\"button\" :class=\"scenarioTab === 'advanced' && 'active'\" @click=\"scenarioTab='advanced'\">Advanced flow</button></nav><section x-show=\"scenarioTab === 'request'\"><label>Endpoint name<input x-model=\"scenarioForm.route.name\"></label><div class=\"insertion-controls\"><label>Method<select x-model=\"scenarioForm.route.method\"><template x-for=\"method in methods\" :key=\"method\"><option x-text=\"method\"></option></template></select></label><label>Path<input x-model=\"scenarioForm.route.path\" placeholder=\"/products/:id\"></label></div><label>Path parameters (JSON string values)<textarea class=\"code-editor short\" x-model=\"scenarioForm.params\" spellcheck=\"false\"></textarea></label><label>Query parameters (JSON arrays of strings)<textarea class=\"code-editor short\" x-model=\"scenarioForm.query\" spellcheck=\"false\"></textarea></label>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -525,33 +525,124 @@ func ScenarioResponse(section string, title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\"></label><div class=\"insertion-controls\"><label>HTTP status<input type=\"number\" min=\"200\" max=\"599\" x-model.number=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\"></label> <label>Response mode<select aria-label=\"Response mode\" x-model=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var21 string
-		templ_7745c5c3_Var21, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".status").Resolve(ctx)
+		templ_7745c5c3_Var21, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".response_mode").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 208, Col: 640}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 209, Col: 111}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var21)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\"></label><label>Response delay (ms)<input type=\"number\" min=\"0\" max=\"10000\" x-model.number=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\"><option value=\"static\">Static JSON</option><option value=\"dynamic\">Dynamic JSON</option></select></label><p class=\"help\" x-show=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var22 string
-		templ_7745c5c3_Var22, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".delay_ms").Resolve(ctx)
+		templ_7745c5c3_Var22, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".response_mode === 'static'").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 208, Col: 775}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 210, Col: 84}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var22)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\"></label></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\">Static JSON is sent exactly as written. Template expressions remain literal text.</p><div class=\"dynamic-response-tools\" x-show=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var23 string
+		templ_7745c5c3_Var23, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".response_mode === 'dynamic'").Resolve(ctx)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 211, Col: 105}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\"><p class=\"help\">A variable used as the whole JSON value preserves its type. Variables inside a sentence become text. Missing fields need a default. Header values always become text.</p><label>Generator seed (optional)<input x-model=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var24 string
+		templ_7745c5c3_Var24, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".response_seed").Resolve(ctx)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 213, Col: 96}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" maxlength=\"256\" placeholder=\"Leave empty for new random values\"></label><p class=\"help\">A fixed seed repeats generated UUIDs, integers and choices. Timestamp always uses the current time. The same generator expression is reused within one response, including its headers.</p><button class=\"btn\" type=\"button\" @click=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var25 string
+		templ_7745c5c3_Var25, templ_7745c5c3_Err = templruntime.NewAttributeExpression("openResponseVariables('" + section + "')").Resolve(ctx)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 214, Col: 88}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "\">Insert variable</button><div class=\"response-variable-picker\" x-show=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var26 string
+		templ_7745c5c3_Var26, templ_7745c5c3_Err = templruntime.NewAttributeExpression("variablePicker === '" + section + "'").Resolve(ctx)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 215, Col: 88}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\"><label>Source<select x-model=\"responseVariable.source\"><option value=\"request.path\">Path parameter</option><option value=\"request.query\">Query parameter</option><option value=\"request.headers\">Request header</option><option value=\"request.body\">JSON body field</option><option value=\"request.form\">Form body field</option><option value=\"request.raw_body\">Raw request body</option><option value=\"generate.uuid\">Generated UUID</option><option value=\"generate.timestamp\">Current timestamp</option><option value=\"generate.integer\">Random integer</option><option value=\"generate.choice\">Random choice</option></select></label> <label x-show=\"['request.path','request.query','request.headers','request.body','request.form'].includes(responseVariable.source)\">Source field<input x-model=\"responseVariable.field\" placeholder=\"name or user.name\"></label> <label x-show=\"['generate.integer','generate.choice'].includes(responseVariable.source)\">Generator arguments (JSON array)<input x-model=\"responseVariable.arguments\" placeholder='[1, 100] or [\"pending\", \"paid\"]'></label><div x-show=\"responseVariable.source.startsWith('request.')\"><label class=\"required-check\"><input type=\"checkbox\" x-model=\"responseVariable.hasDefault\"> Use default when missing</label><label x-show=\"responseVariable.hasDefault\">Default value (JSON)<input x-model=\"responseVariable.defaultJSON\" placeholder='\"Guest\", 0, false, null, [], {}'></label></div><label>Destination<select x-model=\"responseVariable.target\"><option value=\"body\">JSON body field</option><option value=\"headers\">Response header</option></select></label><label>Response field / header name<input x-model=\"responseVariable.key\" placeholder=\"value or X-Request-ID\"></label><button type=\"button\" class=\"btn primary\" @click=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var27 string
+		templ_7745c5c3_Var27, templ_7745c5c3_Err = templruntime.NewAttributeExpression("insertResponseVariable('" + section + "')").Resolve(ctx)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 220, Col: 386}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\">Insert into response</button></div></div><div class=\"insertion-controls\"><label>HTTP status<input type=\"number\" min=\"200\" max=\"599\" x-model.number=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var28 string
+		templ_7745c5c3_Var28, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".status").Resolve(ctx)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 223, Col: 147}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\"></label><label>Response delay (ms)<input type=\"number\" min=\"0\" max=\"10000\" x-model.number=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var29 string
+		templ_7745c5c3_Var29, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".delay_ms").Resolve(ctx)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 223, Col: 282}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var29)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\"></label></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -559,20 +650,111 @@ func ScenarioResponse(section string, title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<label>JSON body<textarea class=\"code-editor\" x-model=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<label>JSON body<textarea aria-label=\"Response JSON body\" class=\"code-editor\" x-model=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var23 string
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".body").Resolve(ctx)
+		var templ_7745c5c3_Var30 string
+		templ_7745c5c3_Var30, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".body").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 208, Col: 940}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 223, Col: 479}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var30)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" spellcheck=\"false\"></textarea></label></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "\" spellcheck=\"false\"></textarea></label> <button type=\"button\" class=\"btn\" :disabled=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var31 string
+		templ_7745c5c3_Var31, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".previewBusy").Resolve(ctx)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 224, Col: 90}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var31)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "\" @click=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var32 string
+		templ_7745c5c3_Var32, templ_7745c5c3_Err = templruntime.NewAttributeExpression("previewResponse('" + section + "')").Resolve(ctx)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 224, Col: 138}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var32)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\">Preview rendered response</button><p class=\"help\">Uses the current Playground input and this response only. Does not apply changes to the draft. Re-run after editing.</p><p class=\"dialog-error\" role=\"alert\" x-show=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var33 string
+		templ_7745c5c3_Var33, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".previewError").Resolve(ctx)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 225, Col: 91}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var33)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" x-text=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var34 string
+		templ_7745c5c3_Var34, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".previewError").Resolve(ctx)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 225, Col: 146}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var34)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\"></p><template x-if=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var35 string
+		templ_7745c5c3_Var35, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".previewResult").Resolve(ctx)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 226, Col: 63}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\"><div class=\"response-render-preview\"><strong>Last preview</strong><pre class=\"response-output\" x-text=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var36 string
+		templ_7745c5c3_Var36, templ_7745c5c3_Err = templruntime.NewAttributeExpression("formatValue(scenarioForm." + section + ".previewResult.body)").Resolve(ctx)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 226, Col: 232}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "\"></pre><label>Rendered headers</label><pre x-text=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var37 string
+		templ_7745c5c3_Var37, templ_7745c5c3_Err = templruntime.NewAttributeExpression("formatValue(scenarioForm." + section + ".previewResult.headers)").Resolve(ctx)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 226, Col: 351}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var37)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "\"></pre></div></template></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

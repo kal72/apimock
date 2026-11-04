@@ -174,8 +174,12 @@ func Evaluate(ctx context.Context, f domain.Flow, r Request, params map[string]s
 				}
 			}
 			result.Status = n.Config.Status
-			result.Body = n.Config.Body
-			for k, v := range n.Config.Headers {
+			body, headers, err := renderResponse(n.Config, r, params)
+			if err != nil {
+				return Result{}, fmt.Errorf("%w: %s", ErrResponseRender, err)
+			}
+			result.Body = body
+			for k, v := range headers {
 				result.Headers[k] = v
 			}
 			return result, nil

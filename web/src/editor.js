@@ -1,3 +1,4 @@
+import { responseEditor, responseConfig } from './responses.js';
 import { workspaceEditor } from './workspace.js';
 import { identityEditor } from './identity.js';
 import { scenarioBranches, arrangeBranches, branchEdges, branchRows, setPriority } from './branches.js';
@@ -9,6 +10,8 @@ import { clone, defaultExample, defaultFlow, outgoingBranches, setConnection, in
 export const createEditor = () => ({
   ...identityEditor,
   ...workspaceEditor,
+  ...responseEditor,
+  responseVariable:{...responseEditor.responseVariable},
   get canManageWorkspace(){return this.workspace?.role === 'owner';},
   get canEditWorkspace(){return ['owner','editor'].includes(this.workspace?.role);},
   workspaces:[], endpoints:[], workspaceID:'', workspace:null, endpoint:null, publicOrigin:'',
@@ -202,7 +205,7 @@ export const createEditor = () => ({
         if(response.body){try{JSON.parse(response.body);}catch{throw Error('Response body must be valid JSON.');}}
         if(!Number.isInteger(response.delay_ms)||response.delay_ms<0||response.delay_ms>10000)throw Error('Response delay must be 0–10000 ms.');
         const node=candidate.nodes.find(item=>item.id===response.id);
-        node.label=response.label;node.config={...node.config,status:response.status,body:response.body,headers:headersFromRows(response.headers),delay_ms:response.delay_ms};
+        node.label=response.label;node.config={...node.config,...responseConfig(response)};
       }
       validationSection='advanced';
       for(const block of form.legacyHeaders)candidate.nodes.find(node=>node.id===block.id).config.headers=headersFromRows(block.headers);
@@ -349,7 +352,7 @@ export const createEditor = () => ({
   conditionIcon(config){const c=normalizeCondition(config);return conditionKinds.find(kind=>kind.key===c.condition_type)?.icon || '◇';},
   conditionMeta(config){const c=normalizeCondition(config);return `${conditionKindLabel(c)}${c.condition_type==='body' ? ' · '+(c.body_mode==='form'?'Form':c.raw_format==='text'?'Raw Text':'Raw JSON') : ''} · ${c.match==='any'?'OR':'AND'} · ${c.rules.length} field`;},
   nodeIcon(type){return {request:'↳',condition:'◇',response:'↗',headers:'≡',delay:'◷'}[type] || '◇';},
-  nodeSummary(node){switch(node.type){case 'request':return `${this.endpoint.method} ${this.endpoint.path}`;case 'response':return `${node.config.status} · JSON response`;case 'headers':return `${Object.keys(node.config.headers||{}).length} response headers`;case 'condition':return conditionSummary(node.config);case 'delay':return `${node.config.delay_ms} ms`;default:return '';}},
+  nodeSummary(node){switch(node.type){case 'request':return `${this.endpoint.method} ${this.endpoint.path}`;case 'response':return `${node.config.status} · ${node.config.response_mode === 'dynamic' ? 'Dynamic JSON' : 'Static JSON'}`;case 'headers':return `${Object.keys(node.config.headers||{}).length} response headers`;case 'condition':return conditionSummary(node.config);case 'delay':return `${node.config.delay_ms} ms`;default:return '';}},
   async runTest(){this.testOpen=true;this.testing=true;this.trace=[];this.testResult=null;try{const input=JSON.parse(this.testInput);this.testResult=await this.request('/api/test','POST',{...input,flow:this.endpoint.flow,method:this.endpoint.method,path:this.endpoint.path});this.trace=this.testResult.trace;}catch(error){this.notify(error.message);}finally{this.testing=false;}},
   async copyBaseURL(){await this.copyText(this.baseURL,'Workspace base URL copied.');},
   async copyURL(){await this.copyText(this.baseURL+this.endpoint.path,'Endpoint URL copied. Replace :parameter with a value before use.');},

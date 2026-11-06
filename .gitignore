@@ -6,3 +6,4 @@ bin/
 !.env.production.example
 tmp/
 coverage.out
+docs/screenshots/*

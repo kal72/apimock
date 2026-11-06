@@ -80,8 +80,8 @@ test('invalid request examples keep the dialog open and preserve the endpoint', 
   assert.equal(JSON.stringify(state.endpoint), before);
 });
 
-test('the default editor opens configuration and exposes unconditional response setup', () => {
-  const state=editor();assert.equal(state.mode,'table');assert.equal(state.responseMode,'direct');
+test('the default editor opens Node mode and exposes unconditional response setup', () => {
+  const state=editor();assert.equal(state.mode,'node');assert.equal(state.responseMode,'direct');
   state.endpoint.flow.nodes=state.endpoint.flow.nodes.filter(node=>node.type!=='response');state.endpoint.flow.edges=[];
   state.openDirectResponse();
   assert.equal(state.modal,'node');assert.equal(state.nodeForm.type,'response');assert.equal(state.nodeForm.config.status,200);

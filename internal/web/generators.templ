@@ -1,0 +1,49 @@
+package web
+
+import "strconv"
+
+templ GeneratorDocumentation() {
+ <!DOCTYPE html>
+ <html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Generator reference — Mocklab</title><script>try { const value=localStorage.getItem('mocklab-theme'); document.documentElement.dataset.theme=value==='night'||!['light','night'].includes(value)&&matchMedia('(prefers-color-scheme: dark)').matches?'night':'light'; } catch { document.documentElement.dataset.theme='light'; }</script><link rel="stylesheet" href="/assets/app.css"/><script type="module" src="/assets/app.js"></script></head>
+ <body class="generator-docs" x-data="generatorDocs"><a href="#generator-content" class="docs-skip">Skip to content</a>
+  <header class="docs-header"><a class="docs-brand" href="/app">☁ mocklab<span>.</span></a><span class="docs-header-label">DOCUMENTATION</span><a href="/app" class="btn">Open workspace ↗</a>@ThemeSwitch()</header>
+  <div class="docs-layout"><nav class="docs-nav" aria-label="Documentation sections"><span class="eyebrow">GENERATE DATA</span><a href="#overview">Overview</a><a href="#quick-start">Quick start</a><a href="#available">Available generators · 4</a><a href="#planned">Planned catalog · 25</a><a href="#rules">Types, seeds &amp; headers</a><a href="#troubleshooting">Troubleshooting</a></nav>
+   <main id="generator-content" class="docs-content"><section id="overview" class="docs-hero"><span class="eyebrow">DYNAMIC JSON / GENERATOR REFERENCE</span><h1>Generate the data your API needs.</h1><p>Use the shared <code>generate.*</code> namespace in Dynamic JSON responses. Explore runnable generators and preview the proposed fake-data catalog.</p><div class="docs-status-note"><strong>Static JSON remains the default.</strong><span>Expressions are processed only when you select Dynamic JSON. The 25 categorized generators below are planned and are not runnable yet.</span></div></section>
+    <section id="quick-start"><h2>Quick start</h2><ol><li>Open a Response node's Edit dialog, or Table → Edit → Response.</li><li>Choose <strong>Dynamic JSON</strong> in Response mode.</li><li>Paste a template below or use Insert variable.</li><li>Use Preview rendered response, apply to draft, then Save changes.</li></ol><p>Preview uses current Playground input and only the selected response. Run test evaluates the complete draft flow. Public URLs use the saved configuration.</p><pre><code>{ "{\n  \"id\": \"{{ generate.uuid }}\",\n  \"stock\": \"{{ generate.integer: [1, 100] }}\"\n}" }</code></pre></section>
+    <div class="docs-search"><label for="generator-search">Find a generator</label><input id="generator-search" type="search" x-model="query" placeholder="Search name, category or result type…"/><span role="status" x-text="copyStatus"></span></div>
+    <section id="available"><div class="docs-section-heading"><h2>Available now</h2><span class="docs-badge available">4 generators</span></div><p>Copy a JSON example into a Dynamic JSON response. Seed is optional.</p><div class="docs-generator-grid">
+     for _, generator := range generatorDocs() {
+      if generator.Available {
+       @GeneratorCard(generator)
+      }
+     }
+    </div><p class="help" x-show="!hasMatches(true)">No available generators match your search.</p></section>
+    <section id="planned"><div class="docs-section-heading"><h2>Planned fake-data catalog</h2><span class="docs-badge planned">Not implemented</span></div><p>Proposed names for 25 additional generators. These examples describe the plan and will currently fail validation. Initial implementation targets a Go adapter around gofakeit; locale support and coherent profiles are later phases.</p><div class="docs-generator-grid">
+     for _, generator := range generatorDocs() {
+      if !generator.Available {
+       @GeneratorCard(generator)
+      }
+     }
+    </div><p class="help" x-show="!hasMatches(false)">No planned generators match your search.</p></section>
+    <section id="rules"><h2>Types, seeds &amp; headers</h2><div class="docs-rule-grid"><article><h3>Preserve JSON types</h3><p>Quote expressions in the template. An expression occupying the whole string preserves its value type; text around it produces a string. Object keys stay static.</p></article><article><h3>Reproduce a sample</h3><p>A fixed Generator seed repeats UUID, integer and choice values. Without a seed, each render uses fresh randomness. Timestamp always uses the current time.</p></article><article><h3>Reuse an identifier</h3><p>Identical generator expressions share one value within a response, including body and headers. Two UUID expressions produce the same ID. Named independent references are not available yet.</p></article><article><h3>Dynamic headers</h3><p>Use an expression directly in a response header value, such as X-Request-ID. Header values become text. Header names remain static; restricted headers and newline injection are rejected.</p></article></div><p>Request variables also support path, query, headers, JSON/form fields and raw body. Use <code>| default: JSON</code> only for missing request variables, not generators. Present null, false, zero and empty values do not trigger a default.</p><p>Limits: 200 expressions per response, 64 levels of template nesting, 1 MiB rendered body plus configured headers, and a seed of at most 256 bytes. No script execution, recursive interpolation or loops.</p></section>
+    <section id="troubleshooting"><h2>Troubleshooting</h2><details><summary>The expression is returned as text</summary><p>Check that Response mode is Dynamic JSON, then apply and save the change. Static JSON intentionally keeps expressions literal.</p></details><details><summary>The JSON body is invalid</summary><p>Keep expressions quoted. Escape quotation marks in choice values and string defaults, or use Insert variable to build the expression.</p></details><details><summary>The generator is unknown</summary><p>Use one of the four available generators. Categorized names in the planned catalog are not implemented yet.</p></details><details><summary>Random values repeat</summary><p>Clear the seed for fresh randomness. Identical expressions still reuse one value per response; this is intentional.</p></details><details><summary>Preview differs from a real request</summary><p>Preview does not select conditions and tests the open form. The public API uses the saved flow. Random values change without a seed, and timestamps remain live.</p></details><details><summary>A request variable is missing</summary><p>Provide the field in Playground input or add a JSON default. Playground shows detailed render errors with status 422; the public mock returns a generic 500.</p></details></section>
+    <footer class="docs-footer">Mocklab generator reference · Planned examples are labeled explicitly.</footer>
+   </main>
+  </div>
+ </body></html>
+}
+
+templ GeneratorCard(generator GeneratorDoc) {
+ <article class="docs-generator-card" data-generator={ generator.Name } data-search={ generator.Name+" "+generator.Category+" "+generator.ResultType } data-available={ strconv.FormatBool(generator.Available) } x-show={ "matches(" + strconv.Quote(generator.Name+" "+generator.Category+" "+generator.ResultType) + ")" }><div class="docs-card-meta"><span>{ generator.Category }</span>if generator.Available {
+ <span class="docs-badge available">Available</span>
+ } else {
+ <span class="docs-badge planned">Planned</span>
+ }
+ </div><h3><code>{ generator.Name }</code></h3><span class="docs-result-type">Returns { generator.ResultType }</span><p>{ generator.Description }</p><details><summary>JSON example</summary><pre><code>{ generator.Example }</code></pre>
+  if generator.Available {
+   <button type="button" class="btn" @click="copyExample($el.previousElementSibling.innerText)">Copy JSON</button>
+  } else {
+   <p class="docs-planned-caption">Reference only · not executable in the current version.</p>
+  }
+ </details></article>
+}

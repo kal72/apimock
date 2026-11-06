@@ -91,6 +91,14 @@ func TestWorkspaceIntegration(t *testing.T) {
 		call(actor, "GET", base+"/endpoints", nil, 200)
 	}
 	call("outsider", "GET", base+"/endpoints", nil, 403)
+	call("viewer", "HEAD", base+"/endpoints", nil, 200)
+	call("viewer", "HEAD", base+"/members", nil, 403)
+	call("outsider", "HEAD", base+"/endpoints", nil, 403)
+	call("viewer", "HEAD", "/api/users", nil, 403)
+	call("", "OPTIONS", "/api/workspaces", nil, 401)
+	for _, path := range []string{"/api/workspaces/" + ws.ID + "%2Fmembers/endpoints", "/api/workspaces/%2F/endpoints"} {
+		call("outsider", "GET", path, nil, 404)
+	}
 	listed := call("outsider", "GET", "/api/workspaces", nil, 200)
 	if listed.Body.String() != "[]\n" {
 		t.Fatal("workspace leaked to outsider")

@@ -7,6 +7,7 @@ import (
 	"context"
 	"crypto/subtle"
 	"errors"
+	"github.com/go-chi/chi/v5"
 	"net"
 	"net/http"
 	"strings"
@@ -72,9 +73,6 @@ func (a *Identity) limited(r *http.Request, username string) bool {
 }
 func (h Handler) identityAccess(w http.ResponseWriter, r *http.Request) (*http.Request, bool) {
 	path := r.URL.Path
-	if strings.HasPrefix(path, "/assets/") || path == "/login" || path == "/api/auth/status" || path == "/api/auth/login" || path == "/api/auth/setup" {
-		return r, true
-	}
 	cookie, err := r.Cookie(sessionCookie)
 	token := ""
 	if err == nil {
@@ -104,10 +102,6 @@ func (h Handler) identityAccess(w http.ResponseWriter, r *http.Request) (*http.R
 			return r, false
 		}
 	}
-	if strings.HasPrefix(path, "/api/users") && u.Role != "admin" {
-		respond(w, nil, usecase.ErrForbidden)
-		return r, false
-	}
 	return r.WithContext(context.WithValue(r.Context(), identityKey{}, identity{User: u, Token: token})), true
 }
 func (h Handler) setSession(w http.ResponseWriter, r *http.Request, token string, clear bool) {
@@ -120,19 +114,19 @@ func (h Handler) setSession(w http.ResponseWriter, r *http.Request, token string
 	}
 	http.SetCookie(w, cookie)
 }
-func (h Handler) identityRoutes(mux *http.ServeMux) {
+func (h Handler) publicIdentityRoutes(r chi.Router) {
 	if h.Auth == nil {
 		return
 	}
-	mux.HandleFunc("GET /login", func(w http.ResponseWriter, r *http.Request) {
+	getHead(r, "/login", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		web.AuthPage().Render(r.Context(), w)
 	})
-	mux.HandleFunc("GET /api/auth/status", func(w http.ResponseWriter, r *http.Request) {
+	getHead(r, "/api/auth/status", func(w http.ResponseWriter, r *http.Request) {
 		exists, err := h.Auth.Service.Repo.HasUsers(r.Context())
 		respond(w, map[string]bool{"setup_required": !exists}, err)
 	})
-	mux.HandleFunc("POST /api/auth/setup", func(w http.ResponseWriter, r *http.Request) {
+	r.Post("/api/auth/setup", func(w http.ResponseWriter, r *http.Request) {
 		if h.Config.ManagedDeployment() {
 			respond(w, nil, usecase.ErrSetupClosed)
 			return
@@ -149,7 +143,7 @@ func (h Handler) identityRoutes(mux *http.ServeMux) {
 		_, err := h.Auth.Service.Setup(r.Context(), input)
 		respond(w, map[string]bool{"created": err == nil}, err)
 	})
-	mux.HandleFunc("POST /api/auth/login", func(w http.ResponseWriter, r *http.Request) {
+	r.Post("/api/auth/login", func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
 			Username string `json:"username"`
 			Password string `json:"password"`
@@ -176,18 +170,23 @@ func (h Handler) identityRoutes(mux *http.ServeMux) {
 		h.setSession(w, r, token, false)
 		respond(w, map[string]any{"user": u, "csrf_token": usecase.CSRFToken(token)}, nil)
 	})
-	mux.HandleFunc("GET /api/auth/me", func(w http.ResponseWriter, r *http.Request) {
+}
+func (h Handler) privateIdentityRoutes(r chi.Router) {
+	if h.Auth == nil {
+		return
+	}
+	getHead(r, "/api/auth/me", func(w http.ResponseWriter, r *http.Request) {
 		p := principal(r)
 		respond(w, map[string]any{"user": p.User, "csrf_token": usecase.CSRFToken(p.Token)}, nil)
 	})
-	mux.HandleFunc("POST /api/auth/logout", func(w http.ResponseWriter, r *http.Request) {
+	r.Post("/api/auth/logout", func(w http.ResponseWriter, r *http.Request) {
 		err := h.Auth.Service.Repo.DeleteSession(r.Context(), usecase.TokenHash(principal(r).Token))
 		if err == nil {
 			h.setSession(w, r, "", true)
 		}
 		respond(w, map[string]bool{"logged_out": err == nil}, err)
 	})
-	mux.HandleFunc("POST /api/auth/password", func(w http.ResponseWriter, r *http.Request) {
+	r.Post("/api/auth/password", func(w http.ResponseWriter, r *http.Request) {
 		if h.Auth.limited(r, "password:"+principal(r).User.ID) {
 			respond(w, nil, errRateLimited)
 			return
@@ -205,26 +204,53 @@ func (h Handler) identityRoutes(mux *http.ServeMux) {
 		}
 		respond(w, map[string]bool{"changed": err == nil}, err)
 	})
-	mux.HandleFunc("GET /api/users", func(w http.ResponseWriter, r *http.Request) {
-		users, err := h.Auth.Service.Repo.Users(r.Context())
-		respond(w, users, err)
-	})
-	save := func(w http.ResponseWriter, r *http.Request) {
-		var input usecase.UserInput
-		if !decode(w, r, &input) {
-			return
+	r.Group(func(r chi.Router) {
+		r.Use(h.requireAdmin)
+		getHead(r, "/api/users", func(w http.ResponseWriter, r *http.Request) {
+			users, err := h.Auth.Service.Repo.Users(r.Context())
+			respond(w, users, err)
+		})
+		save := func(w http.ResponseWriter, r *http.Request) {
+			var input usecase.UserInput
+			if !decode(w, r, &input) {
+				return
+			}
+			u, err := h.Auth.Service.SaveUser(r.Context(), principal(r).User, routeParam(r, "uid"), input)
+			respond(w, u, err)
 		}
-		u, err := h.Auth.Service.SaveUser(r.Context(), principal(r).User, r.PathValue("uid"), input)
-		respond(w, u, err)
-	}
-	mux.HandleFunc("POST /api/users", save)
-	mux.HandleFunc("PUT /api/users/{uid}", save)
-	mux.HandleFunc("DELETE /api/users/{uid}", func(w http.ResponseWriter, r *http.Request) {
-		err := h.Auth.Service.DeleteUser(r.Context(), principal(r).User, r.PathValue("uid"))
-		respond(w, map[string]bool{"deleted": err == nil}, err)
+		r.Post("/api/users", save)
+		r.Put("/api/users/{uid}", save)
+		r.Delete("/api/users/{uid}", func(w http.ResponseWriter, r *http.Request) {
+			err := h.Auth.Service.DeleteUser(r.Context(), principal(r).User, routeParam(r, "uid"))
+			respond(w, map[string]bool{"deleted": err == nil}, err)
+		})
 	})
 }
 
 var errRateLimited = errors.New("too many sign-in attempts; try again in 15 minutes")
 
 var errCSRF = errors.New("CSRF validation failed; refresh the page and try again")
+
+func (h Handler) requireAdmin(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if principal(r).User.Role != "admin" {
+			respond(w, nil, usecase.ErrForbidden)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (h Handler) requireSession(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if h.Auth == nil {
+			next.ServeHTTP(w, r)
+			return
+		}
+		authenticated, ok := h.identityAccess(w, r)
+		if !ok {
+			return
+		}
+		next.ServeHTTP(w, authenticated)
+	})
+}

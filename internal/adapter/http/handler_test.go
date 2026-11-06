@@ -149,3 +149,23 @@ func TestDynamicPublicAndPlaygroundResponses(t *testing.T) {
 		t.Fatal("invalid dynamic template saved", w.Code, w.Body.String())
 	}
 }
+
+func TestGeneratorDocumentation(t *testing.T) {
+	w := httptest.NewRecorder()
+	testHandler().ServeHTTP(w, httptest.NewRequest("GET", "/docs/generators", nil))
+	body := w.Body.String()
+	if w.Code != 200 || !strings.Contains(w.Header().Get("Content-Type"), "text/html") {
+		t.Fatal("documentation page not rendered")
+	}
+	if strings.Count(body, `data-available="true"`) != 4 || strings.Count(body, `data-available="false"`) != 25 {
+		t.Fatal("generator catalog availability is incorrect")
+	}
+	if strings.Count(body, ">Copy JSON</button>") != 4 || !strings.Contains(body, "not runnable yet") {
+		t.Fatal("planned generators must not have runnable copy controls")
+	}
+	for _, name := range []string{"generate.uuid", "generate.timestamp", "generate.integer", "generate.choice", "generate.person.full_name"} {
+		if !strings.Contains(body, name) {
+			t.Fatalf("missing generator %s", name)
+		}
+	}
+}

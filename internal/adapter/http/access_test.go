@@ -65,6 +65,7 @@ func TestMockCORS(t *testing.T) {
 		want                                                 int
 		allowed                                              bool
 	}{
+		{"noncanonical preflight", "OPTIONS", "/public//demo/products/123", "https://frontend.example.com", "POST", "content-type", 204, true},
 		{"JSON preflight", "OPTIONS", "/public/demo/products/123", "https://frontend.example.com", "POST", "content-type, authorization", 204, true},
 		{"allowed actual response", "GET", "/public/demo/products/123", "https://frontend.example.com", "", "", 200, true},
 		{"CORS on error", "GET", "/public/demo/missing", "https://frontend.example.com", "", "", 404, true},

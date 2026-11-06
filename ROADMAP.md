@@ -1,6 +1,6 @@
 # Mocklab roadmap
 
-Last updated: **2026-11-04**.
+Last updated: **2026-11-06**.
 
 This roadmap tracks implementation scope, not promised release dates. No version or Git tag has been released. Available features remain part of an MVP. Internal deployment uses the application host and /public/{workspace-slug}; no domain is provisioned by the application.
 
@@ -16,7 +16,7 @@ This roadmap tracks implementation scope, not promised release dates. No version
 
 | ID | Area | Work item | Status | Outcome / limitations |
 | --- | --- | --- | --- | --- |
-| F01 | Backend | Go 1.27.1 as the only HTTP server | Done | Go serves the UI, assets, management API, and mock API. |
+| F01 | Backend | Go 1.27.3 as the only HTTP server | Done | Go serves the UI, assets, management API, and mock API. |
 | F02 | Architecture | Separate domain, use cases, adapters, and composition root | Done | Use cases own the repository port; the server injects the PostgreSQL adapter. |
 | F03 | Database | PostgreSQL connection pool and JSONB flow storage | Done | Workspaces and endpoints are persistent; database integration has been tested. |
 | F04 | Database | Schema migrations with version tracking and transaction locking | Done | Embedded SQL is applied at startup. |
@@ -27,11 +27,15 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | CFX01 | Conditions | Priority conflict warnings and Playground diagnosis | Done | Conservative duplicate/shadow/possible-overlap analysis in independent typed scenarios; staged popup preview; chosen response and field checks distinguish actual execution from diagnostic-only checks. Nested legacy graphs and collective coverage are outside scope. |
 | WUX01 | Workspace UX | Compact workspace settings popover | Done | Owner settings beside selector; separate access label; grouped editing/membership and separated destructive action. |
 | DOC-DYN01 | Documentation | Dynamic JSON usage guide | Done | English tutorial, template/source reference, type/default rules, generator and header examples, preview/save workflow, limits, and troubleshooting in docs/DYNAMIC_JSON.md. |
+| DOC-GEN02 | Documentation UI | Searchable in-app generator reference | Done | /docs/generators, navigation links, runnable JSON examples for four existing generators, clearly labeled 25 planned generators, types/seeds/header guidance and troubleshooting. |
+| DOC-ORG01 | Documentation | Concise README and focused guides | Done | README covers description, screenshot, stack/dependencies, architecture, configuration/startup and Contributions; detailed usage and account/access references remain in dedicated guides. |
+| HTTP-CHI01 | HTTP architecture | Chi route groups and explicit workspace policies | Done | Chi v5.5.0, grouped authentication/admin/mock routes, fail-closed workspace policy, and HEAD/OPTIONS/path-encoding regression coverage. |
+| SEC-GO01 | Security | Patch Go standard-library vulnerability findings | Done | Toolchain and container build image upgraded to Go 1.27.3; govulncheck v1.9.0 reports no vulnerabilities. See docs/ROUTING.md. |
 | M01 | Workspace | Create, read, update, and delete workspaces | Done | Unique slugs; deleting a workspace cascades to its endpoints. |
 | M02 | Workspace | Workspace slug as the mock base path | Done | Uses /public/{slug}; display names and slugs can be changed independently. |
 | M03 | Endpoint | REST endpoint CRUD | Done | The API stores method, path, name, and flow; the UI supports creation, selection, method/path/flow updates, and deletion. |
 | M04 | Routing | Path parameters and static route priority | Done | Supports /products/:id; routes with more static segments take priority. |
-| M05 | Editor | Node and Table modes sharing configuration | Done | Both modes share graph state; Table rows represent complete paths in execution order, with one Action editor per row. |
+| M05 | Editor | Node and Table modes sharing configuration | Done | Node is the default mode. Both modes share graph state; Table rows represent complete paths in execution order, with one Action editor per row. |
 | M06 | Editor | Node dragging and visual connections | Done | Initial connections are rendered as SVG roots inside HTML templates; lines and per-node connection actions open an editable source/branch/target dialog. New blocks are wired automatically. |
 | M07 | Editor | Condition and response templates | Done | Node quick-add offers Header/Query/Body/Path catalogs; Table uses typed condition templates. Response/default presets remain in the shared editor. |
 | M08 | Editor | Unified scenario editing popup | Done | One popup edits request/route, conditions, response status/headers/body/delay, fallback, and advanced graph settings. Table has no inline editors. |
@@ -109,7 +113,7 @@ These items form the development backlog; their order and scope can be adjusted.
 | --- | --- | --- | --- | --- |
 | N01 | Flow | Multi-field AND/OR and additional nesting | Partial | Flat AND/OR groups with required and five operators are available in each typed node. Nested subgroups remain future work. |
 | N02 | Flow | Set Variable and response interpolation | Partial | Typed request interpolation, defaults and response/header rendering implemented. Set Variable nodes and earlier step outputs remain future work. |
-| N03 | Data | Dummy data generator and pagination presets | Partial | UUID, timestamp, integer and choice generators with optional seed implemented. Faker datasets, list generation and pagination presets remain future work. |
+| N03 | Data | Dummy data generator and pagination presets | Partial | UUID, timestamp, integer and choice generators with optional seed implemented. Fake-data library/catalog/phases proposed under the unified generate.* namespace in docs/FAKE_DATA_PLAN.md; fake providers, lists and pagination remain unimplemented. |
 | N04 | Data | Stateful mock CRUD | Todo | POST/PATCH/DELETE requests update a simulated dataset. |
 | N05 | Interoperability | Workspace export/import | Todo | Transfer configurations using a validated format. |
 | N06 | Interoperability | OpenAPI import | Todo | Generate endpoints and example responses from specifications. |

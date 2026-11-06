@@ -5,7 +5,7 @@ import { addConditionScenario, defaultScenario, projectScenarios, scenarioForm, 
 import { createEditor } from './editor.js';
 
 const endpoint = () => ({ id: 'e', name: 'Products', method: 'GET', path: '/products/:id', flow: defaultFlow() });
-const editor = () => { const state = createEditor(); state.endpoint = endpoint(); return state; };
+const editor = () => { const state = createEditor(); state.endpoint = endpoint(); state.mode = 'table'; return state; };
 
 test('an unconditional endpoint has one default request-to-response row', () => {
   const { rows, truncated } = projectScenarios(defaultFlow());

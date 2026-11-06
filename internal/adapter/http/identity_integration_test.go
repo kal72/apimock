@@ -78,7 +78,9 @@ func TestIdentityIntegration(t *testing.T) {
 	if hxResponse.Header().Get("HX-Redirect") != "/login" {
 		t.Fatal("expired HTMX requests must navigate to login")
 	}
-	w, _ := call("GET", "/app", "", nil, "")
+	w, _ := call("GET", "/docs/generators", "", nil, "")
+	expect(w, 303)
+	w, _ = call("GET", "/app", "", nil, "")
 	expect(w, 303)
 	w, _ = call("GET", "/api/workspaces", "", nil, "")
 	expect(w, 401)

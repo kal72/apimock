@@ -8,9 +8,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/go-chi/chi/v5"
 	"io"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -23,89 +25,81 @@ type Handler struct {
 }
 
 func (h Handler) Routes() http.Handler {
-	mux := http.NewServeMux()
-	h.identityRoutes(mux)
-	h.workspaceRoutes(mux)
-	workspaceRoute := func(pattern string, handler http.HandlerFunc) { mux.HandleFunc(pattern, h.workspaceGuard(handler)) }
-	mux.HandleFunc("GET /api/config", func(w http.ResponseWriter, r *http.Request) {
+	r := chi.NewRouter()
+	getHead(r, "/healthz", h.health)
+	r.Group(func(management chi.Router) {
+		management.Use(h.managementAccess)
+		h.publicIdentityRoutes(management)
+		getHead(management, "/assets/*", h.Assets.ServeHTTP)
+		getHead(management, "/assets", func(w http.ResponseWriter, r *http.Request) {
+			u := *r.URL
+			u.Path = "/assets/"
+			http.Redirect(w, r, u.String(), http.StatusTemporaryRedirect)
+		})
+		management.Group(func(protected chi.Router) {
+			protected.Use(h.requireSession)
+			h.privateIdentityRoutes(protected)
+			h.pageRoutes(protected)
+			h.workspaceRoutes(protected)
+			h.playgroundRoutes(protected)
+		})
+	})
+	r.Route("/public", func(public chi.Router) {
+		public.Use(h.mockCORS)
+		public.HandleFunc("/{slug}", func(w http.ResponseWriter, r *http.Request) {
+			u := *r.URL
+			u.Path += "/"
+			if u.RawPath != "" {
+				u.RawPath += "/"
+			}
+			http.Redirect(w, r, u.String(), http.StatusTemporaryRedirect)
+		})
+		public.HandleFunc("/{slug}/*", h.mock)
+		public.Handle("/*", http.NotFoundHandler())
+	})
+	r.NotFound(h.routingFallback(http.NotFoundHandler()).ServeHTTP)
+	r.MethodNotAllowed(h.routingFallback(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+		if strings.HasPrefix(request.URL.Path, "/public/") {
+			http.NotFound(w, request)
+			return
+		}
+		methodNotAllowed(r).ServeHTTP(w, request)
+	})).ServeHTTP)
+	return middleware(h.access(canonicalPath(r)))
+}
+func (h Handler) health(w http.ResponseWriter, r *http.Request) {
+	if h.Ready != nil {
+		if err := h.Ready(r); err != nil {
+			http.Error(w, "database unavailable", 503)
+			return
+		}
+	}
+	w.Write([]byte("ok"))
+}
+func (h Handler) pageRoutes(r chi.Router) {
+	getHead(r, "/api/config", func(w http.ResponseWriter, r *http.Request) {
 		respond(w, map[string]string{"public_base_url": h.Config.PublicBaseURL}, nil)
 	})
-	mux.Handle("GET /assets/", h.Assets)
-	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) { http.Redirect(w, r, "/app", http.StatusSeeOther) })
-	mux.HandleFunc("GET /app", func(w http.ResponseWriter, r *http.Request) {
+	getHead(r, "/", func(w http.ResponseWriter, r *http.Request) { http.Redirect(w, r, "/app", http.StatusSeeOther) })
+	getHead(r, "/app", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		if err := web.Page().Render(r.Context(), w); err != nil {
 			slog.Error("render page", "error", err)
 		}
 	})
-	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
-		if h.Ready != nil {
-			if err := h.Ready(r); err != nil {
-				http.Error(w, "database unavailable", 503)
-				return
-			}
+	getHead(r, "/docs/generators", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		if err := web.GeneratorDocumentation().Render(r.Context(), w); err != nil {
+			slog.Error("render generator documentation", "error", err)
 		}
-		w.Write([]byte("ok"))
 	})
-	mux.HandleFunc("GET /app/status", func(w http.ResponseWriter, r *http.Request) {
+	getHead(r, "/app/status", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.Write([]byte(`<span class="status-dot"></span> Server connected`))
 	})
-	workspaceRoute("GET /api/workspaces", func(w http.ResponseWriter, r *http.Request) {
-		if h.Auth != nil {
-			items, err := h.Service.WorkspaceRepository().VisibleWorkspaces(r.Context(), principal(r).User)
-			respond(w, items, err)
-			return
-		}
-		items, err := h.Service.Repo.Workspaces(r.Context())
-		respond(w, items, err)
-	})
-	workspaceRoute("POST /api/workspaces", func(w http.ResponseWriter, r *http.Request) {
-		var item domain.Workspace
-		if !decode(w, r, &item) {
-			return
-		}
-		item.ID = ""
-		if h.Auth != nil {
-			saved, err := h.Service.CreateWorkspace(r.Context(), item, principal(r).User)
-			respond(w, saved, err)
-			return
-		}
-		saved, err := h.Service.SaveWorkspace(r.Context(), item)
-		respond(w, saved, err)
-	})
-	workspaceRoute("PUT /api/workspaces/{wid}", func(w http.ResponseWriter, r *http.Request) {
-		var item domain.Workspace
-		if !decode(w, r, &item) {
-			return
-		}
-		item.ID = r.PathValue("wid")
-		saved, err := h.Service.SaveWorkspace(r.Context(), item)
-		respond(w, saved, err)
-	})
-	workspaceRoute("DELETE /api/workspaces/{wid}", func(w http.ResponseWriter, r *http.Request) {
-		respond(w, map[string]bool{"deleted": true}, h.Service.Repo.DeleteWorkspace(r.Context(), r.PathValue("wid")))
-	})
-	workspaceRoute("GET /api/workspaces/{wid}/endpoints", func(w http.ResponseWriter, r *http.Request) {
-		items, err := h.Service.Repo.Endpoints(r.Context(), r.PathValue("wid"))
-		respond(w, items, err)
-	})
-	save := func(w http.ResponseWriter, r *http.Request) {
-		var item domain.Endpoint
-		if !decode(w, r, &item) {
-			return
-		}
-		item.WorkspaceID = r.PathValue("wid")
-		item.ID = r.PathValue("eid")
-		saved, err := h.Service.SaveEndpoint(r.Context(), item)
-		respond(w, saved, err)
-	}
-	workspaceRoute("POST /api/workspaces/{wid}/endpoints", save)
-	workspaceRoute("PUT /api/workspaces/{wid}/endpoints/{eid}", save)
-	workspaceRoute("DELETE /api/workspaces/{wid}/endpoints/{eid}", func(w http.ResponseWriter, r *http.Request) {
-		respond(w, map[string]bool{"deleted": true}, h.Service.Repo.DeleteEndpoint(r.Context(), r.PathValue("wid"), r.PathValue("eid")))
-	})
-	mux.HandleFunc("POST /api/test", func(w http.ResponseWriter, r *http.Request) {
+}
+func (h Handler) playgroundRoutes(r chi.Router) {
+	r.Post("/api/test", func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
 			Flow     domain.Flow         `json:"flow"`
 			Method   string              `json:"method"`
@@ -149,38 +143,38 @@ func (h Handler) Routes() http.Handler {
 			ResponseID string                   `json:"response_id"`
 		}{result, usecase.ExplainConditions(input.Flow, request, input.Params, result.Trace), selected}, nil)
 	})
-	mock := func(w http.ResponseWriter, r *http.Request) {
-		request, err := parseMockRequest(w, r)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		result, err := h.Service.Execute(r.Context(), r.PathValue("slug"), request)
-		if errors.Is(err, usecase.ErrResponseRender) {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(500)
-			w.Write([]byte(`{"error":"Mock response could not be rendered; check its template in Playground"}`))
-			return
-		}
-		if err != nil {
-			respond(w, nil, err)
-			return
-		}
-		for k, v := range result.Headers {
-			w.Header().Set(k, v)
-		}
-		if r.Header.Get("Origin") != "" {
-			w.Header().Add("Vary", "Origin")
-		}
-		w.Header().Set("X-Content-Type-Options", "nosniff")
-		w.WriteHeader(result.Status)
-		if r.Method != "HEAD" {
-			w.Write([]byte(result.Body))
-		}
-	}
-	mux.HandleFunc("/public/{slug}/{path...}", mock)
-	return middleware(h.access(mux))
 }
+func (h Handler) mock(w http.ResponseWriter, r *http.Request) {
+
+	request, err := parseMockRequest(w, r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	result, err := h.Service.Execute(r.Context(), routeParam(r, "slug"), request)
+	if errors.Is(err, usecase.ErrResponseRender) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(500)
+		w.Write([]byte(`{"error":"Mock response could not be rendered; check its template in Playground"}`))
+		return
+	}
+	if err != nil {
+		respond(w, nil, err)
+		return
+	}
+	for k, v := range result.Headers {
+		w.Header().Set(k, v)
+	}
+	if r.Header.Get("Origin") != "" {
+		w.Header().Add("Vary", "Origin")
+	}
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.WriteHeader(result.Status)
+	if r.Method != "HEAD" {
+		w.Write([]byte(result.Body))
+	}
+}
+
 func decode(w http.ResponseWriter, r *http.Request, v any) bool {
 	d := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<20))
 	d.DisallowUnknownFields()

@@ -14,7 +14,7 @@ import (
 )
 
 func parseMockRequest(w http.ResponseWriter, r *http.Request) (usecase.Request, error) {
-	request := usecase.Request{Method: r.Method, Path: "/" + r.PathValue("path"), Headers: r.Header, Query: r.URL.Query()}
+	request := usecase.Request{Method: r.Method, Path: "/" + routeParam(r, "path"), Headers: r.Header, Query: r.URL.Query()}
 	var raw []byte
 	if r.Body != nil {
 		var err error

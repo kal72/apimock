@@ -1,6 +1,7 @@
 package httpadapter
 
 import (
+	"context"
 	"crypto/sha256"
 	"crypto/subtle"
 	"net/http"
@@ -17,10 +18,17 @@ func (h Handler) access(next http.Handler) http.Handler {
 			http.Error(w, "unexpected host", http.StatusMisdirectedRequest)
 			return
 		}
+		// Run mock preflight before canonical redirects, preserving existing clients.
 		if strings.HasPrefix(r.URL.Path, "/public/") {
 			h.mockCORS(next).ServeHTTP(w, r)
 			return
 		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (h Handler) managementAccess(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-store")
 		if h.Auth == nil && h.Config.AdminUsername != "" {
 			username, password, ok := r.BasicAuth()
@@ -45,13 +53,6 @@ func (h Handler) access(next http.Handler) http.Handler {
 				return
 			}
 		}
-		if h.Auth != nil {
-			var ok bool
-			r, ok = h.identityAccess(w, r)
-			if !ok {
-				return
-			}
-		}
 		next.ServeHTTP(w, r)
 	})
 }
@@ -65,8 +66,16 @@ func allowedMethod(method string) bool {
 	}
 	return false
 }
+
+type mockCORSKey struct{}
+
 func (h Handler) mockCORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if applied, _ := r.Context().Value(mockCORSKey{}).(bool); applied {
+			next.ServeHTTP(w, r)
+			return
+		}
+		r = r.WithContext(context.WithValue(r.Context(), mockCORSKey{}, true))
 		w.Header().Add("Vary", "Origin")
 		origin := r.Header.Get("Origin")
 		if origin == "" {
@@ -109,4 +118,17 @@ func (h Handler) sameOrigin(r *http.Request, origin string) bool {
 		return origin == h.Config.PublicBaseURL
 	}
 	return origin == h.Config.PublicBaseURL || origin == "http://"+r.Host || origin == "https://"+r.Host
+}
+
+// Error fallbacks preserve the public mock boundary without exposing management handlers.
+func (h Handler) routingFallback(next http.Handler) http.Handler {
+	management := h.managementAccess(h.requireSession(next))
+	public := h.mockCORS(next)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/public/") {
+			public.ServeHTTP(w, r)
+			return
+		}
+		management.ServeHTTP(w, r)
+	})
 }

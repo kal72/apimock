@@ -6,7 +6,42 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ## [Unreleased]
 
+### Changed
+
+- Open the endpoint editor in Node mode by default. Table remains available through the mode switch; flow data is unchanged.
+
+### Refactored
+
+- Migrated HTTP routing to pinned Chi v5.5.0 with public-authentication, session-protected management, administrator and public-mock groups. templ remains on standard net/http; domain/use-case dependencies and database schema are unchanged. Preserved normal route URLs, methods, session/CSRF and CORS behavior, decoded wildcard paths, query-preserving canonical redirects and 405 Allow headers.
+- Replaced URL-substring workspace policy inference with explicit Viewer/Editor/Owner middleware. Missing workspace parameters and unknown permission roles deny access. Corrected Viewer HEAD reads to use Viewer permission rather than Editor permission. Added routing/authorization regression coverage and routing documentation.
+- Preserved public preflight handling before normalization and kept unknown mock methods outside management authentication.
+- Canonical redirects run before destination session checks; a redirected management URL still enforces its complete authentication/authorization policy. No RealIP, automatic method rewriting, or blanket path/CORS middleware was enabled.
+
+### Security
+
+- Upgraded the Go toolchain and container build image from 1.27.1 to 1.27.3, resolving nine reachable standard-library advisories. govulncheck v1.9.0 reports no vulnerabilities after the upgrade. No database migration or API configuration change is required; local development now requires Go 1.27.3. Details are documented in docs/ROUTING.md.
+
+
+### Generator documentation page
+
+- Verification: 67 JavaScript tests, Go race tests, PostgreSQL-backed authentication checks, vet, standalone build, and desktop Light/Night browser checks passed. Confirmed catalog counts, search, example expansion, copy feedback, and login protection.
+
+- Added an authenticated, searchable generator reference at `/docs/generators`, linked from the sidebar and Dynamic JSON editor. Four available generators include copyable JSON examples; the 25 proposed categorized generators are explicitly marked Planned with no runnable copy action. Added quick-start, type/seed/header rules, troubleshooting, responsive layout and Light/Night styles.
+
+
 ### Documentation
+
+- Added refreshed viewport and full-page main screenshots showing the default Node editor in docs/img/main-node-mode.jpg and docs/img/main-node-mode-full.jpg. The full-page capture includes the playground and footer, with canvas zoom at 75% to show every node.
+
+- Reorganized README around description, screenshot, technology/dependencies, architecture, configuration and startup, with Contributions as the final section. Added aligned Docker/Podman and local-development setup instructions while keeping detailed usage in dedicated guides.
+
+- Shortened README to the product overview, screenshot, quick start, development commands and documentation links. Moved editor/condition guidance, architecture/development details, and account/session information into dedicated guides; removed repeated styling history and corrected obsolete editor labels/condition-insertion descriptions.
+
+- Added a main workspace screenshot near the top of README, showing Table response scenarios and the request playground.
+
+- Standardized the proposed fake-data catalog and examples on the existing `generate.*` namespace (for example, `generate.person.full_name`). Existing generator names remain unchanged; categorized generators are still planned, not implemented.
+
+- Added a proposed fake-data implementation plan selecting gofakeit/v7 for evaluation, 25 allowlisted generators, delivery phases, seed/version contracts, provider boundaries and acceptance checks. This is a plan only; no fake-data library or runtime feature has been installed.
 
 - Added a Dynamic JSON usage guide with Static/Dynamic mode selection, Node/Table workflows, type preservation, defaults, source reference, generators/seeds, header templates, preview versus full-flow tests, curl examples, limits, and troubleshooting. Linked it from README. Verified all 13 JSON examples, validated 10 dynamic templates against the current parser, checked quick-start rendered output, and checked guide links/anchors.
 

@@ -18,7 +18,7 @@ export const createEditor = () => ({
   methods:['GET','POST','PUT','PATCH','DELETE','HEAD','OPTIONS'],
   preview:null, formatValue,
   conditionKinds, conditionTemplates, responseTemplates, scenarioForm:null, scenarioDraft:null, scenarioScope:null, scenarioTab:'response', scenarioTemplate:'header', scenarioIsNew:false,
-  highlightedNodeID:null, mode:'table', search:'', modal:null, dialogError:'', notice:'', busy:false, dirty:false,
+  highlightedNodeID:null, mode:'node', search:'', modal:null, dialogError:'', notice:'', busy:false, dirty:false,
   workspaceForm:{}, endpointForm:{}, nodeForm:null, headerRows:[], connecting:null, drag:null, zoom:1, minZoom:0.5, maxZoom:2, zoomStep:0.25,
   nodeSection:'all', directResponseID:'', pendingSummary:'', undoSnapshot:null, requestRoute:{}, paramsText:'{}', queryText:'{}', requestBodyText:'{}',
   insertAfter:'', insertBranch:'', pendingFlow:null, connectionForm:{from:'',to:'',branch:''}, originalConnection:null,

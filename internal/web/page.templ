@@ -53,6 +53,7 @@ templ Sidebar() {
   <input class="search-input" placeholder="Search endpoints…" aria-label="Search endpoints" x-model="search"/>
   <nav class="endpoint-list"><template x-for="e in filteredEndpoints" :key="e.id"><button class="endpoint-link" :class="endpoint?.id === e.id ? 'active' : ''" @click="selectEndpoint(e)"><span class="method" :class="e.method.toLowerCase()" x-text="e.method"></span><span class="truncate" x-text="e.path"></span></button></template></nav>
   <button class="add-endpoint" :disabled="!workspace || !canEditWorkspace" @click="newEndpoint()">+ Add endpoint</button>
+  <a class="generator-reference-link" href="/docs/generators" target="_blank" rel="noopener">Generator reference ↗</a>
   <div class="sidebar-bottom"><span class="mini-icon">◇</span><div><strong>Build before the backend.</strong><p>One workspace. Endless possibilities.</p></div></div>
  </aside>
 }
@@ -211,6 +212,7 @@ templ ScenarioResponse(section string, title string) {
   <div class="dynamic-response-tools" x-show={ "scenarioForm." + section + ".response_mode === 'dynamic'" }>
    <p class="help">A variable used as the whole JSON value preserves its type. Variables inside a sentence become text. Missing fields need a default. Header values always become text.</p>
    <label>Generator seed (optional)<input x-model={ "scenarioForm." + section + ".response_seed" } maxlength="256" placeholder="Leave empty for new random values"/></label><p class="help">A fixed seed repeats generated UUIDs, integers and choices. Timestamp always uses the current time. The same generator expression is reused within one response, including its headers.</p>
+   <a class="text-button" href="/docs/generators" target="_blank" rel="noopener">Generator reference ↗</a>
    <button class="btn" type="button" @click={ "openResponseVariables('" + section + "')" }>Insert variable</button>
    <div class="response-variable-picker" x-show={ "variablePicker === '" + section + "'" }>
     <label>Source<select x-model="responseVariable.source"><option value="request.path">Path parameter</option><option value="request.query">Query parameter</option><option value="request.headers">Request header</option><option value="request.body">JSON body field</option><option value="request.form">Form body field</option><option value="request.raw_body">Raw request body</option><option value="generate.uuid">Generated UUID</option><option value="generate.timestamp">Current timestamp</option><option value="generate.integer">Random integer</option><option value="generate.choice">Random choice</option></select></label>

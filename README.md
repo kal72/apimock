@@ -102,6 +102,8 @@ Replace the origin/port and workspace slug as needed. Management pages require l
 
 For internal deployment, HTTPS ingress, and CORS, see [Deployment](docs/DEPLOYMENT.md). For application workflows, see [Usage](docs/USAGE.md), [Dynamic JSON](docs/DYNAMIC_JSON.md), and [Access control](docs/ACCESS_CONTROL.md). The in-app generator reference is available at `/docs/generators` after signing in.
 
+The optional [V2 design preview](docs/UI_V2.md) is available at `/app/v2` after login. It uses sample data only and does not save changes.
+
 ## Contributions
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) before making changes. Run `make check`, document relevant changes in [CHANGELOG.md](CHANGELOG.md), and update the [roadmap](ROADMAP.md) when scope or status changes. Project documentation, code comments, and UI text use English.

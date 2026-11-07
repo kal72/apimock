@@ -6,7 +6,13 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ## [Unreleased]
 
+### Added
+
+- Added authenticated V2 static design previews at /app/v2 for Endpoints, Environments, Mocks, Logs and Settings. Shared templ components and scoped Graphite Blue/Cloudline styles provide Light/Night themes, Node/Table views and local sample interactions. Preview pages do not call application APIs or persist changes; proposed capabilities are illustrative. Existing UI and database schema are unchanged. See docs/UI_V2.md for migration boundaries.
+
 ### Changed
+
+- Refined the V2 header to follow the original concept: compact breadcrumb and Saved/theme/account row, right-aligned sky decoration, functional local account popover, and a separate endpoint/base-URL/Node–Table toolbar. Unified the endpoint list into the main sidebar to preserve toolbar width and moved the preview notice to the footer; all content remains static.
 
 - Open the endpoint editor in Node mode by default. Table remains available through the mode switch; flow data is unchanged.
 

@@ -10,6 +10,7 @@ import './moonlight.css';
 import './identity.css';
 import './toolbar.css';
 import './generator-docs.css';
+import './v2.css';
 import { createTheme } from './theme.js';
 
 window.htmx = htmx;

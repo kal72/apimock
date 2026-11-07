@@ -77,6 +77,18 @@ func (h Handler) health(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("ok"))
 }
 func (h Handler) pageRoutes(r chi.Router) {
+	for _, page := range []string{"endpoints", "environments", "mocks", "logs", "settings"} {
+		getHead(r, "/app/v2/"+page, func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			if err := web.V2Page(page).Render(r.Context(), w); err != nil {
+				slog.Error("render v2 mockup", "error", err)
+			}
+		})
+	}
+	getHead(r, "/app/v2", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/app/v2/endpoints", http.StatusSeeOther)
+	})
+
 	getHead(r, "/api/config", func(w http.ResponseWriter, r *http.Request) {
 		respond(w, map[string]string{"public_base_url": h.Config.PublicBaseURL}, nil)
 	})

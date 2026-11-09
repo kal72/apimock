@@ -22,6 +22,14 @@ type Repository interface {
 	SaveEndpoint(context.Context, domain.Endpoint) error
 	DeleteEndpoint(context.Context, string, string) error
 }
+type EnvironmentRepository interface {
+	Environments(context.Context, string) ([]domain.Environment, error)
+	SaveEnvironment(context.Context, string, domain.Environment) error
+	DeleteEnvironment(context.Context, string, string) error
+	SaveEnvironmentVariable(context.Context, string, string, domain.EnvironmentVariable) error
+	DeleteEnvironmentVariable(context.Context, string, string, string) error
+	EnvironmentValues(context.Context, string, string) (map[string]any, error)
+}
 type Service struct{ Repo Repository }
 
 func ID() string {
@@ -51,6 +59,23 @@ func (s Service) SaveEndpoint(ctx context.Context, e domain.Endpoint) (domain.En
 		e.ID = ID()
 	}
 	return e, s.Repo.SaveEndpoint(ctx, e)
+}
+func (s Service) EnvironmentRepository() EnvironmentRepository { return s.Repo.(EnvironmentRepository) }
+func (s Service) SaveEnvironment(ctx context.Context, userID string, item domain.Environment) (domain.Environment, error) {
+	item.Name = strings.TrimSpace(item.Name)
+	if err := item.Validate(); err != nil {
+		return item, fmt.Errorf("%w: %s", domain.ErrValidation, err)
+	}
+	if item.ID == "" {
+		item.ID = ID()
+	}
+	return item, s.EnvironmentRepository().SaveEnvironment(ctx, userID, item)
+}
+func (s Service) SaveEnvironmentVariable(ctx context.Context, userID, environmentID string, item domain.EnvironmentVariable) error {
+	if err := item.Validate(); err != nil {
+		return fmt.Errorf("%w: %s", domain.ErrValidation, err)
+	}
+	return s.EnvironmentRepository().SaveEnvironmentVariable(ctx, userID, environmentID, item)
 }
 
 type Request struct {
@@ -132,6 +157,9 @@ func match(pattern, path string) (map[string]string, bool) {
 	return p, true
 }
 func Evaluate(ctx context.Context, f domain.Flow, r Request, params map[string]string) (Result, error) {
+	return EvaluateWithEnvironment(ctx, f, r, params, nil)
+}
+func EvaluateWithEnvironment(ctx context.Context, f domain.Flow, r Request, params map[string]string, environment map[string]any) (Result, error) {
 	if err := f.Validate(); err != nil {
 		return Result{}, fmt.Errorf("%w: %s", domain.ErrValidation, err)
 	}
@@ -174,7 +202,7 @@ func Evaluate(ctx context.Context, f domain.Flow, r Request, params map[string]s
 				}
 			}
 			result.Status = n.Config.Status
-			body, headers, err := renderResponse(n.Config, r, params)
+			body, headers, err := renderResponseWithEnvironment(n.Config, r, params, environment)
 			if err != nil {
 				return Result{}, fmt.Errorf("%w: %s", ErrResponseRender, err)
 			}

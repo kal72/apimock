@@ -100,7 +100,7 @@ curl http://localhost:8080/public/demo-store/products/123
 
 Replace the origin/port and workspace slug as needed. Management pages require login; saved mock URLs are callable without a management session.
 
-For internal deployment, HTTPS ingress, and CORS, see [Deployment](docs/DEPLOYMENT.md). For application workflows, see [Usage](docs/USAGE.md), [Dynamic JSON](docs/DYNAMIC_JSON.md), and [Access control](docs/ACCESS_CONTROL.md). The in-app generator reference is available at `/docs/generators` after signing in.
+For internal deployment, HTTPS ingress, and CORS, see [Deployment](docs/DEPLOYMENT.md). For application workflows, see [Usage](docs/USAGE.md), [Dynamic JSON](docs/DYNAMIC_JSON.md), [Environments](docs/ENVIRONMENTS.md), and [Access control](docs/ACCESS_CONTROL.md). The in-app generator reference is available at `/docs/generators` after signing in.
 
 The optional [V2 design preview](docs/UI_V2.md) is available at `/app/v2` after login. It uses sample data only and does not save changes.
 

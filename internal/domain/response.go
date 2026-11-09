@@ -19,6 +19,7 @@ type ResponseToken struct {
 }
 
 var responseSource = regexp.MustCompile(`^request\.(path|query|headers|form|body)\.[A-Za-z0-9_.$-]+$`)
+var environmentSource = regexp.MustCompile(`^environment\.[A-Za-z_][A-Za-z0-9_]{0,63}$`)
 
 func ParseResponseExpression(text string) (ResponseExpression, error) {
 	var e ResponseExpression
@@ -36,11 +37,11 @@ func ParseResponseExpression(text string) (ResponseExpression, error) {
 			return e, fmt.Errorf("default must be valid JSON")
 		}
 	}
-	if responseSource.MatchString(source) || source == "request.body" || source == "request.raw_body" {
+	if responseSource.MatchString(source) || source == "request.body" || source == "request.raw_body" || environmentSource.MatchString(source) {
 		return e, nil
 	}
 	if hasDefault {
-		return e, fmt.Errorf("defaults are supported for request variables only")
+		return e, fmt.Errorf("defaults are supported for request and environment variables only")
 	}
 	if source == "generate.uuid" || source == "generate.timestamp" {
 		return e, nil

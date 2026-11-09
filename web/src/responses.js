@@ -12,7 +12,9 @@ export const responseEditor={
  insertResponseVariable(section){
   try{
    const v=this.responseVariable,form=this.scenarioForm[section];let source=v.source;
-   if(['request.path','request.query','request.headers','request.body','request.form'].includes(source)){
+   if(source==='environment'){
+    if(!/^[A-Za-z_][A-Za-z0-9_]{0,63}$/.test(v.field))throw Error('Select an environment variable.');source+='.'+v.field;
+   } else if(['request.path','request.query','request.headers','request.body','request.form'].includes(source)){
     if(!/^[A-Za-z0-9_.$-]+$/.test(v.field))throw Error('Enter a field path using letters, numbers, dots, underscores or hyphens.');source+='.'+v.field;
    }
    if(['generate.integer','generate.choice'].includes(source))source+=': '+JSON.stringify(JSON.parse(v.arguments));
@@ -34,7 +36,7 @@ export const responseEditor={
   const form=this.scenarioForm[section];form.previewBusy=true;form.previewError='';form.previewResult=null;
   try{
    const flow=defaultFlow();flow.nodes.find(n=>n.type==='response').config=responseConfig(form);
-   form.previewResult=await this.request('/api/test','POST',{...JSON.parse(this.testInput),flow,method:this.endpoint.method,path:this.endpoint.path});
+   form.previewResult=await this.request('/api/test','POST',{...JSON.parse(this.testInput),environment_id:this.activeEnvironmentID,flow,method:this.endpoint.method,path:this.endpoint.path});
   }catch(error){form.previewError=error.message;}finally{form.previewBusy=false;}
  }
 };

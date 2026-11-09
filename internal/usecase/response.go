@@ -16,6 +16,9 @@ import (
 var ErrResponseRender = errors.New("mock response rendering failed")
 
 func renderResponse(c domain.Config, r Request, params map[string]string) (string, map[string]string, error) {
+	return renderResponseWithEnvironment(c, r, params, nil)
+}
+func renderResponseWithEnvironment(c domain.Config, r Request, params map[string]string, environment map[string]any) (string, map[string]string, error) {
 	if c.ResponseMode != "dynamic" {
 		return c.Body, c.Headers, nil
 	}
@@ -61,6 +64,8 @@ func renderResponse(c domain.Config, r Request, params map[string]string) (strin
 		var value any
 		var exists bool
 		switch {
+		case strings.HasPrefix(e.Source, "environment."):
+			value, exists = environment[strings.TrimPrefix(e.Source, "environment.")]
 		case e.Source == "request.raw_body":
 			value = r.RawBody
 			exists = r.BodyPresent || r.RawBody != ""
@@ -96,7 +101,7 @@ func renderResponse(c domain.Config, r Request, params map[string]string) (strin
 			if e.HasDefault {
 				return e.Default, nil
 			}
-			return nil, fmt.Errorf("missing variable %s; provide it in the request or add | default: JSON", e.Source)
+			return nil, fmt.Errorf("missing variable %s; provide it in the request or select an environment, or add | default: JSON", e.Source)
 		}
 		return value, nil
 	}

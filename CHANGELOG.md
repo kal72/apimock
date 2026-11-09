@@ -8,6 +8,8 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Added
 
+- Added private, per-user environments shared across that user's workspaces. Users can create, rename, and delete environments and typed string, number, boolean, or secret variables. Secret values are masked by the management API and UI after saving. The selected environment is available to Playground and Dynamic JSON response previews through `{{ environment.variable_key }}`; it is deliberately unavailable to public `/public/{workspace}` mock requests to prevent private-value exposure. Added migration `004_user_environments.sql` and docs/ENVIRONMENTS.md. Existing workspace flows and public mock behavior are unchanged.
+
 - Added authenticated V2 static design previews at /app/v2 for Endpoints, Environments, Mocks, Logs and Settings. Shared templ components and scoped Graphite Blue/Cloudline styles provide Light/Night themes, Node/Table views and local sample interactions. Preview pages do not call application APIs or persist changes; proposed capabilities are illustrative. Existing UI and database schema are unchanged. See docs/UI_V2.md for migration boundaries.
 
 ### Changed

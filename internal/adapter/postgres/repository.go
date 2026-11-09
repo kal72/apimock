@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"apimock/internal/domain"
+	"bytes"
 	"context"
 	"embed"
 	"encoding/json"
@@ -128,4 +129,107 @@ func (r Repository) DeleteEndpoint(ctx context.Context, wid, id string) error {
 		return domain.ErrNotFound
 	}
 	return err
+}
+
+func (r Repository) Environments(ctx context.Context, userID string) ([]domain.Environment, error) {
+	rows, err := r.Pool.Query(ctx, `SELECT id,name FROM user_environments WHERE user_id=$1 ORDER BY name,id`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := []domain.Environment{}
+	for rows.Next() {
+		var item domain.Environment
+		if err := rows.Scan(&item.ID, &item.Name); err != nil {
+			return nil, err
+		}
+		variableRows, err := r.Pool.Query(ctx, `SELECT key,kind,value FROM environment_variables WHERE environment_id=$1 ORDER BY key`, item.ID)
+		if err != nil {
+			return nil, err
+		}
+		for variableRows.Next() {
+			var variable domain.EnvironmentVariable
+			if err := variableRows.Scan(&variable.Key, &variable.Kind, &variable.Value); err != nil {
+				variableRows.Close()
+				return nil, err
+			}
+			if variable.Kind == "secret" {
+				variable.Value = nil
+				variable.HasValue = true
+			}
+			item.Variables = append(item.Variables, variable)
+		}
+		if err := variableRows.Err(); err != nil {
+			variableRows.Close()
+			return nil, err
+		}
+		variableRows.Close()
+		out = append(out, item)
+	}
+	return out, rows.Err()
+}
+func (r Repository) SaveEnvironment(ctx context.Context, userID string, item domain.Environment) error {
+	if item.ID == "" {
+		return errors.New("environment ID is required")
+	}
+	tag, err := r.Pool.Exec(ctx, `INSERT INTO user_environments(id,user_id,name) VALUES($1,$2,$3) ON CONFLICT(id) DO UPDATE SET name=EXCLUDED.name,updated_at=now() WHERE user_environments.user_id=EXCLUDED.user_id`, item.ID, userID, item.Name)
+	if err == nil && tag.RowsAffected() == 0 {
+		return domain.ErrNotFound
+	}
+	return dbError(err)
+}
+func (r Repository) DeleteEnvironment(ctx context.Context, userID, id string) error {
+	tag, err := r.Pool.Exec(ctx, `DELETE FROM user_environments WHERE id=$1 AND user_id=$2`, id, userID)
+	if err == nil && tag.RowsAffected() == 0 {
+		return domain.ErrNotFound
+	}
+	return dbError(err)
+}
+func (r Repository) SaveEnvironmentVariable(ctx context.Context, userID, environmentID string, variable domain.EnvironmentVariable) error {
+	var exists bool
+	if err := r.Pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM user_environments WHERE id=$1 AND user_id=$2)`, environmentID, userID).Scan(&exists); err != nil {
+		return err
+	}
+	if !exists {
+		return domain.ErrNotFound
+	}
+	_, err := r.Pool.Exec(ctx, `INSERT INTO environment_variables(environment_id,key,kind,value) VALUES($1,$2,$3,$4) ON CONFLICT(environment_id,key) DO UPDATE SET kind=EXCLUDED.kind,value=EXCLUDED.value,updated_at=now()`, environmentID, variable.Key, variable.Kind, []byte(variable.Value))
+	return dbError(err)
+}
+func (r Repository) DeleteEnvironmentVariable(ctx context.Context, userID, environmentID, key string) error {
+	tag, err := r.Pool.Exec(ctx, `DELETE FROM environment_variables v USING user_environments e WHERE v.environment_id=e.id AND e.id=$1 AND e.user_id=$2 AND v.key=$3`, environmentID, userID, key)
+	if err == nil && tag.RowsAffected() == 0 {
+		return domain.ErrNotFound
+	}
+	return dbError(err)
+}
+func (r Repository) EnvironmentValues(ctx context.Context, userID, environmentID string) (map[string]any, error) {
+	var exists bool
+	if err := r.Pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM user_environments WHERE id=$1 AND user_id=$2)`, environmentID, userID).Scan(&exists); err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, domain.ErrNotFound
+	}
+	rows, err := r.Pool.Query(ctx, `SELECT key,value FROM environment_variables WHERE environment_id=$1`, environmentID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	values := map[string]any{}
+	for rows.Next() {
+		var key string
+		var raw []byte
+		if err := rows.Scan(&key, &raw); err != nil {
+			return nil, err
+		}
+		var value any
+		decoder := json.NewDecoder(bytes.NewReader(raw))
+		decoder.UseNumber()
+		if err := decoder.Decode(&value); err != nil {
+			return nil, err
+		}
+		values[key] = value
+	}
+	return values, rows.Err()
 }

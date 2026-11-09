@@ -41,6 +41,7 @@ func (h Handler) Routes() http.Handler {
 			h.privateIdentityRoutes(protected)
 			h.pageRoutes(protected)
 			h.workspaceRoutes(protected)
+			h.environmentRoutes(protected)
 			h.playgroundRoutes(protected)
 		})
 	})
@@ -113,16 +114,17 @@ func (h Handler) pageRoutes(r chi.Router) {
 func (h Handler) playgroundRoutes(r chi.Router) {
 	r.Post("/api/test", func(w http.ResponseWriter, r *http.Request) {
 		var input struct {
-			Flow     domain.Flow         `json:"flow"`
-			Method   string              `json:"method"`
-			Path     string              `json:"path"`
-			Headers  map[string]string   `json:"headers"`
-			Body     any                 `json:"body"`
-			BodyMode string              `json:"body_mode"`
-			RawBody  string              `json:"raw_body"`
-			Form     map[string][]string `json:"form"`
-			Params   map[string]string   `json:"params"`
-			Query    map[string][]string `json:"query"`
+			Flow          domain.Flow         `json:"flow"`
+			Method        string              `json:"method"`
+			Path          string              `json:"path"`
+			Headers       map[string]string   `json:"headers"`
+			Body          any                 `json:"body"`
+			BodyMode      string              `json:"body_mode"`
+			RawBody       string              `json:"raw_body"`
+			Form          map[string][]string `json:"form"`
+			Params        map[string]string   `json:"params"`
+			Query         map[string][]string `json:"query"`
+			EnvironmentID string              `json:"environment_id"`
 		}
 		if !decode(w, r, &input) {
 			return
@@ -140,7 +142,15 @@ func (h Handler) playgroundRoutes(r chi.Router) {
 		request.Path = input.Path
 		request.Headers = headers
 		request.Query = input.Query
-		result, err := usecase.Evaluate(r.Context(), input.Flow, request, input.Params)
+		environment := map[string]any(nil)
+		if input.EnvironmentID != "" {
+			environment, err = h.Service.EnvironmentRepository().EnvironmentValues(r.Context(), principal(r).User.ID, input.EnvironmentID)
+			if err != nil {
+				respond(w, nil, err)
+				return
+			}
+		}
+		result, err := usecase.EvaluateWithEnvironment(r.Context(), input.Flow, request, input.Params, environment)
 		if err != nil {
 			respond(w, nil, err)
 			return

@@ -1,6 +1,7 @@
 import { responseEditor, responseConfig } from './responses.js';
 import { workspaceEditor } from './workspace.js';
 import { identityEditor } from './identity.js';
+import { environmentEditor } from './environments.js';
 import { scenarioBranches, arrangeBranches, branchEdges, branchRows, setPriority } from './branches.js';
 import { formatValue, pathPreview } from './preview.js';
 import { conditionKinds, pathParameters, typedCondition, normalizeCondition, conditionDiagnostics, conditionSummary, conditionKindLabel, flowConditionWarnings } from './conditions.js';
@@ -9,6 +10,7 @@ import { clone, defaultExample, defaultFlow, outgoingBranches, setConnection, in
 
 export const createEditor = () => ({
   ...identityEditor,
+  ...environmentEditor,
   ...workspaceEditor,
   ...responseEditor,
   responseVariable:{...responseEditor.responseVariable},
@@ -64,7 +66,7 @@ export const createEditor = () => ({
   get flowIssues(){return this.endpoint ? graphIssues(this.endpoint.flow) : [];},
   get insertionSources(){return this.orderedNodes.filter(node => node.type !== 'response');},
   get baseURL(){return `${this.publicOrigin || location.origin}/public/${this.workspace?.slug || ''}`;},
-  get modalTitle(){return {members:'Workspace members',users:'User management',user:this.userForm?.id?'Edit user':'Create user',password:'Change password',view:'View request path',workspace:this.workspaceForm.id?'Edit workspace':'New workspace',endpoint:'New endpoint',templates:'Add configuration',node:this.nodeForm?.type === 'request' ? 'Edit incoming request' : 'Edit configuration',connection:'Edit connection',direct:'Use an unconditional response',palette:'Add condition node',scenario:this.scenarioScope ? 'Edit node · '+this.scenarioScope.label : this.scenarioIsNew ? 'Add condition' : 'Edit path · ' + (this.scenarioForm?.label || '')}[this.modal] || '';},
+  get modalTitle(){return {environments:'Environments',members:'Workspace members',users:'User management',user:this.userForm?.id?'Edit user':'Create user',password:'Change password',view:'View request path',workspace:this.workspaceForm.id?'Edit workspace':'New workspace',endpoint:'New endpoint',templates:'Add configuration',node:this.nodeForm?.type === 'request' ? 'Edit incoming request' : 'Edit configuration',connection:'Edit connection',direct:'Use an unconditional response',palette:'Add condition node',scenario:this.scenarioScope ? 'Edit node · '+this.scenarioScope.label : this.scenarioIsNew ? 'Add condition' : 'Edit path · ' + (this.scenarioForm?.label || '')}[this.modal] || '';},
   async request(url,method='GET',data){
     const response=await fetch(url,{method,headers:{'Content-Type':'application/json',...(this.csrfToken?{'X-CSRF-Token':this.csrfToken}:{})},body:data===undefined?undefined:JSON.stringify(data)});
     if(response.status===401 && url!=='/api/auth/password'){window.location.assign('/login');throw Error('Your session has expired. Sign in again.');}const result=await response.json();if(!response.ok)throw Error(result.error || 'Request failed');return result;
@@ -73,7 +75,7 @@ export const createEditor = () => ({
   async boot(){
     this.$watch('modal',value=>{this.dialogError='';if(value!=='password')this.passwordForm={current:'',next:'',confirmation:''};if(value!=='user'&&this.userForm)this.userForm.password='';});
     window.addEventListener('beforeunload',event=>{if(this.dirty){event.preventDefault();event.returnValue='';}});
-    try{await this.loadIdentity();const settings=await this.request('/api/config');this.publicOrigin=settings.public_base_url;this.workspaces=await this.request('/api/workspaces');if(this.workspaces.length)await this.selectWorkspace(this.workspaces[0].id);}catch(error){this.notify(error.message);}
+    try{await this.loadIdentity();await this.loadEnvironments();const settings=await this.request('/api/config');this.publicOrigin=settings.public_base_url;this.workspaces=await this.request('/api/workspaces');if(this.workspaces.length)await this.selectWorkspace(this.workspaces[0].id);}catch(error){this.notify(error.message);}
   },
   mayDiscard(){return !this.dirty || window.confirm('You have unsaved changes. Continue and discard them?');},
   async selectWorkspace(id){
@@ -353,7 +355,7 @@ export const createEditor = () => ({
   conditionMeta(config){const c=normalizeCondition(config);return `${conditionKindLabel(c)}${c.condition_type==='body' ? ' · '+(c.body_mode==='form'?'Form':c.raw_format==='text'?'Raw Text':'Raw JSON') : ''} · ${c.match==='any'?'OR':'AND'} · ${c.rules.length} field`;},
   nodeIcon(type){return {request:'↳',condition:'◇',response:'↗',headers:'≡',delay:'◷'}[type] || '◇';},
   nodeSummary(node){switch(node.type){case 'request':return `${this.endpoint.method} ${this.endpoint.path}`;case 'response':return `${node.config.status} · ${node.config.response_mode === 'dynamic' ? 'Dynamic JSON' : 'Static JSON'}`;case 'headers':return `${Object.keys(node.config.headers||{}).length} response headers`;case 'condition':return conditionSummary(node.config);case 'delay':return `${node.config.delay_ms} ms`;default:return '';}},
-  async runTest(){this.testOpen=true;this.testing=true;this.trace=[];this.testResult=null;try{const input=JSON.parse(this.testInput);this.testResult=await this.request('/api/test','POST',{...input,flow:this.endpoint.flow,method:this.endpoint.method,path:this.endpoint.path});this.trace=this.testResult.trace;}catch(error){this.notify(error.message);}finally{this.testing=false;}},
+  async runTest(){this.testOpen=true;this.testing=true;this.trace=[];this.testResult=null;try{const input=JSON.parse(this.testInput);this.testResult=await this.request('/api/test','POST',{...input,environment_id:this.activeEnvironmentID,flow:this.endpoint.flow,method:this.endpoint.method,path:this.endpoint.path});this.trace=this.testResult.trace;}catch(error){this.notify(error.message);}finally{this.testing=false;}},
   async copyBaseURL(){await this.copyText(this.baseURL,'Workspace base URL copied.');},
   async copyURL(){await this.copyText(this.baseURL+this.endpoint.path,'Endpoint URL copied. Replace :parameter with a value before use.');},
   async copyText(value,message){try{await navigator.clipboard.writeText(value);this.notify(message);}catch{this.notify('Copy this URL: '+value);}},

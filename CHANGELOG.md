@@ -20,6 +20,9 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Refactored
 
+- Restructured internal packages to align with idiomatic Clean Architecture conventions by replacing `internal/adapter/postgres` and `internal/adapter/http` with top-level `internal/repository` and `internal/handler`.
+- Decoupled `internal/handler` from the underlying persistence layer by exposing usecase service operations for workspaces, endpoints, environments, and memberships on `usecase.Service`.
+- Added constructor functions `NewService` and `repository.New`, named interface parameters on `WorkspaceRepository`, standardized error messages in English, and replaced raw numeric status codes with standard `http.Status*` constants.
 - Migrated HTTP routing to pinned Chi v5.5.0 with public-authentication, session-protected management, administrator and public-mock groups. templ remains on standard net/http; domain/use-case dependencies and database schema are unchanged. Preserved normal route URLs, methods, session/CSRF and CORS behavior, decoded wildcard paths, query-preserving canonical redirects and 405 Allow headers.
 - Replaced URL-substring workspace policy inference with explicit Viewer/Editor/Owner middleware. Missing workspace parameters and unknown permission roles deny access. Corrected Viewer HEAD reads to use Viewer permission rather than Editor permission. Added routing/authorization regression coverage and routing documentation.
 - Preserved public preflight handling before normalization and kept unknown mock methods outside management authentication.

@@ -32,8 +32,8 @@ Dependencies are locked in `go.sum` and `package-lock.json`. The templ Go tool v
 cmd/server/                 Composition root and server lifecycle
 internal/domain/            Entities, graph and template validation
 internal/usecase/           Repository ports, CRUD, matching and rendering
-internal/adapter/http/      Routes, sessions, middleware and transport
-internal/adapter/postgres/  pgx repositories and embedded migrations
+internal/repository/        pgx repositories and embedded migrations
+internal/handler/           Routes, sessions, middleware and transport
 internal/web/               templ components and embedded assets
 web/src/                    Alpine state, graph helpers and styling
 ```

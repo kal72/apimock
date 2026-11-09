@@ -1,4 +1,4 @@
-package httpadapter
+package handler
 
 import (
 	"apimock/internal/domain"
@@ -35,7 +35,7 @@ func (h Handler) memberRoutes(r chi.Router) {
 		return
 	}
 	getHead(r.With(h.requireWorkspace("owner")), "/api/workspaces/{wid}/members", func(w http.ResponseWriter, r *http.Request) {
-		items, err := h.Service.WorkspaceRepository().WorkspaceMembers(r.Context(), routeParam(r, "wid"))
+		items, err := h.Service.WorkspaceMembers(r.Context(), routeParam(r, "wid"))
 		respond(w, items, err)
 	})
 	r.With(h.requireWorkspace("owner")).Put("/api/workspaces/{wid}/members/{username}", func(w http.ResponseWriter, r *http.Request) {
@@ -50,11 +50,11 @@ func (h Handler) memberRoutes(r chi.Router) {
 			respond(w, nil, validationError{"role is required"})
 			return
 		}
-		err := h.Service.WorkspaceRepository().SetWorkspaceMember(r.Context(), routeParam(r, "wid"), strings.ToLower(strings.TrimSpace(routeParam(r, "username"))), input.Role, principal(r).User)
+		err := h.Service.SetWorkspaceMember(r.Context(), routeParam(r, "wid"), strings.ToLower(strings.TrimSpace(routeParam(r, "username"))), input.Role, principal(r).User)
 		respond(w, map[string]bool{"saved": err == nil}, err)
 	})
 	r.With(h.requireWorkspace("owner")).Delete("/api/workspaces/{wid}/members/{username}", func(w http.ResponseWriter, r *http.Request) {
-		err := h.Service.WorkspaceRepository().SetWorkspaceMember(r.Context(), routeParam(r, "wid"), routeParam(r, "username"), "", principal(r).User)
+		err := h.Service.SetWorkspaceMember(r.Context(), routeParam(r, "wid"), routeParam(r, "username"), "", principal(r).User)
 		respond(w, map[string]bool{"deleted": err == nil}, err)
 	})
 }
@@ -63,11 +63,11 @@ func (h Handler) workspaceRoutes(r chi.Router) {
 	h.memberRoutes(r)
 	getHead(r, "/api/workspaces", func(w http.ResponseWriter, r *http.Request) {
 		if h.Auth != nil {
-			items, err := h.Service.WorkspaceRepository().VisibleWorkspaces(r.Context(), principal(r).User)
+			items, err := h.Service.VisibleWorkspaces(r.Context(), principal(r).User)
 			respond(w, items, err)
 			return
 		}
-		items, err := h.Service.Repo.Workspaces(r.Context())
+		items, err := h.Service.Workspaces(r.Context())
 		respond(w, items, err)
 	})
 	r.Post("/api/workspaces", func(w http.ResponseWriter, r *http.Request) {
@@ -94,10 +94,10 @@ func (h Handler) workspaceRoutes(r chi.Router) {
 		respond(w, saved, err)
 	})
 	r.With(h.requireWorkspace("owner")).Delete("/api/workspaces/{wid}", func(w http.ResponseWriter, r *http.Request) {
-		respond(w, map[string]bool{"deleted": true}, h.Service.Repo.DeleteWorkspace(r.Context(), routeParam(r, "wid")))
+		respond(w, map[string]bool{"deleted": true}, h.Service.DeleteWorkspace(r.Context(), routeParam(r, "wid")))
 	})
 	getHead(r.With(h.requireWorkspace("viewer")), "/api/workspaces/{wid}/endpoints", func(w http.ResponseWriter, r *http.Request) {
-		items, err := h.Service.Repo.Endpoints(r.Context(), routeParam(r, "wid"))
+		items, err := h.Service.Endpoints(r.Context(), routeParam(r, "wid"))
 		respond(w, items, err)
 	})
 	save := func(w http.ResponseWriter, r *http.Request) {
@@ -113,6 +113,6 @@ func (h Handler) workspaceRoutes(r chi.Router) {
 	r.With(h.requireWorkspace("editor")).Post("/api/workspaces/{wid}/endpoints", save)
 	r.With(h.requireWorkspace("editor")).Put("/api/workspaces/{wid}/endpoints/{eid}", save)
 	r.With(h.requireWorkspace("editor")).Delete("/api/workspaces/{wid}/endpoints/{eid}", func(w http.ResponseWriter, r *http.Request) {
-		respond(w, map[string]bool{"deleted": true}, h.Service.Repo.DeleteEndpoint(r.Context(), routeParam(r, "wid"), routeParam(r, "eid")))
+		respond(w, map[string]bool{"deleted": true}, h.Service.DeleteEndpoint(r.Context(), routeParam(r, "wid"), routeParam(r, "eid")))
 	})
 }

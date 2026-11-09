@@ -1,6 +1,6 @@
 # Mocklab roadmap
 
-Last updated: **2026-11-07**.
+Last updated: **2026-11-09**.
 
 This roadmap tracks implementation scope, not promised release dates. No version or Git tag has been released. Available features remain part of an MVP. Internal deployment uses the application host and /public/{workspace-slug}; no domain is provisioned by the application.
 
@@ -17,7 +17,7 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | ID | Area | Work item | Status | Outcome / limitations |
 | --- | --- | --- | --- | --- |
 | F01 | Backend | Go 1.27.3 as the only HTTP server | Done | Go serves the UI, assets, management API, and mock API. |
-| F02 | Architecture | Separate domain, use cases, adapters, and composition root | Done | Use cases own the repository port; the server injects the PostgreSQL adapter. |
+| F02 | Architecture | Separate domain, use cases, repository, handler, and composition root | Done | Use cases own repository ports; repository and handler packages implement persistence and HTTP transport. |
 | F03 | Database | PostgreSQL connection pool and JSONB flow storage | Done | Workspaces and endpoints are persistent; database integration has been tested. |
 | F04 | Database | Schema migrations with version tracking and transaction locking | Done | Embedded SQL is applied at startup. |
 | F05 | UI | templ + Alpine + HTMX + Tailwind components | Done | Sidebar, toolbar, editor, playground, and dialogs are separate components. HTMX provides server status updates. |

@@ -3,6 +3,7 @@ package usecase
 import (
 	"apimock/internal/domain"
 	"context"
+	"errors"
 	"fmt"
 )
 
@@ -11,10 +12,23 @@ type WorkspaceRepository interface {
 	WorkspaceRole(context.Context, string, domain.User) (string, error)
 	CreateOwnedWorkspace(context.Context, domain.Workspace, string) error
 	WorkspaceMembers(context.Context, string) ([]domain.WorkspaceMember, error)
-	SetWorkspaceMember(context.Context, string, string, string, domain.User) error
+	SetWorkspaceMember(ctx context.Context, workspaceID, username, role string, actor domain.User) error
 }
 
 func (s Service) WorkspaceRepository() WorkspaceRepository { return s.Repo.(WorkspaceRepository) }
+
+func (s Service) WorkspaceMembers(ctx context.Context, wid string) ([]domain.WorkspaceMember, error) {
+	return s.WorkspaceRepository().WorkspaceMembers(ctx, wid)
+}
+
+func (s Service) SetWorkspaceMember(ctx context.Context, wid, username, role string, actor domain.User) error {
+	return s.WorkspaceRepository().SetWorkspaceMember(ctx, wid, username, role, actor)
+}
+
+func (s Service) VisibleWorkspaces(ctx context.Context, actor domain.User) ([]domain.Workspace, error) {
+	return s.WorkspaceRepository().VisibleWorkspaces(ctx, actor)
+}
+
 func (s Service) WorkspaceAccess(ctx context.Context, wid string, actor domain.User, required string) error {
 	role, err := s.WorkspaceRepository().WorkspaceRole(ctx, wid, actor)
 	if err != nil {
@@ -27,7 +41,7 @@ func (s Service) WorkspaceAccess(ctx context.Context, wid string, actor domain.U
 	return nil
 }
 
-var ErrWorkspaceAccess = fmt.Errorf("workspace access denied")
+var ErrWorkspaceAccess = errors.New("workspace access denied")
 
 func (s Service) CreateWorkspace(ctx context.Context, w domain.Workspace, actor domain.User) (domain.Workspace, error) {
 	if err := w.Validate(); err != nil {

@@ -1,9 +1,9 @@
-package httpadapter
+package handler
 
 import (
-	"apimock/internal/adapter/postgres"
 	"apimock/internal/config"
 	"apimock/internal/domain"
+	"apimock/internal/repository"
 	"apimock/internal/usecase"
 	"context"
 	"encoding/json"
@@ -44,7 +44,7 @@ func TestIdentityIntegration(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer pool.Close()
-	repo := postgres.Repository{Pool: pool}
+	repo := repository.Repository{Pool: pool}
 	if err = repo.Migrate(ctx); err != nil {
 		t.Fatal(err)
 	}

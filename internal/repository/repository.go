@@ -1,4 +1,4 @@
-package postgres
+package repository
 
 import (
 	"apimock/internal/domain"
@@ -15,6 +15,10 @@ import (
 var migrations embed.FS
 
 type Repository struct{ Pool *pgxpool.Pool }
+
+func New(pool *pgxpool.Pool) Repository {
+	return Repository{Pool: pool}
+}
 
 func (r Repository) Migrate(ctx context.Context) error {
 	tx, err := r.Pool.Begin(ctx)

@@ -1,4 +1,4 @@
-package postgres
+package repository
 
 import (
 	"apimock/internal/domain"

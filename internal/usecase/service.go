@@ -32,6 +32,42 @@ type EnvironmentRepository interface {
 }
 type Service struct{ Repo Repository }
 
+func NewService(repo Repository) Service {
+	return Service{Repo: repo}
+}
+
+func (s Service) Workspaces(ctx context.Context) ([]domain.Workspace, error) {
+	return s.Repo.Workspaces(ctx)
+}
+
+func (s Service) DeleteWorkspace(ctx context.Context, id string) error {
+	return s.Repo.DeleteWorkspace(ctx, id)
+}
+
+func (s Service) Endpoints(ctx context.Context, wid string) ([]domain.Endpoint, error) {
+	return s.Repo.Endpoints(ctx, wid)
+}
+
+func (s Service) DeleteEndpoint(ctx context.Context, wid, eid string) error {
+	return s.Repo.DeleteEndpoint(ctx, wid, eid)
+}
+
+func (s Service) Environments(ctx context.Context, userID string) ([]domain.Environment, error) {
+	return s.EnvironmentRepository().Environments(ctx, userID)
+}
+
+func (s Service) DeleteEnvironment(ctx context.Context, userID, envID string) error {
+	return s.EnvironmentRepository().DeleteEnvironment(ctx, userID, envID)
+}
+
+func (s Service) DeleteEnvironmentVariable(ctx context.Context, userID, envID, key string) error {
+	return s.EnvironmentRepository().DeleteEnvironmentVariable(ctx, userID, envID, key)
+}
+
+func (s Service) EnvironmentValues(ctx context.Context, userID, envID string) (map[string]any, error) {
+	return s.EnvironmentRepository().EnvironmentValues(ctx, userID, envID)
+}
+
 func ID() string {
 	var b [16]byte
 	if _, err := rand.Read(b[:]); err != nil {
@@ -224,7 +260,7 @@ func EvaluateWithEnvironment(ctx context.Context, f domain.Flow, r Request, para
 		}
 		current = next
 	}
-	return Result{}, errors.New("flow melebihi batas eksekusi")
+	return Result{}, errors.New("execution step limit exceeded")
 }
 func field(key string, r Request, params map[string]string) (string, bool) {
 	prefix, name, _ := strings.Cut(key, ".")

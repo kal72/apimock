@@ -1,4 +1,4 @@
-package httpadapter
+package handler
 
 import (
 	"apimock/internal/config"
@@ -71,7 +71,7 @@ func (h Handler) Routes() http.Handler {
 func (h Handler) health(w http.ResponseWriter, r *http.Request) {
 	if h.Ready != nil {
 		if err := h.Ready(r); err != nil {
-			http.Error(w, "database unavailable", 503)
+			http.Error(w, "database unavailable", http.StatusServiceUnavailable)
 			return
 		}
 	}
@@ -144,7 +144,7 @@ func (h Handler) playgroundRoutes(r chi.Router) {
 		request.Query = input.Query
 		environment := map[string]any(nil)
 		if input.EnvironmentID != "" {
-			environment, err = h.Service.EnvironmentRepository().EnvironmentValues(r.Context(), principal(r).User.ID, input.EnvironmentID)
+			environment, err = h.Service.EnvironmentValues(r.Context(), principal(r).User.ID, input.EnvironmentID)
 			if err != nil {
 				respond(w, nil, err)
 				return

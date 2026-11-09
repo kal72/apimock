@@ -1,4 +1,4 @@
-package httpadapter
+package handler
 
 import (
 	"apimock/internal/usecase"

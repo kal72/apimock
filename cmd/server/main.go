@@ -1,9 +1,9 @@
 package main
 
 import (
-	httpadapter "apimock/internal/adapter/http"
-	"apimock/internal/adapter/postgres"
 	"apimock/internal/config"
+	"apimock/internal/handler"
+	"apimock/internal/repository"
 	"apimock/internal/usecase"
 	"apimock/internal/web"
 	"context"
@@ -32,7 +32,7 @@ func run() error {
 	defer stop()
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
-		return errors.New("DATABASE_URL wajib diisi; lihat .env.example")
+		return errors.New("DATABASE_URL is required; see .env.example")
 	}
 	pool, err := pgxpool.New(ctx, dsn)
 	if err != nil {
@@ -44,7 +44,7 @@ func run() error {
 	if err = pool.Ping(startup); err != nil {
 		return err
 	}
-	repo := postgres.Repository{Pool: pool}
+	repo := repository.New(pool)
 	if err = repo.Migrate(startup); err != nil {
 		return err
 	}
@@ -56,14 +56,23 @@ func run() error {
 	if addr == "" {
 		addr = "127.0.0.1:8080"
 	}
-	h := httpadapter.Handler{Auth: &httpadapter.Identity{Service: auth}, Config: settings, Service: usecase.Service{Repo: repo}, Assets: http.StripPrefix("/assets/", http.FileServer(http.FS(web.Assets))), Ready: func(r *http.Request) error {
-		c, cancel := context.WithTimeout(r.Context(), 2*time.Second)
-		defer cancel()
-		return pool.Ping(c)
-	}}
+	h := handler.Handler{
+		Auth:    &handler.Identity{Service: auth},
+		Config:  settings,
+		Service: usecase.NewService(repo),
+		Assets:  http.StripPrefix("/assets/", http.FileServer(http.FS(web.Assets))),
+		Ready: func(r *http.Request) error {
+			c, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+			defer cancel()
+			return pool.Ping(c)
+		},
+	}
 	server := &http.Server{Addr: addr, Handler: h.Routes(), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 60 * time.Second}
 	done := make(chan error, 1)
-	go func() { slog.Info("Mocklab ready", "url", "http://"+addr+"/app"); done <- server.ListenAndServe() }()
+	go func() {
+		slog.Info("Mocklab ready", "url", "http://"+addr+"/app")
+		done <- server.ListenAndServe()
+	}()
 	select {
 	case err := <-done:
 		if !errors.Is(err, http.ErrServerClosed) {

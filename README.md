@@ -30,8 +30,8 @@ The project follows clean architecture: domain rules are independent of transpor
 cmd/server/                 Dependency wiring and server lifecycle
 internal/domain/            Entities, flow and template validation
 internal/usecase/           Application logic, matching and rendering
-internal/adapter/http/      Routes, authentication and middleware
-internal/adapter/postgres/  Persistence and embedded migrations
+internal/repository/        Persistence and embedded migrations
+internal/handler/           Routes, authentication and middleware
 internal/web/               templ components and embedded assets
 web/src/                    Alpine state, editor helpers and styling
 ```

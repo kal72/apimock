@@ -1,6 +1,6 @@
 # Mocklab roadmap
 
-Last updated: **2026-11-09**.
+Last updated: **2026-11-11**.
 
 This roadmap tracks implementation scope, not promised release dates. No version or Git tag has been released. Available features remain part of an MVP. Internal deployment uses the application host and /public/{workspace-slug}; no domain is provisioned by the application.
 
@@ -47,7 +47,7 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | M12 | Validation | Graphs, connections, JSON, headers, and size limits | Done | Rejects cycles, unreachable nodes, incomplete branches, invalid JSON, and unsafe headers. |
 | M13 | API testing | Playground responses and execution traces | Done | Tests unsaved flows; traces are displayed and highlight the canvas. |
 | M14 | UX | Unsaved-change indicator and navigation warning | Done | Drafts exist only in the browser; no autosave or persistent drafts. |
-| M15 | Environments | Private per-user Environment CRUD and Playground selection | Done | Typed string, number, boolean, and masked-secret variables are shared across a user's workspaces. Dynamic JSON previews resolve `environment.key`; public mock URLs intentionally do not receive private environments. |
+| M15 | Environments | Private per-user Environment CRUD and Playground selection | Done | Typed string, number, boolean, and masked-secret variables are shared across a user's workspaces. Selected from topbar selector; Dynamic JSON previews resolve `environment.key`; public mock URLs intentionally do not receive private environments. |
 
 ## MVP improvements and release readiness
 

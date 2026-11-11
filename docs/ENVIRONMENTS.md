@@ -4,7 +4,7 @@ Environments are private variable sets owned by a user. They are shared across e
 
 ## Manage variables
 
-Open **Environments** from the top bar or the sidebar selector. Create an environment, then add variables with a key and one of these types:
+In the top toolbar next to the theme switcher, use the **ENV** selector to choose an active environment, or click **Manage** next to the selector to create an environment and add variables with a key and one of these types:
 
 | Type | Example | Dynamic JSON result |
 | --- | --- | --- |
@@ -17,7 +17,7 @@ Keys must begin with a letter or underscore, then use only letters, numbers, and
 
 ## Use in Dynamic JSON
 
-Select an environment in the sidebar, choose **Dynamic JSON** for a response, then use **Insert variable** → **Selected environment**. The resulting template expression is:
+Select an environment in the top toolbar, choose **Dynamic JSON** for a response, then use **Insert variable** → **Selected environment**. The resulting template expression is:
 
 ```json
 {

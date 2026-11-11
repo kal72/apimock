@@ -14,6 +14,20 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Changed
 
+- Repositioned the "✓ Saved" indicator in the top toolbar to the left of the Environment dropdown selector, keeping save status feedback directly alongside the workspace breadcrumb and endpoint context.
+
+- Redesigned the scenario path view modal (`path-view-modal`) in Table mode into a balanced two-column inspector layout featuring a prominent hero header with HTTP status badge, route method pill, full URL banner with copy action, structured routing conditions, example request payloads, cascaded response headers, and response body preview with copy support.
+
+- Isolated application shell viewport scrolling: locked the root document (`html, body, .app-shell`) to 100vh with `overscroll-behavior: none` and designated `<main>` as the sole independent scroll container, eliminating window-level rubber-band bouncing and top-space detachment when scrolling to the bottom.
+
+- Upgraded the endpoint counter in the sidebar to a styled badge pill with tabular numerals, dedicated dark/night theme border styling, and dynamic active filter count reporting (e.g. `2 / 5`) when searching endpoints.
+
+- Redesigned the Environments management dialog into a Master–Detail two-column layout with an environment navigator list on the left and an active environment variables table with color-coded type badges (String, Number, Boolean, Secret), masked secret values, and inline add/edit variable controls on the right.
+
+- Relocated the Environment dropdown selector and inline **Manage** button to the top toolbar next to the theme switcher, keeping the sidebar focused on workspace selection and endpoint navigation.
+
+- Fixed the desktop sidebar layout to remain pinned to the viewport height (`position: sticky`), making only the endpoint list independently scrollable while the brand, workspace switcher, and footer actions remain fixed.
+
 - Refined the V2 header to follow the original concept: compact breadcrumb and Saved/theme/account row, right-aligned sky decoration, functional local account popover, and a separate endpoint/base-URL/Node–Table toolbar. Unified the endpoint list into the main sidebar to preserve toolbar width and moved the preview notice to the footer; all content remains static.
 
 - Open the endpoint editor in Node mode by default. Table remains available through the mode switch; flow data is unchanged.

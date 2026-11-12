@@ -85,12 +85,12 @@ templ EnvironmentSwitcher() {
 
 templ Toolbar() {
 	<header class="toolbar" x-data="{accountOpen:false}" @keydown.escape.stop="accountOpen=false; $refs.accountTrigger?.focus()">
-		<div class="breadcrumbs"><span>Workspaces</span><span>/</span><strong x-text="workspace?.name || 'Overview'"></strong><span class="unsaved" x-show="dirty && canEditWorkspace" x-cloak>Unsaved</span></div>
+		<div class="breadcrumbs"><span>Workspaces</span><span>/</span><strong x-text="workspace?.name || 'Overview'"></strong></div>
 		<div class="topbar-actions">
 			<span class="topbar-saved" x-show="endpoint && !dirty" x-cloak><span aria-hidden="true">✓</span> Saved</span>
+			<span class="topbar-unsaved" x-show="endpoint && dirty" x-cloak :title="canEditWorkspace ? 'Unsaved changes · Save via draft bar or Ctrl+S' : 'Unsaved changes'" @click="canEditWorkspace && readyToSave && saveEndpoint()"><span aria-hidden="true">●</span> <span x-text="busy ? 'Saving…' : 'Unsaved'"></span></span>
 			@EnvironmentSwitcher()
 			@ThemeSwitch()
-			<button class="btn primary" x-show="dirty && canEditWorkspace" x-cloak :disabled="!readyToSave" @click="saveEndpoint()" x-text="busy ? 'Saving…' : 'Save changes'"></button>
 			<div class="account-popover" x-show="currentUser" x-cloak @click.outside="accountOpen=false">
     <button class="account-trigger" x-ref="accountTrigger" aria-label="Account settings" aria-controls="account-settings-panel" :aria-expanded="accountOpen" @click="accountOpen=!accountOpen" @keydown.arrow-down.prevent="accountOpen=true; $nextTick(()=>(currentUser?.role === 'admin' ? $refs.userAction : $refs.passwordAction).focus())"><span class="account-avatar" x-text="currentUser?.name?.slice(0,1).toUpperCase() || '?'"></span><span class="account-first-name" x-text="currentUser?.name?.trim().split(/\s+/)[0] || 'Account'"></span><span class="account-chevron" aria-hidden="true">⌄</span></button>
     <section id="account-settings-panel" class="account-settings-panel" aria-label="Account settings" x-show="accountOpen" x-cloak x-transition.opacity.duration.100ms>
@@ -407,7 +407,7 @@ templ Dialogs() {
            </div>
            <div class="env-field env-field-type">
             <label>Type</label>
-            <select x-model="variableForm.kind" aria-label="Variable type">
+            <select x-model="variableForm.kind" aria-label="Variable type" @change="if(variableForm.kind==='boolean'&&variableForm.value!==true&&variableForm.value!==false&&variableForm.value!=='true'&&variableForm.value!=='false')variableForm.value='true'">
              <option value="string">String</option>
              <option value="number">Number</option>
              <option value="boolean">Boolean</option>
@@ -416,7 +416,13 @@ templ Dialogs() {
            </div>
            <div class="env-field env-field-val">
             <label>Value</label>
-            <input x-model="variableForm.value" :type="variableForm.kind === 'secret' ? 'password' : 'text'" :placeholder="variableForm.kind === 'secret' ? 'Secret value' : variableForm.kind === 'boolean' ? 'true / false' : variableForm.kind === 'number' ? '42' : 'Value string'" required aria-label="Variable value"/>
+            <select x-show="variableForm.kind === 'boolean'" x-model="variableForm.value" aria-label="Variable boolean value">
+             <option value="true">true</option>
+             <option value="false">false</option>
+            </select>
+            <input x-show="variableForm.kind === 'number'" type="number" step="any" x-model="variableForm.value" placeholder="42" :required="variableForm.kind === 'number'" aria-label="Variable number value"/>
+            <input x-show="variableForm.kind === 'secret'" type="password" x-model="variableForm.value" placeholder="Secret value" :required="variableForm.kind === 'secret' && !isEditingVariable" aria-label="Variable secret value"/>
+            <input x-show="variableForm.kind === 'string'" type="text" x-model="variableForm.value" placeholder="Value string" aria-label="Variable string value"/>
            </div>
            <div class="env-field env-field-action">
             <label>&nbsp;</label>
@@ -427,6 +433,7 @@ templ Dialogs() {
            Secret values are masked on save and cannot be read back by the browser or API.
           </p>
          </form>
+         <p class="dialog-error env-form-error" role="alert" x-show="dialogError" x-text="dialogError"></p>
         </section>
        </div>
       </template>

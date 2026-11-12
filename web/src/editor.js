@@ -16,6 +16,11 @@ export const createEditor = () => ({
   responseVariable:{...responseEditor.responseVariable},
   get canManageWorkspace(){return this.workspace?.role === 'owner';},
   get canEditWorkspace(){return ['owner','editor'].includes(this.workspace?.role);},
+  get activeEnvironment(){
+    return this.environments.find(item => item.id === this.activeEnvironmentID) || (this.environments.length ? this.environments[0] : null);
+  },
+  get environmentVariables(){return this.activeEnvironment?.variables || [];},
+  get isEditingVariable(){return Boolean(this.variableForm.key && this.environmentVariables.some(v => v.key === this.variableForm.key));},
   workspaces:[], endpoints:[], workspaceID:'', workspace:null, endpoint:null, publicOrigin:'',
   methods:['GET','POST','PUT','PATCH','DELETE','HEAD','OPTIONS'],
   preview:null, formatValue,

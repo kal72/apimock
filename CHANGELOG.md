@@ -14,6 +14,8 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Changed
 
+- Replaced the "Save changes" primary button on the top toolbar with an "● Unsaved" status indicator positioned beside the Environment dropdown selector, matching the quiet style and placement of "✓ Saved" when no changes are pending. Saving remains available through the bottom draft bar, shortcut (`Ctrl+S` / `Cmd+S`), or by clicking the unsaved indicator.
+
 - Repositioned the "✓ Saved" indicator in the top toolbar to the left of the Environment dropdown selector, keeping save status feedback directly alongside the workspace breadcrumb and endpoint context.
 
 - Redesigned the scenario path view modal (`path-view-modal`) in Table mode into a balanced two-column inspector layout featuring a prominent hero header with HTTP status badge, route method pill, full URL banner with copy action, structured routing conditions, example request payloads, cascaded response headers, and response body preview with copy support.
@@ -31,6 +33,10 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 - Refined the V2 header to follow the original concept: compact breadcrumb and Saved/theme/account row, right-aligned sky decoration, functional local account popover, and a separate endpoint/base-URL/Node–Table toolbar. Unified the endpoint list into the main sidebar to preserve toolbar width and moved the preview notice to the footer; all content remains static.
 
 - Open the endpoint editor in Node mode by default. Table remains available through the mode switch; flow data is unchanged.
+
+### Fixed
+
+- Resolved an issue in the Environment Management modal where environment variables could not be created or edited. Preserved reactive getters (`activeEnvironment`, `environmentVariables`, and `isEditingVariable`) across Alpine state composition, ensured environment variable forms auto-select the active or first available environment, introduced dedicated input types for boolean, number, string, and secret kinds, and surfaced inline validation/server error notices directly within the variable form.
 
 ### Refactored
 

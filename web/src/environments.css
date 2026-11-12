@@ -465,6 +465,13 @@
   font-size: 10px;
 }
 
+.env-form-error {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
 /* Empty Selected State */
 .env-none-selected {
   display: flex;

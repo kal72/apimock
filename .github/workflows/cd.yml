@@ -218,9 +218,9 @@ jobs:
           TARGET_ENV: ${{ needs.build-and-push.outputs.target_env }}
           DEPLOY_PATH: ${{ vars.DEPLOY_PATH || (needs.build-and-push.outputs.target_env == 'prod' && '/opt/mocklab/prod' || '/opt/mocklab/dev') }}
           # App configuration secrets and variables
-          APP_ENV: ${{ vars.APP_ENV || (needs.build-and-push.outputs.target_env == 'prod' && 'internal' || 'development') }}
+          APP_ENV: ${{ vars.APP_ENV || (vars.PUBLIC_BASE_URL != '' && (needs.build-and-push.outputs.target_env == 'prod' && 'internal' || 'development') || 'development') }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PUBLIC_BASE_URL: ${{ vars.PUBLIC_BASE_URL }}
+          PUBLIC_BASE_URL: ${{ vars.PUBLIC_BASE_URL || '' }}
           ADMIN_USERNAME: ${{ vars.ADMIN_USERNAME || 'admin' }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
           MOCK_CORS_ORIGINS: ${{ vars.MOCK_CORS_ORIGINS || '' }}

@@ -98,9 +98,9 @@ Configure these in **Settings → Environments → [dev / prod] → Environment 
 | Variable Name | Required | Dev Default | Prod Default | Description |
 | --- | --- | --- | --- | --- |
 | `APP_ENV` | No | `development` | `internal` | `development`, `internal`, or `production` |
-| `PUBLIC_BASE_URL` | Yes | `http://dev-mocklab.example.com` | `https://mocklab.example.com` | Public origin of the application |
+| `PUBLIC_BASE_URL` | No | `""` (empty) | `""` (empty) | Public origin URL. Defaults to empty so Mocklab automatically uses the browser's current origin (e.g. `http://<IP_VPS>:<PORT>`). Set only if using a custom domain. |
 | `APP_PORT` | No | `8081` | `8080` | Host port mapped to the Go app |
-| `APP_BIND` | No | `127.0.0.1` | `127.0.0.1` | Interface IP binding (`127.0.0.1` behind reverse proxy) |
+| `APP_BIND` | No | `0.0.0.0` | `0.0.0.0` | Interface IP binding (`0.0.0.0` for direct public access, `127.0.0.1` if behind Nginx/Caddy) |
 | `DEPLOY_PATH` | No | `/opt/mocklab/dev` | `/opt/mocklab/prod` | Project directory on VPS |
 | `ADMIN_USERNAME` | No | `admin` | `admin` | Bootstrap administrator username |
 | `MOCK_CORS_ORIGINS` | No | `*` | `https://myfrontend.com` | Allowed CORS origins for mock calls |

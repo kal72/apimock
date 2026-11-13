@@ -183,13 +183,10 @@ jobs:
         with:
           ref: ${{ inputs.branch != '' && inputs.branch || github.ref }}
 
-      - name: Setup SSH agent
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Configure SSH known_hosts
+      - name: Setup SSH client & authentication (Password or Key)
         env:
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
         run: |
@@ -198,11 +195,26 @@ jobs:
           ssh-keyscan -p "${SSH_PORT}" -H "${SSH_HOST}" >> ~/.ssh/known_hosts 2>/dev/null
           chmod 644 ~/.ssh/known_hosts
 
+          if [ -n "${SSH_PASSWORD}" ]; then
+            echo "--> Configuring SSH password authentication via sshpass..."
+            sudo apt-get update -qq && sudo apt-get install -y -qq sshpass
+            echo "SSH_AUTH=password" >> "$GITHUB_ENV"
+          elif [ -n "${SSH_PRIVATE_KEY}" ]; then
+            echo "--> Configuring SSH key authentication..."
+            echo "${SSH_PRIVATE_KEY}" | tr -d '\r' > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            echo "SSH_AUTH=key" >> "$GITHUB_ENV"
+          else
+            echo "Error: Neither SSH_PASSWORD nor SSH_PRIVATE_KEY is defined in GitHub Secrets." >&2
+            exit 1
+          fi
+
       - name: Upload environment configuration to VPS
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
           SSH_USER: ${{ secrets.SSH_USER }}
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
           TARGET_ENV: ${{ needs.build-and-push.outputs.target_env }}
           DEPLOY_PATH: ${{ vars.DEPLOY_PATH || (needs.build-and-push.outputs.target_env == 'prod' && '/opt/mocklab/prod' || '/opt/mocklab/dev') }}
           # App configuration secrets and variables
@@ -214,8 +226,16 @@ jobs:
           MOCK_CORS_ORIGINS: ${{ vars.MOCK_CORS_ORIGINS || '' }}
           MOCK_CORS_HEADERS: ${{ vars.MOCK_CORS_HEADERS || 'Content-Type,Authorization,X-Api-Key' }}
         run: |
+          if [ "${SSH_AUTH}" = "password" ]; then
+            SSH_CMD="sshpass -e ssh -o StrictHostKeyChecking=accept-new -p ${SSH_PORT}"
+            SCP_CMD="sshpass -e scp -o StrictHostKeyChecking=accept-new -P ${SSH_PORT}"
+          else
+            SSH_CMD="ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=accept-new -p ${SSH_PORT}"
+            SCP_CMD="scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=accept-new -P ${SSH_PORT}"
+          fi
+
           echo "--> Preparing destination directory ${DEPLOY_PATH} on VPS..."
-          ssh -p "${SSH_PORT}" "${SSH_USER}@${SSH_HOST}" "mkdir -p '${DEPLOY_PATH}'"
+          $SSH_CMD "${SSH_USER}@${SSH_HOST}" "mkdir -p '${DEPLOY_PATH}'"
 
           TARGET_FILE=".env"
           if [ "${TARGET_ENV}" = "prod" ]; then
@@ -239,8 +259,8 @@ jobs:
           sed -i -E 's/^[[:space:]]+//' generated.env
 
           echo "--> Uploading ${TARGET_FILE} to ${DEPLOY_PATH}..."
-          scp -P "${SSH_PORT}" generated.env "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/${TARGET_FILE}"
-          ssh -p "${SSH_PORT}" "${SSH_USER}@${SSH_HOST}" "chmod 600 '${DEPLOY_PATH}/${TARGET_FILE}'"
+          $SCP_CMD generated.env "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}/${TARGET_FILE}"
+          $SSH_CMD "${SSH_USER}@${SSH_HOST}" "chmod 600 '${DEPLOY_PATH}/${TARGET_FILE}'"
 
           rm -f generated.env
 
@@ -249,6 +269,7 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
           SSH_USER: ${{ secrets.SSH_USER }}
+          SSHPASS: ${{ secrets.SSH_PASSWORD }}
           TARGET_ENV: ${{ needs.build-and-push.outputs.target_env }}
           IMAGE_NAME: ${{ needs.build-and-push.outputs.image_name }}
           DEPLOY_PATH: ${{ vars.DEPLOY_PATH || (needs.build-and-push.outputs.target_env == 'prod' && '/opt/mocklab/prod' || '/opt/mocklab/dev') }}
@@ -262,9 +283,16 @@ jobs:
           echo " Triggering Podman deploy on remote host: ${SSH_USER}@${SSH_HOST}"
           echo " Image : ${IMAGE_NAME}"
           echo " Port  : ${APP_BIND}:${APP_PORT}"
+          echo " Auth  : ${SSH_AUTH}"
           echo "=========================================================="
 
+          if [ "${SSH_AUTH}" = "password" ]; then
+            SSH_CMD="sshpass -e ssh -o StrictHostKeyChecking=accept-new -p ${SSH_PORT}"
+          else
+            SSH_CMD="ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=accept-new -p ${SSH_PORT}"
+          fi
+
           # Pipe deploy/podman-deploy.sh directly over SSH stdin
-          ssh -p "${SSH_PORT}" "${SSH_USER}@${SSH_HOST}" \
+          $SSH_CMD "${SSH_USER}@${SSH_HOST}" \
             "GHCR_TOKEN='${GHCR_TOKEN}' GHCR_USER='${GHCR_USER}' PODMAN_EXTRA_ARGS='${PODMAN_EXTRA_ARGS}' bash -s -- '${TARGET_ENV}' '${IMAGE_NAME}' '${APP_PORT}' '${APP_BIND}' '${DEPLOY_PATH}'" \
             < deploy/podman-deploy.sh

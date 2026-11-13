@@ -77,10 +77,13 @@ Configure these in **Settings → Environments → [dev / prod] → Environment 
 | --- | --- | --- | --- |
 | `SSH_HOST` | Yes | VPS IP address or domain name | `203.0.113.10` or `vps.example.com` |
 | `SSH_USER` | Yes | SSH user on VPS with Podman access | `deploy` or `root` |
-| `SSH_PRIVATE_KEY` | Yes | OpenSSH private key for authentication | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
+| `SSH_PASSWORD` | Optional* | Password for SSH login on VPS (via `sshpass`) | `MyVpsPassword123!` |
+| `SSH_PRIVATE_KEY` | Optional* | OpenSSH private key for key-based authentication | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
 | `DATABASE_URL` | Yes | Full PostgreSQL connection URL | `postgres://user:pass@127.0.0.1:5432/mocklab?sslmode=disable` |
 | `ADMIN_PASSWORD` | Yes | Initial bootstrap admin password | `SuperAdminPassword123!` |
 | `SSH_PORT` | No | Custom SSH port (defaults to `22`) | `22` or `2222` |
+
+*\*Note: Provide either `SSH_PASSWORD` (for standard password login) or `SSH_PRIVATE_KEY` (for SSH key-based login).*
 
 > [!TIP]
 > If your database is running on the VPS host itself and the container is in Podman rootless network:
@@ -141,25 +144,27 @@ sudo mkdir -p /opt/mocklab/dev /opt/mocklab/prod
 sudo chown -R deploy:deploy /opt/mocklab
 ```
 
-### 3. Add GitHub Actions SSH Key
+### 3. SSH Authentication Options
 
-Generate a dedicated keypair for CI/CD on your local machine:
+#### Option A: Password Authentication (Recommended if VPS uses password only)
+Simply add your VPS SSH user's password as the `SSH_PASSWORD` secret in GitHub Settings → Environments.
+The deployment workflow will automatically install `sshpass` on the runner and connect securely using the password. No keypair generation or server configuration is required!
 
-```sh
-ssh-keygen -t ed25519 -C "github-actions-mocklab" -f ~/.ssh/mocklab_deploy
-```
-
-- Add `~/.ssh/mocklab_deploy` (private key) to GitHub Secret `SSH_PRIVATE_KEY`.
-- Append `~/.ssh/mocklab_deploy.pub` (public key) to `/home/deploy/.ssh/authorized_keys` on your VPS:
-
-```sh
-# On VPS as deploy user:
-mkdir -p ~/.ssh && chmod 700 ~/.ssh
-cat >> ~/.ssh/authorized_keys << 'EOF'
-ssh-ed25519 AAAAC3... github-actions-mocklab
-EOF
-chmod 600 ~/.ssh/authorized_keys
-```
+#### Option B: Key-based Authentication
+If you prefer SSH keys:
+1. Generate an SSH keypair:
+   ```sh
+   ssh-keygen -t ed25519 -C "github-actions-mocklab" -f ~/.ssh/mocklab_deploy
+   ```
+2. Save `~/.ssh/mocklab_deploy` (private key) in GitHub Secret `SSH_PRIVATE_KEY`.
+3. Append `~/.ssh/mocklab_deploy.pub` (public key) to `/home/deploy/.ssh/authorized_keys` on your VPS:
+   ```sh
+   mkdir -p ~/.ssh && chmod 700 ~/.ssh
+   cat >> ~/.ssh/authorized_keys << 'EOF'
+   ssh-ed25519 AAAAC3... github-actions-mocklab
+   EOF
+   chmod 600 ~/.ssh/authorized_keys
+   ```
 
 ---
 

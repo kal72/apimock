@@ -27,7 +27,7 @@ flowchart TD
         end
 
         subgraph Containers ["Running Podman Containers"]
-            DevApp["mocklab-dev container (:8081)"]
+            DevApp["mocklab-dev container (:8080)"]
             ProdApp["mocklab-prod container (:8080)"]
         end
     end
@@ -99,7 +99,7 @@ Configure these in **Settings → Environments → [dev / prod] → Environment 
 | --- | --- | --- | --- | --- |
 | `APP_ENV` | No | `development` | `internal` | `development`, `internal`, or `production` |
 | `PUBLIC_BASE_URL` | No | `""` (empty) | `""` (empty) | Public origin URL. Defaults to empty so Mocklab automatically uses the browser's current origin (e.g. `http://<IP_VPS>:<PORT>`). Set only if using a custom domain. |
-| `APP_PORT` | No | `8081` | `8080` | Host port mapped to the Go app |
+| `APP_PORT` | No | `8080` | `8080` | Host port mapped to the Go app |
 | `APP_BIND` | No | `0.0.0.0` | `0.0.0.0` | Interface IP binding (`0.0.0.0` for direct public access, `127.0.0.1` if behind Nginx/Caddy) |
 | `ADMIN_USERNAME` | No | `""` (empty) | `""` (empty) | Bootstrap admin username. If empty, Mocklab displays initial web onboarding setup. |
 | `MOCK_CORS_ORIGINS` | No | `*` | `https://myfrontend.com` | Allowed CORS origins for mock calls |

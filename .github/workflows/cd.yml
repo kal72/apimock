@@ -214,8 +214,8 @@ jobs:
           SSHPASS: ${{ secrets.SSH_PASSWORD }}
           TARGET_ENV: ${{ needs.build-and-push.outputs.target_env }}
           IMAGE_NAME: ${{ needs.build-and-push.outputs.image_name }}
-          APP_PORT: ${{ vars.APP_PORT || (needs.build-and-push.outputs.target_env == 'prod' && '8080' || '8081') }}
-          APP_BIND: ${{ vars.APP_BIND || '0.0.0.0' }}
+          APP_PORT: ${{ vars.APP_PORT || (needs.build-and-push.outputs.target_env == 'prod' && '8080' || '8080') }}
+          APP_BIND: ${{ vars.APP_BIND || '127.0.0.1' }}
           PODMAN_EXTRA_ARGS: ${{ vars.PODMAN_EXTRA_ARGS || '' }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GHCR_USER: ${{ github.actor }}

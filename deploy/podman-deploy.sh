@@ -15,7 +15,7 @@ set -euo pipefail
 TARGET_ENV="${1:-dev}"
 IMAGE_NAME="${2:-}"
 APP_PORT="${3:-8080}"
-APP_BIND="${4:-0.0.0.0}"
+APP_BIND="${4:-127.0.0.1}"
 
 CONTAINER_NAME="mocklab-${TARGET_ENV}"
 
@@ -31,6 +31,9 @@ if ! command -v podman >/dev/null 2>&1; then
   echo "Error: 'podman' command is not installed on this VPS." >&2
   exit 1
 fi
+
+# Ensure user lingering is enabled for rootless containers
+loginctl enable-linger "${USER:-}" >/dev/null 2>&1 || true
 
 if [ -z "$IMAGE_NAME" ]; then
   echo "Error: Container image name must be provided as the 2nd argument." >&2

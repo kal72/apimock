@@ -80,6 +80,7 @@ func run() error {
 		}
 		return nil
 	case <-ctx.Done():
+		slog.Info("Server received shutdown signal, shutting down gracefully...")
 		shutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		return server.Shutdown(shutdown)

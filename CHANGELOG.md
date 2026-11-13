@@ -38,6 +38,8 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Fixed
 
+- Fixed deployment startup failure when administrator credentials are not configured. Made `ADMIN_USERNAME` default to empty in `cd.yml` and `deploy/podman-deploy.sh`, allowing Mocklab to boot successfully into web onboarding mode on first launch when neither `ADMIN_USERNAME` nor `ADMIN_PASSWORD` is provided.
+
 - Resolved an issue in the Environment Management modal where environment variables could not be created or edited. Preserved reactive getters (`activeEnvironment`, `environmentVariables`, and `isEditingVariable`) across Alpine state composition, ensured environment variable forms auto-select the active or first available environment, introduced dedicated input types for boolean, number, string, and secret kinds, and surfaced inline validation/server error notices directly within the variable form.
 
 ### Refactored

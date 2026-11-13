@@ -70,7 +70,7 @@ podman run -d \
   -e APP_ENV="${APP_ENV:-development}" \
   -e DATABASE_URL="${DATABASE_URL:-}" \
   -e PUBLIC_BASE_URL="${PUBLIC_BASE_URL:-}" \
-  -e ADMIN_USERNAME="${ADMIN_USERNAME:-admin}" \
+  -e ADMIN_USERNAME="${ADMIN_USERNAME:-}" \
   -e ADMIN_PASSWORD="${ADMIN_PASSWORD:-}" \
   -e MOCK_CORS_ORIGINS="${MOCK_CORS_ORIGINS:-}" \
   -e MOCK_CORS_HEADERS="${MOCK_CORS_HEADERS:-Content-Type,Authorization,X-Api-Key}" \

@@ -223,8 +223,8 @@ jobs:
           APP_ENV: ${{ vars.APP_ENV || (vars.PUBLIC_BASE_URL != '' && (needs.build-and-push.outputs.target_env == 'prod' && 'internal' || 'development') || 'development') }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           PUBLIC_BASE_URL: ${{ vars.PUBLIC_BASE_URL || '' }}
-          ADMIN_USERNAME: ${{ vars.ADMIN_USERNAME || 'admin' }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          ADMIN_USERNAME: ${{ vars.ADMIN_USERNAME || '' }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD || '' }}
           MOCK_CORS_ORIGINS: ${{ vars.MOCK_CORS_ORIGINS || '' }}
           MOCK_CORS_HEADERS: ${{ vars.MOCK_CORS_HEADERS || 'Content-Type,Authorization,X-Api-Key' }}
         run: |

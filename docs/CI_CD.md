@@ -80,7 +80,7 @@ Configure these in **Settings → Environments → [dev / prod] → Environment 
 | `SSH_PASSWORD` | Optional* | Password for SSH login on VPS (via `sshpass`) | `MyVpsPassword123!` |
 | `SSH_PRIVATE_KEY` | Optional* | OpenSSH private key for key-based authentication | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
 | `DATABASE_URL` | Yes | Full PostgreSQL connection URL | `postgres://user:pass@127.0.0.1:5432/mocklab?sslmode=disable` |
-| `ADMIN_PASSWORD` | Yes | Initial bootstrap admin password | `SuperAdminPassword123!` |
+| `ADMIN_PASSWORD` | No | Initial bootstrap admin password (optional; if omitted, web shows onboarding on first launch) | `SuperAdminPassword123!` |
 | `SSH_PORT` | No | Custom SSH port (defaults to `22`) | `22` or `2222` |
 
 *\*Note: Provide either `SSH_PASSWORD` (for standard password login) or `SSH_PRIVATE_KEY` (for SSH key-based login).*
@@ -101,7 +101,7 @@ Configure these in **Settings → Environments → [dev / prod] → Environment 
 | `PUBLIC_BASE_URL` | No | `""` (empty) | `""` (empty) | Public origin URL. Defaults to empty so Mocklab automatically uses the browser's current origin (e.g. `http://<IP_VPS>:<PORT>`). Set only if using a custom domain. |
 | `APP_PORT` | No | `8081` | `8080` | Host port mapped to the Go app |
 | `APP_BIND` | No | `0.0.0.0` | `0.0.0.0` | Interface IP binding (`0.0.0.0` for direct public access, `127.0.0.1` if behind Nginx/Caddy) |
-| `ADMIN_USERNAME` | No | `admin` | `admin` | Bootstrap administrator username |
+| `ADMIN_USERNAME` | No | `""` (empty) | `""` (empty) | Bootstrap admin username. If empty, Mocklab displays initial web onboarding setup. |
 | `MOCK_CORS_ORIGINS` | No | `*` | `https://myfrontend.com` | Allowed CORS origins for mock calls |
 | `MOCK_CORS_HEADERS` | No | `Content-Type,Authorization,X-Api-Key` | `Content-Type,Authorization,X-Api-Key` | Allowed CORS request headers |
 | `PODMAN_EXTRA_ARGS` | No | `""` | `""` | Optional extra arguments for `podman run` |

@@ -1,4 +1,4 @@
-name: CD (Podman VPS)
+name: Deployment
 
 on:
   push:

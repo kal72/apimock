@@ -101,7 +101,6 @@ Configure these in **Settings → Environments → [dev / prod] → Environment 
 | `PUBLIC_BASE_URL` | No | `""` (empty) | `""` (empty) | Public origin URL. Defaults to empty so Mocklab automatically uses the browser's current origin (e.g. `http://<IP_VPS>:<PORT>`). Set only if using a custom domain. |
 | `APP_PORT` | No | `8081` | `8080` | Host port mapped to the Go app |
 | `APP_BIND` | No | `0.0.0.0` | `0.0.0.0` | Interface IP binding (`0.0.0.0` for direct public access, `127.0.0.1` if behind Nginx/Caddy) |
-| `DEPLOY_PATH` | No | `/opt/mocklab/dev` | `/opt/mocklab/prod` | Project directory on VPS |
 | `ADMIN_USERNAME` | No | `admin` | `admin` | Bootstrap administrator username |
 | `MOCK_CORS_ORIGINS` | No | `*` | `https://myfrontend.com` | Allowed CORS origins for mock calls |
 | `MOCK_CORS_HEADERS` | No | `Content-Type,Authorization,X-Api-Key` | `Content-Type,Authorization,X-Api-Key` | Allowed CORS request headers |
@@ -138,10 +137,6 @@ Create a dedicated user `deploy` and enable lingering so containers continue run
 ```sh
 sudo useradd -m -s /bin/bash deploy
 sudo loginctl enable-linger deploy
-
-# Prepare directories
-sudo mkdir -p /opt/mocklab/dev /opt/mocklab/prod
-sudo chown -R deploy:deploy /opt/mocklab
 ```
 
 ### 3. SSH Authentication Options
@@ -204,20 +199,20 @@ All builds also generate an immutable commit-SHA tag (`ghcr.io/username/apimock:
 
 ## Triggering Deployments
 
-### Automatic Deployment
-- Push to `develop` branch → automatically builds and deploys `ghcr.io/owner/repo:dev` to `dev`.
-- Push to `main` branch → automatically builds and deploys `ghcr.io/owner/repo:v1.0` (and `:latest`) to `prod`.
-- Push to a release tag (e.g. `git tag v1.0 && git push origin v1.0`) → automatically builds and deploys `ghcr.io/owner/repo:v1.0` to `prod`.
+### Automatic Deployment (Main Branch Only)
+- **Push to `main` branch**: Automatically triggers CI/CD, builds the container image with version tag **`:dev`**, and deploys it to the **`dev`** environment on your VPS.
+- No other branch triggers automatic deployment.
 
-### Manual Deployment via GitHub UI
+### Manual Deployment (Production & On-Demand Dev)
+Deployment to **`prod` is strictly manual** to prevent accidental production releases:
 1. Go to your repository on GitHub.
 2. Click **Actions** → select **CD (Podman VPS)** in the left sidebar.
 3. Click **Run workflow**.
 4. Configure options:
    - **Use workflow from**: Choose the base branch from the GitHub dropdown.
-   - **Target deployment environment**: Select `dev` or `prod`.
-   - **Image version for prod**: If deploying to `prod`, enter your version tag (e.g. `v1.0`, `v2.0.1`). When `dev` is selected, this input is ignored and the image version is always `dev`.
-   - **Branch or Git ref to deploy**: Optionally enter a specific branch name, tag, or commit. If left blank, it deploys the branch selected in the dropdown.
+   - **Target deployment environment**: Select **`prod`** (or `dev` for manual re-deploy).
+   - **Image version for prod**: Enter your release version tag (e.g. `v1.0`, `v1.0.1`). When `prod` is chosen, the image is tagged and deployed with this version (and also tagged `:latest`). If deploying `dev`, this field is ignored and `:dev` is used.
+   - **Branch or Git ref to deploy**: Optionally enter a specific branch or tag. If left blank, it deploys the branch selected in the dropdown.
    - **Skip CI test checks**: Check only if you need emergency deployment without re-running unit tests.
 5. Click **Run workflow** to initiate deployment.
 

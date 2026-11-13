@@ -1,28 +1,23 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Mocklab - Podman Pull & Run Deployment Script for Manual VPS (No Compose)
+# Mocklab - Direct Podman Pull & Run Deployment Script (Stateless, No File Sync)
 # ==============================================================================
-# This script is executed on the VPS. It:
-# 1. Authenticates to GitHub Container Registry (ghcr.io)
-# 2. Pulls the pre-built container image from GHCR
-# 3. Stops and deletes the previous container
-# 4. Starts the new container with Podman
+# This script runs via SSH on the VPS. It:
+# 1. Authenticates to GitHub Container Registry (ghcr.io) if token is provided
+# 2. Pulls the latest pre-built container image
+# 3. Stops and removes the previous container
+# 4. Runs the new container with environment variables injected directly
 # 5. Verifies application health at /healthz
-# 6. Cleans up old dangling images
+# 6. Cleans up dangling images
 # ==============================================================================
 set -euo pipefail
 
 TARGET_ENV="${1:-dev}"
 IMAGE_NAME="${2:-}"
 APP_PORT="${3:-8080}"
-APP_BIND="${4:-127.0.0.1}"
-DEPLOY_PATH="${5:-/opt/mocklab/${TARGET_ENV}}"
+APP_BIND="${4:-0.0.0.0}"
 
 CONTAINER_NAME="mocklab-${TARGET_ENV}"
-ENV_FILE="${DEPLOY_PATH}/.env"
-if [ "$TARGET_ENV" = "prod" ] && [ -f "${DEPLOY_PATH}/.env.production" ]; then
-  ENV_FILE="${DEPLOY_PATH}/.env.production"
-fi
 
 echo "======================================================================"
 echo " Mocklab Podman Deployment (GHCR Image)"
@@ -30,8 +25,6 @@ echo " Environment : ${TARGET_ENV}"
 echo " Container   : ${CONTAINER_NAME}"
 echo " Image       : ${IMAGE_NAME}"
 echo " Port Binding: ${APP_BIND}:${APP_PORT} -> 8080"
-echo " Deploy Path : ${DEPLOY_PATH}"
-echo " Env File    : ${ENV_FILE}"
 echo "======================================================================"
 
 if ! command -v podman >/dev/null 2>&1; then
@@ -44,11 +37,6 @@ if [ -z "$IMAGE_NAME" ]; then
   exit 1
 fi
 
-if [ ! -f "$ENV_FILE" ]; then
-  echo "Error: Environment file '${ENV_FILE}' not found." >&2
-  exit 1
-fi
-
 # Step 1: Optional authentication with GitHub Container Registry
 if [ -n "${GHCR_TOKEN:-}" ]; then
   echo "--> Authenticating with GitHub Container Registry (ghcr.io)..."
@@ -58,6 +46,8 @@ fi
 # Step 2: Pull the fresh image from GHCR
 echo "--> Pulling latest image '${IMAGE_NAME}' from GHCR..."
 podman pull "$IMAGE_NAME"
+echo "--> Successfully updated image: ${IMAGE_NAME}"
+echo "--> Image ID: $(podman images -q --no-trunc "$IMAGE_NAME" | head -n 1)"
 
 # Step 3: Stop and remove existing container
 if podman container exists "$CONTAINER_NAME" 2>/dev/null; then
@@ -68,7 +58,7 @@ if podman container exists "$CONTAINER_NAME" 2>/dev/null; then
 fi
 
 # Step 4: Run the new container with Podman
-echo "--> Running container '${CONTAINER_NAME}'..."
+echo "--> Running container '${CONTAINER_NAME}' with injected environment..."
 EXTRA_ARGS="${PODMAN_EXTRA_ARGS:-}"
 
 # shellcheck disable=SC2086
@@ -76,7 +66,14 @@ podman run -d \
   --name "$CONTAINER_NAME" \
   --restart unless-stopped \
   -p "${APP_BIND}:${APP_PORT}:8080" \
-  --env-file "$ENV_FILE" \
+  -e ADDR=0.0.0.0:8080 \
+  -e APP_ENV="${APP_ENV:-development}" \
+  -e DATABASE_URL="${DATABASE_URL:-}" \
+  -e PUBLIC_BASE_URL="${PUBLIC_BASE_URL:-}" \
+  -e ADMIN_USERNAME="${ADMIN_USERNAME:-admin}" \
+  -e ADMIN_PASSWORD="${ADMIN_PASSWORD:-}" \
+  -e MOCK_CORS_ORIGINS="${MOCK_CORS_ORIGINS:-}" \
+  -e MOCK_CORS_HEADERS="${MOCK_CORS_HEADERS:-Content-Type,Authorization,X-Api-Key}" \
   $EXTRA_ARGS \
   "$IMAGE_NAME"
 

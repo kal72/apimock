@@ -1,6 +1,6 @@
 # Mocklab roadmap
 
-Last updated: **2026-11-11**.
+Last updated: **2026-11-13**.
 
 This roadmap tracks implementation scope, not promised release dates. No version or Git tag has been released. Available features remain part of an MVP. Internal deployment uses the application host and /public/{workspace-slug}; no domain is provisioned by the application.
 
@@ -24,6 +24,7 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | F06 | Build | npm + Vite for asset builds only | Done | No npm server is required at runtime; assets are embedded with go:embed. |
 | F07 | Operations | Makefile, multi-stage Dockerfile, and Compose | Done | Binary/image builds passed; container runtime and health endpoint were checked. |
 | F08 | Operations | Structured logging, timeouts, and graceful shutdown | Done | Uses slog and the Go server lifecycle. |
+| OPS-CICD01 | Operations | GitHub Actions CI/CD with Podman on manual VPS | Done | CI runs tests and Podman container checks; CD deploys dev and prod application containers directly to manual VPS via SSH without Compose, managing environment secrets, variables, and health checks. See docs/CI_CD.md. |
 | CFX01 | Conditions | Priority conflict warnings and Playground diagnosis | Done | Conservative duplicate/shadow/possible-overlap analysis in independent typed scenarios; staged popup preview; chosen response and field checks distinguish actual execution from diagnostic-only checks. Nested legacy graphs and collective coverage are outside scope. |
 | WUX01 | Workspace UX | Compact workspace settings popover | Done | Owner settings beside selector; separate access label; grouped editing/membership and separated destructive action. |
 | DOC-DYN01 | Documentation | Dynamic JSON usage guide | Done | English tutorial, template/source reference, type/default rules, generator and header examples, preview/save workflow, limits, and troubleshooting in docs/DYNAMIC_JSON.md. |

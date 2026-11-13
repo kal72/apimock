@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Run frontend unit tests
+        run: npm test
+
+      - name: Generate templ components
+        run: go tool templ generate
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Run Go unit and race tests
+        run: go test -race ./...
+
+      - name: Run Go vet
+        run: go vet ./...
+
+      - name: Verify standalone binary build
+        run: CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o bin/mocklab ./cmd/server
+
+  container-check:
+    name: Podman Container Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build container image with Podman
+        run: podman build -t mocklab:ci -f Dockerfile .
+
+      - name: Inspect container image
+        run: |
+          podman images mocklab:ci
+          podman inspect mocklab:ci --format 'Image Architecture: {{.Architecture}}, OS: {{.Os}}, Size: {{.Size}} bytes'
+

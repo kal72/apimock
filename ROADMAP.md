@@ -108,6 +108,7 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | P04 | Security | Administrator management access boundary | Done | Session login protects management pages/APIs; mock requests and login assets are independent. Internal/production modes require credentials and check the configured Host; production additionally requires HTTPS. |
 | P05 | Deployment | Internal-domain deployment configuration | Done | Go + PostgreSQL only, /public/{workspace-slug}, managed internal mode, private host binding, optional existing HTTPS ingress, environment examples, Makefile targets, and English instructions. |
 | P06 | Deployment | Verify internal hostname and network reachability | Todo | Requires the target internal hostname/server and client-side DNS or hosts resolution; local runtime can be tested without changing machine DNS. |
+| P07 | Public Portal | Shareable public API docs & per-API playground with ON/OFF access control | Done | Optional per-workspace public viewer portal at `/share/{workspace-slug}` (`005_workspace_public_docs.sql`, disabled by default). Exposes read-only endpoint specs, priority scenarios, cURL/fetch snippets, and a live per-API playground (`POST /share/{slug}/playground`) without login while keeping private user environments isolated. |
 
 ## Future development
 

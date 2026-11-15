@@ -87,6 +87,7 @@ export const createEditor = () => ({
   get flowIssues(){return this.endpoint ? graphIssues(this.endpoint.flow) : [];},
   get insertionSources(){return this.orderedNodes.filter(node => node.type !== 'response');},
   get baseURL(){return `${this.publicOrigin || location.origin}/public/${this.workspace?.slug || ''}`;},
+  get publicDocsURL(){return `${this.publicOrigin || location.origin}/share/${this.workspace?.slug || ''}`;},
   get modalTitle(){return {environments:'Environments',members:'Workspace members',users:'User management',user:this.userForm?.id?'Edit user':'Create user',password:'Change password',view:'View request path',workspace:this.workspaceForm.id?'Edit workspace':'New workspace',endpoint:'New endpoint',templates:'Add configuration',node:this.nodeForm?.type === 'request' ? 'Edit incoming request' : 'Edit configuration',connection:'Edit connection',direct:'Use an unconditional response',palette:'Add condition node',scenario:this.scenarioScope ? 'Edit node · '+this.scenarioScope.label : this.scenarioIsNew ? 'Add condition' : this.scenarioForm?.isDefault ? 'Edit default response' : 'Edit condition · ' + (this.scenarioForm?.label || '')}[this.modal] || '';},
   async request(url,method='GET',data){
     const response=await fetch(url,{method,headers:{'Content-Type':'application/json',...(this.csrfToken?{'X-CSRF-Token':this.csrfToken}:{})},body:data===undefined?undefined:JSON.stringify(data)});
@@ -108,7 +109,7 @@ export const createEditor = () => ({
     if(page==='environments'){this.openEnvironments(false);this.navPage='environments';return;}
     if(page==='settings'){
       if(!this.workspace)return;
-      this.workspaceForm={id:this.workspace.id,name:this.workspace.name,slug:this.workspace.slug};
+      this.workspaceForm={id:this.workspace.id,name:this.workspace.name,slug:this.workspace.slug,public_docs:Boolean(this.workspace.public_docs)};
       this.settingsTab=tab;this.navPage='settings';
       if(this.canManageWorkspace){this.memberForm={username:'',role:'viewer'};try{this.members=await this.request(`/api/workspaces/${this.workspace.id}/members`);}catch(error){this.dialogError=error.message;}}
       return;
@@ -120,8 +121,20 @@ export const createEditor = () => ({
     try{const endpoints=id?await this.request(`/api/workspaces/${id}/endpoints`):[];this.workspaceID=id;this.workspace=this.workspaces.find(w=>w.id===id)||null;this.endpoints=endpoints;this.endpoint=null;this.dirty=false;this.notice='';this.trace=[];this.testResult=null;if(endpoints.length)this.selectEndpoint(endpoints[0]);if(this.navPage==='settings'){if(this.workspace)await this.openPage('settings',this.settingsTab);else this.navPage='endpoints';}}catch(error){this.workspaceID=this.workspace?.id || '';this.notify(error.message);}
   },
   selectEndpoint(endpoint){if(!this.mayDiscard())return;this.endpoint=clone(endpoint);const m=scenarioBranches(this.endpoint.flow);if(this.endpoint.flow.layout!=='scenarios'||(m&&(m.request.x===80||m.request.x===100||m.fallback.x===820||m.fallback.x===500||m.fallback.y===80+m.branches.length*220)))arrangeBranches(this.endpoint.flow);this.dirty=false;this.notice='';this.dismissedWarningKey='';this.trace=[];this.testResult=null;this.connecting=null;this.pendingFlow=null;this.pendingSummary='';this.undoSnapshot=null;this.highlightedNodeID=null;this.insertAfter=this.requestNode?.id || '';this.testInput=JSON.stringify(this.requestNode?.config.example || defaultExample(),null,2);this.$nextTick?.(()=>{this.$root?.querySelector('.canvas-scroll')?.scrollTo({left:0,top:0});});},
-  openWorkspace(workspace){if(workspace){this.openPage('settings','general');return;}this.workspaceForm={name:'',slug:''};this.modal='workspace';},
-  async saveWorkspace(){this.busy=true;this.dialogError='';try{const w=this.workspaceForm;const saved=await this.request('/api/workspaces'+(w.id?`/${w.id}`:''),w.id?'PUT':'POST',w);this.workspaces=await this.request('/api/workspaces');this.modal=null;if(this.workspace?.id===saved.id){this.workspace=this.workspaces.find(w=>w.id===saved.id);this.workspaceForm={id:this.workspace.id,name:this.workspace.name,slug:this.workspace.slug};}else{this.navPage='endpoints';await this.selectWorkspace(saved.id);}this.notify('Workspace saved.');}catch(error){this.dialogError=error.message;}finally{this.busy=false;}},
+  openWorkspace(workspace){if(workspace){this.openPage('settings','general');return;}this.workspaceForm={name:'',slug:'',public_docs:false};this.modal='workspace';},
+  async saveWorkspace(){this.busy=true;this.dialogError='';try{const w={...this.workspaceForm,public_docs:Boolean(this.workspaceForm.public_docs)};const saved=await this.request('/api/workspaces'+(w.id?`/${w.id}`:''),w.id?'PUT':'POST',w);this.workspaces=await this.request('/api/workspaces');this.modal=null;if(this.workspace?.id===saved.id){this.workspace=this.workspaces.find(w=>w.id===saved.id);this.workspaceForm={id:this.workspace.id,name:this.workspace.name,slug:this.workspace.slug,public_docs:Boolean(this.workspace.public_docs)};}else{this.navPage='endpoints';await this.selectWorkspace(saved.id);}this.notify('Workspace saved.');}catch(error){this.dialogError=error.message;}finally{this.busy=false;}},
+  async togglePublicDocs(enabled=!this.workspace?.public_docs){
+    if(!this.workspace || !this.canManageWorkspace || this.busy)return;
+    this.busy=true;this.dialogError='';
+    try{
+      const payload={id:this.workspace.id,name:this.workspace.name,slug:this.workspace.slug,public_docs:Boolean(enabled)};
+      const saved=await this.request(`/api/workspaces/${this.workspace.id}`,'PUT',payload);
+      this.workspaces=await this.request('/api/workspaces');
+      this.workspace=this.workspaces.find(w=>w.id===saved.id)||saved;
+      if(this.workspaceForm?.id===saved.id)this.workspaceForm.public_docs=Boolean(this.workspace.public_docs);
+      this.notify(this.workspace.public_docs ? 'Public API docs enabled (/share/' + this.workspace.slug + ').' : 'Public API docs disabled.');
+    }catch(error){this.dialogError=error.message;this.notify(error.message);}finally{this.busy=false;}
+  },
   async removeWorkspace(){if(!this.workspace||!window.confirm(`Delete workspace "${this.workspace.name}" and all its endpoints?`))return;try{await this.request(`/api/workspaces/${this.workspace.id}`,'DELETE');this.workspaces=this.workspaces.filter(w=>w.id!==this.workspace.id);this.dirty=false;this.navPage='endpoints';await this.selectWorkspace(this.workspaces[0]?.id || '');}catch(error){this.notify(error.message);}},
   newEndpoint(){if(!this.mayDiscard())return;this.navPage='endpoints';this.endpointForm={name:'',method:'GET',path:'/'};this.modal='endpoint';},
   async createEndpoint(){this.busy=true;try{const saved=await this.request(`/api/workspaces/${this.workspace.id}/endpoints`,'POST',{...this.endpointForm,flow:defaultFlow()});this.endpoints.push(saved);this.dirty=false;this.selectEndpoint(saved);this.modal=null;this.mode='table';this.notify('Endpoint active: Incoming request → Success response 200. Conditions are optional.');}catch(error){this.dialogError=error.message;}finally{this.busy=false;}},
@@ -407,6 +420,7 @@ export const createEditor = () => ({
   nodeSummary(node){switch(node.type){case 'request':return `${this.endpoint.method} ${this.endpoint.path}`;case 'response':return `${node.config.status} · ${node.config.response_mode === 'dynamic' ? 'Dynamic JSON' : 'Static JSON'}`;case 'headers':return `${Object.keys(node.config.headers||{}).length} response headers`;case 'condition':return `${conditionKindLabel(node.config).replace(' Params','')} · ${conditionSummary(node.config)}`;case 'delay':return `${node.config.delay_ms} ms`;default:return '';}},
   async runTest(){this.testOpen=true;this.testing=true;this.trace=[];this.testResult=null;try{const input=JSON.parse(this.testInput);this.testResult=await this.request('/api/test','POST',{...input,environment_id:this.activeEnvironmentID,flow:this.endpoint.flow,method:this.endpoint.method,path:this.endpoint.path});this.trace=this.testResult.trace;}catch(error){this.notify(error.message);}finally{this.testing=false;}},
   async copyBaseURL(){await this.copyText(this.baseURL,'Workspace base URL copied.');},
+  async copyPublicDocsURL(){await this.copyText(this.publicDocsURL,'Public API docs URL copied.');},
   async copyURL(){await this.copyText(this.baseURL+this.endpoint.path,'Endpoint URL copied. Replace :parameter with a value before use.');},
   async copyText(value,message){try{await navigator.clipboard.writeText(value);this.notify(message||'Copied to clipboard.');}catch{this.notify('Copied: '+value);}},
   commitModal(){if(this.modal==='node')this.saveNode();if(this.modal==='connection')this.saveConnection();if(this.modal==='direct')this.prepareDirectResponse();if(this.modal==='scenario')this.saveScenario();}

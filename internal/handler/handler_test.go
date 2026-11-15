@@ -21,6 +21,12 @@ func (r *testRepository) Workspaces(context.Context) ([]domain.Workspace, error)
 	return r.workspaces, nil
 }
 func (r *testRepository) SaveWorkspace(_ context.Context, w domain.Workspace) error {
+	for i, existing := range r.workspaces {
+		if existing.ID == w.ID {
+			r.workspaces[i] = w
+			return nil
+		}
+	}
 	r.workspaces = append(r.workspaces, w)
 	return nil
 }
@@ -167,5 +173,60 @@ func TestGeneratorDocumentation(t *testing.T) {
 		if !strings.Contains(body, name) {
 			t.Fatalf("missing generator %s", name)
 		}
+	}
+}
+
+func TestPublicDocsAndPlaygroundToggle(t *testing.T) {
+	c := config.Config{Environment: "production", PublicBaseURL: "https://mock.example.com", AdminUsername: "admin", AdminPassword: "test-password-long-enough"}
+	h := configuredHandler(c).Routes()
+
+	// By default, PublicDocs is false (OFF), so /share/demo and /share/demo/playground return 404.
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, httptest.NewRequest("GET", "https://mock.example.com/share/demo", nil))
+	if w.Code != http.StatusNotFound || !strings.Contains(w.Body.String(), "Public API documentation unavailable") {
+		t.Fatalf("expected 404 when public_docs is disabled, got %d: %s", w.Code, w.Body.String())
+	}
+
+	w = httptest.NewRecorder()
+	h.ServeHTTP(w, httptest.NewRequest("POST", "https://mock.example.com/share/demo/playground", strings.NewReader(`{"endpoint_id":"e1"}`)))
+	if w.Code != http.StatusNotFound {
+		t.Fatalf("expected 404 for playground when public_docs is disabled, got %d", w.Code)
+	}
+
+	// Enable public_docs via authenticated PUT /api/workspaces/w1.
+	enableReq := httptest.NewRequest("PUT", "https://mock.example.com/api/workspaces/w1", strings.NewReader(`{"name":"Demo","slug":"demo","public_docs":true}`))
+	enableReq.SetBasicAuth(c.AdminUsername, c.AdminPassword)
+	w = httptest.NewRecorder()
+	h.ServeHTTP(w, enableReq)
+	if w.Code != http.StatusOK || !strings.Contains(w.Body.String(), `"public_docs":true`) {
+		t.Fatalf("failed to enable public_docs: %d %s", w.Code, w.Body.String())
+	}
+
+	// Now unauthenticated GET /share/demo and POST /share/demo/playground succeed!
+	w = httptest.NewRecorder()
+	h.ServeHTTP(w, httptest.NewRequest("GET", "https://mock.example.com/share/demo", nil))
+	if w.Code != http.StatusOK || !strings.Contains(w.Body.String(), "Public API Docs") || !strings.Contains(w.Body.String(), "/products/:id") {
+		t.Fatalf("expected 200 public docs page, got %d: %s", w.Code, w.Body.String())
+	}
+
+	w = httptest.NewRecorder()
+	h.ServeHTTP(w, httptest.NewRequest("POST", "https://mock.example.com/share/demo/playground", strings.NewReader(`{"endpoint_id":"e1","params":{"id":"42"}}`)))
+	if w.Code != http.StatusOK || !strings.Contains(w.Body.String(), `"status":200`) {
+		t.Fatalf("expected 200 from public playground, got %d: %s", w.Code, w.Body.String())
+	}
+
+	// Turn public_docs OFF again and verify access is immediately revoked.
+	disableReq := httptest.NewRequest("PUT", "https://mock.example.com/api/workspaces/w1", strings.NewReader(`{"name":"Demo","slug":"demo","public_docs":false}`))
+	disableReq.SetBasicAuth(c.AdminUsername, c.AdminPassword)
+	w = httptest.NewRecorder()
+	h.ServeHTTP(w, disableReq)
+	if w.Code != http.StatusOK {
+		t.Fatalf("failed to disable public_docs: %d", w.Code)
+	}
+
+	w = httptest.NewRecorder()
+	h.ServeHTTP(w, httptest.NewRequest("GET", "https://mock.example.com/share/demo", nil))
+	if w.Code != http.StatusNotFound {
+		t.Fatalf("expected 404 after disabling public_docs, got %d", w.Code)
 	}
 }

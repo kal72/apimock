@@ -98,7 +98,7 @@ A healthy server returns `ok`. Create a workspace such as `demo-store`, add `GET
 curl http://localhost:8080/public/demo-store/products/123
 ```
 
-Replace the origin/port and workspace slug as needed. Management pages require login; saved mock URLs are callable without a management session.
+Replace the origin/port and workspace slug as needed. Management pages require login; saved mock URLs are callable without a management session. Workspace owners can also enable a shareable **Public API Docs & Playground** portal at `/share/{workspace-slug}` from Workspace Settings so external viewers can browse endpoint documentation and test APIs interactively without logging in.
 
 For internal deployment, HTTPS ingress, and CORS, see [Deployment](docs/DEPLOYMENT.md). For automated deployment with Podman, see [CI/CD Guide](docs/CI_CD.md). For application workflows, see [Usage](docs/USAGE.md), [Dynamic JSON](docs/DYNAMIC_JSON.md), [Environments](docs/ENVIRONMENTS.md), and [Access control](docs/ACCESS_CONTROL.md). The in-app generator reference is available at `/docs/generators` after signing in.
 

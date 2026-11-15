@@ -125,7 +125,7 @@ func (h Handler) routingFallback(next http.Handler) http.Handler {
 	management := h.managementAccess(h.requireSession(next))
 	public := h.mockCORS(next)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/public/") {
+		if strings.HasPrefix(r.URL.Path, "/public/") || strings.HasPrefix(r.URL.Path, "/share/") {
 			public.ServeHTTP(w, r)
 			return
 		}

@@ -70,7 +70,7 @@ func dbError(err error) error {
 	return err
 }
 func (r Repository) Workspaces(ctx context.Context) ([]domain.Workspace, error) {
-	rows, err := r.Pool.Query(ctx, "SELECT id,name,slug FROM workspaces ORDER BY name,id")
+	rows, err := r.Pool.Query(ctx, "SELECT id,name,slug,public_docs FROM workspaces ORDER BY name,id")
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (r Repository) Workspaces(ctx context.Context) ([]domain.Workspace, error) 
 	out := []domain.Workspace{}
 	for rows.Next() {
 		var w domain.Workspace
-		if err = rows.Scan(&w.ID, &w.Name, &w.Slug); err != nil {
+		if err = rows.Scan(&w.ID, &w.Name, &w.Slug, &w.PublicDocs); err != nil {
 			return nil, err
 		}
 		out = append(out, w)
@@ -86,7 +86,7 @@ func (r Repository) Workspaces(ctx context.Context) ([]domain.Workspace, error) 
 	return out, rows.Err()
 }
 func (r Repository) SaveWorkspace(ctx context.Context, w domain.Workspace) error {
-	_, err := r.Pool.Exec(ctx, `INSERT INTO workspaces(id,name,slug) VALUES($1,$2,$3) ON CONFLICT(id) DO UPDATE SET name=EXCLUDED.name,slug=EXCLUDED.slug`, w.ID, w.Name, w.Slug)
+	_, err := r.Pool.Exec(ctx, `INSERT INTO workspaces(id,name,slug,public_docs) VALUES($1,$2,$3,$4) ON CONFLICT(id) DO UPDATE SET name=EXCLUDED.name,slug=EXCLUDED.slug,public_docs=EXCLUDED.public_docs`, w.ID, w.Name, w.Slug, w.PublicDocs)
 	return dbError(err)
 }
 func (r Repository) DeleteWorkspace(ctx context.Context, id string) error {

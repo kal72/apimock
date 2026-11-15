@@ -9,7 +9,7 @@ import (
 )
 
 func (r Repository) VisibleWorkspaces(ctx context.Context, actor domain.User) ([]domain.Workspace, error) {
-	rows, err := r.Pool.Query(ctx, `SELECT w.id,w.name,w.slug,CASE WHEN $2='admin' THEN 'owner' ELSE m.role END FROM workspaces w LEFT JOIN workspace_members m ON m.workspace_id=w.id AND m.user_id=$1 WHERE $2='admin' OR m.user_id IS NOT NULL ORDER BY w.name,w.id`, actor.ID, actor.Role)
+	rows, err := r.Pool.Query(ctx, `SELECT w.id,w.name,w.slug,w.public_docs,CASE WHEN $2='admin' THEN 'owner' ELSE m.role END FROM workspaces w LEFT JOIN workspace_members m ON m.workspace_id=w.id AND m.user_id=$1 WHERE $2='admin' OR m.user_id IS NOT NULL ORDER BY w.name,w.id`, actor.ID, actor.Role)
 	if err != nil {
 		return nil, err
 	}
@@ -17,7 +17,7 @@ func (r Repository) VisibleWorkspaces(ctx context.Context, actor domain.User) ([
 	out := []domain.Workspace{}
 	for rows.Next() {
 		var w domain.Workspace
-		if err = rows.Scan(&w.ID, &w.Name, &w.Slug, &w.Role); err != nil {
+		if err = rows.Scan(&w.ID, &w.Name, &w.Slug, &w.PublicDocs, &w.Role); err != nil {
 			return nil, err
 		}
 		out = append(out, w)
@@ -38,7 +38,7 @@ func (r Repository) CreateOwnedWorkspace(ctx context.Context, w domain.Workspace
 		return err
 	}
 	defer tx.Rollback(ctx)
-	if _, err = tx.Exec(ctx, `INSERT INTO workspaces(id,name,slug) VALUES($1,$2,$3)`, w.ID, w.Name, w.Slug); err != nil {
+	if _, err = tx.Exec(ctx, `INSERT INTO workspaces(id,name,slug,public_docs) VALUES($1,$2,$3,$4)`, w.ID, w.Name, w.Slug, w.PublicDocs); err != nil {
 		return dbError(err)
 	}
 	if _, err = tx.Exec(ctx, `INSERT INTO workspace_members VALUES($1,$2,'owner')`, w.ID, uid); err != nil {

@@ -1,7 +1,7 @@
 FROM node:24-alpine AS assets
 WORKDIR /src
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --no-audit --no-fund && npm cache clean --force
 COPY vite.config.js ./
 COPY web ./web
 COPY internal/web ./internal/web
@@ -13,7 +13,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 COPY --from=assets /src/internal/web/static ./internal/web/static
-RUN go tool templ generate && CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /mocklab ./cmd/server
+RUN go tool templ generate && CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /mocklab ./cmd/server && go clean -cache
 
 FROM gcr.io/distroless/static-debian12:nonroot
 COPY --from=build /mocklab /mocklab

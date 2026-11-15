@@ -40,6 +40,28 @@ func (s Service) Workspaces(ctx context.Context) ([]domain.Workspace, error) {
 	return s.Repo.Workspaces(ctx)
 }
 
+func (s Service) PublicWorkspace(ctx context.Context, slug string) (domain.Workspace, []domain.Endpoint, error) {
+	ws, err := s.Repo.Workspaces(ctx)
+	if err != nil {
+		return domain.Workspace{}, nil, err
+	}
+	var found domain.Workspace
+	for _, w := range ws {
+		if w.Slug == slug {
+			found = w
+			break
+		}
+	}
+	if found.ID == "" || !found.PublicDocs {
+		return domain.Workspace{}, nil, domain.ErrNotFound
+	}
+	endpoints, err := s.Repo.Endpoints(ctx, found.ID)
+	if err != nil {
+		return domain.Workspace{}, nil, err
+	}
+	return found, endpoints, nil
+}
+
 func (s Service) DeleteWorkspace(ctx context.Context, id string) error {
 	return s.Repo.DeleteWorkspace(ctx, id)
 }

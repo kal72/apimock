@@ -27,6 +27,7 @@ type Handler struct {
 func (h Handler) Routes() http.Handler {
 	r := chi.NewRouter()
 	getHead(r, "/healthz", h.health)
+	h.publicDocsRoutes(r)
 	r.Group(func(management chi.Router) {
 		management.Use(h.managementAccess)
 		h.publicIdentityRoutes(management)

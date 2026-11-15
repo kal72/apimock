@@ -3,6 +3,7 @@ import focus from '@alpinejs/focus';
 import htmx from 'htmx.org';
 import { createLogin } from './identity.js';
 import { createEditor } from './editor.js';
+import { createPublicDocs } from './public-docs.js';
 import './app.css';
 import './conditions.css';
 import './v2.css';
@@ -13,6 +14,7 @@ import './toolbar.css';
 import './environments.css';
 import './path-view.css';
 import './generator-docs.css';
+import './public-docs.css';
 import { createTheme } from './theme.js';
 
 window.htmx = htmx;
@@ -20,6 +22,7 @@ Alpine.plugin(focus);
 Alpine.store('theme', createTheme());
 Alpine.data('mocklab', createEditor);
 Alpine.data('identityLogin',createLogin);
+Alpine.data('publicDocs', createPublicDocs);
 window.Alpine = Alpine;
 Alpine.data('generatorDocs',()=>({
  query:'',copyStatus:'',

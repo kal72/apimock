@@ -27,6 +27,7 @@ export function createPublicDocs(initialData) {
     methodFilter: 'ALL',
     notice: '',
     noticeTimer: null,
+    snippetLang: 'curl',
     playTab: 'params',
     playParams: {},
     playQuery: [],

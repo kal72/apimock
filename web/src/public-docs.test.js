@@ -27,16 +27,33 @@ test('publicDocs initializes endpoints, URLs, method filters, and code snippets'
   assert.equal(state.playParams.id, '123');
   assert.equal(state.scenarios.length, 2);
   assert.equal(state.resolvedPlaygroundURL, 'https://mock.example.com/public/demo-store/products/123');
+  assert.equal(state.supportsBody, false);
+  assert.equal(state.hasBodyExample, false);
 
   state.methodFilter = 'POST';
   assert.equal(state.filteredEndpoints.length, 1);
   assert.equal(state.filteredEndpoints[0].id, 'e2');
+
+  const postState = createPublicDocs(samplePublicPayload());
+  postState.selectEndpoint(postState.endpoints[1]);
+  assert.equal(postState.supportsBody, true);
+  assert.equal(postState.hasBodyExample, false);
 
   state.methodFilter = 'ALL';
   state.search = 'product';
   assert.equal(state.filteredEndpoints.length, 1);
   assert.ok(state.curlSnippet.includes('curl -i -X GET "https://mock.example.com/public/demo-store/products/123"'));
   assert.ok(state.fetchSnippet.includes('await fetch("https://mock.example.com/public/demo-store/products/123"'));
+});
+
+test('publicDocs hides request body for GET even if example body is populated', () => {
+  const payload = samplePublicPayload();
+  payload.endpoints[0].flow.nodes[0].config.example.body = { leftover: 'data' };
+  const state = createPublicDocs(payload);
+  assert.equal(state.endpoint.method, 'GET');
+  assert.equal(state.supportsBody, false);
+  assert.equal(state.hasBodyExample, false);
+  assert.equal(state.formattedExampleBody, '');
 });
 
 test('loadScenarioIntoPlayground populates playground inputs from condition rules', () => {

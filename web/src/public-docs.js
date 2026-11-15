@@ -28,6 +28,7 @@ export function createPublicDocs(initialData) {
     notice: '',
     noticeTimer: null,
     snippetLang: 'curl',
+    activeScenarioKey: '',
     playTab: 'params',
     playParams: {},
     playQuery: [],
@@ -100,6 +101,10 @@ export function createPublicDocs(initialData) {
     get defaultScenarioRow() {
       return this.scenarios.find(row => row.isDefault) || this.scenarios.at(-1) || null;
     },
+    get activeScenario() {
+      if (!this.scenarios.length) return null;
+      return this.scenarios.find(row => row.key === this.activeScenarioKey) || this.scenarios[0];
+    },
     get documentedQueryParams() {
       if (!this.endpoint) return [];
       const map = new Map();
@@ -142,20 +147,50 @@ export function createPublicDocs(initialData) {
       }
       return [...map.entries()].map(([key, value]) => ({ key, value }));
     },
+    get supportsBody() {
+      return Boolean(this.endpoint && !['GET', 'HEAD', 'OPTIONS'].includes(this.endpoint.method));
+    },
+    get documentedBodyConditions() {
+      if (!this.supportsBody) return [];
+      const rules = [];
+      for (const node of this.endpoint?.flow?.nodes || []) {
+        if (node.type === 'condition') {
+          const cfg = normalizeCondition(node.config);
+          if (cfg.condition_type === 'body') {
+            for (const rule of cfg.rules || []) {
+              if (rule.field) rules.push(rule);
+            }
+          }
+        }
+      }
+      return rules;
+    },
     get hasBodyExample() {
-      if (!this.endpoint) return false;
+      if (!this.endpoint || !this.supportsBody) return false;
       const ex = this.requestExample;
       if (ex.body_mode === 'form' && ex.form && Object.keys(ex.form).length > 0) return true;
-      if (ex.body_mode === 'text' && ex.raw_body) return true;
-      if (ex.body && Object.keys(ex.body).length > 0) return true;
-      return ['POST', 'PUT', 'PATCH'].includes(this.endpoint.method);
+      if (ex.body_mode === 'text' && ex.raw_body && ex.raw_body.trim().length > 0) return true;
+      if (ex.raw_body && ex.raw_body.trim().length > 0 && ex.raw_body.trim() !== '{}') return true;
+      if (ex.body && typeof ex.body === 'object' && !Array.isArray(ex.body) && Object.keys(ex.body).length > 0) return true;
+      return this.documentedBodyConditions.length > 0;
     },
     get formattedExampleBody() {
+      if (!this.supportsBody) return '';
       const ex = this.requestExample;
       if (ex.body_mode === 'form') return JSON.stringify(ex.form || {}, null, 2);
       if (ex.body_mode === 'text') return ex.raw_body || '';
-      if (ex.raw_body) return formatPreviewValue(ex.raw_body);
-      return JSON.stringify(ex.body || {}, null, 2);
+      if (ex.raw_body && ex.raw_body.trim() && ex.raw_body.trim() !== '{}') return formatPreviewValue(ex.raw_body);
+      if (ex.body && typeof ex.body === 'object' && !Array.isArray(ex.body) && Object.keys(ex.body).length > 0) {
+        return JSON.stringify(ex.body, null, 2);
+      }
+      if (this.documentedBodyConditions.length > 0) {
+        const sample = {};
+        for (const rule of this.documentedBodyConditions) {
+          setNestedValue(sample, rule.field, rule.operator === 'empty' ? '' : rule.value || 'sample-value');
+        }
+        return JSON.stringify(sample, null, 2);
+      }
+      return '';
     },
     get resolvedPlaygroundURL() {
       if (!this.endpoint) return this.baseURL;
@@ -234,6 +269,10 @@ export function createPublicDocs(initialData) {
       this.endpoint = ep;
       this.testResult = null;
       this.playError = '';
+      this.activeScenarioKey = this.scenarios[0]?.key || '';
+      if (!this.supportsBody && this.playTab === 'body') {
+        this.playTab = 'params';
+      }
       this.resetPlayground();
     },
     resetPlayground() {
@@ -256,6 +295,7 @@ export function createPublicDocs(initialData) {
     },
     loadScenarioIntoPlayground(row) {
       if (!row) return;
+      this.activeScenarioKey = row.key;
       this.resetPlayground();
       let targetTab = 'params';
       for (const cond of row.conditionDetails || []) {
@@ -377,6 +417,8 @@ export function createPublicDocs(initialData) {
         const result = await response.json();
         if (!response.ok) throw Error(result.error || 'Playground request failed.');
         this.testResult = result;
+        const matched = this.scenarios.find(row => row.responseID === result.response_id);
+        if (matched) this.activeScenarioKey = matched.key;
       } catch (error) {
         this.playError = error.message;
       } finally {

@@ -18,6 +18,8 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Changed
 
+- Fixed request body visibility in Public API Docs (`web/src/public-docs.js` and `internal/web/public_docs.templ`): hidden the "Request body" specification section and Playground Body tab for endpoints with HTTP methods that do not have a request body (`GET`, `HEAD`, `OPTIONS`) even if remnant body data existed in the flow example, and removed the fallback that erroneously displayed an empty `{}` body example on `POST`/`PUT`/`PATCH` endpoints when no body example or body condition rules are configured.
+
 - Rebalanced and modernized the Workspace Settings page layout (`SettingsPage` in `internal/web/page.templ` and `web/src/cloudline.css`): moved the **Public API Docs & Playground** configuration card into the wide primary left column (`.settings-main-col`, `1.65fr`) directly below **Workspace details** so the toggle switch and shareable `/share/{slug}` URL input have full horizontal room, while keeping **Access & resources** and **Danger zone** in the right-hand summary column (`.settings-side-col`, `1fr`). Arranged `Workspace name` and `Workspace slug` side-by-side in `.settings-form-grid`, added a page header badge bar (`Role` and `PUBLIC DOCS` status), and converted the `Members` and `Overview & Defaults` tabs to use semantic V2 form controls and two-column `.v2-split` grids with 1-click cURL copying.
 
 - Optimized multi-stage `Dockerfile` build layers by cleaning the Go build cache (`go clean -cache`) and npm cache (`npm cache clean --force`) within the same `RUN` steps, preventing hundreds of megabytes of intermediate `/root/.cache/go-build` artifacts from being committed into Buildah/Podman storage on repeated `compose up --build` runs.

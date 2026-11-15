@@ -71,14 +71,14 @@ templ PublicDocsPage(workspace domain.Workspace, endpoints []domain.Endpoint, pu
 				<!-- Left Pane: API Reference Table of Contents -->
 				<aside class="apidoc-sidebar" aria-label="API Reference Navigation">
 					<div class="apidoc-nav-group">
-						<div class="apidoc-nav-heading">INTRODUCTION</div>
+						<div class="apidoc-nav-heading">ON THIS PAGE</div>
 						<a href="#apidoc-overview" class="apidoc-nav-link">
 							<span class="apidoc-nav-dot"></span>
-							<span>Overview &amp; Base URL</span>
+							<span>Request Parameters</span>
 						</a>
 						<a href="#apidoc-routing-spec" class="apidoc-nav-link" x-show="endpoint">
 							<span class="apidoc-nav-dot"></span>
-							<span>Scenario Routing</span>
+							<span>Responses</span>
 						</a>
 					</div>
 
@@ -128,190 +128,179 @@ templ PublicDocsPage(workspace domain.Workspace, endpoints []domain.Endpoint, pu
 					<div class="apidoc-content-grid">
 						<!-- Center Pane: Editorial API Reference Specification -->
 						<main class="apidoc-article" id="public-docs-main">
-							<!-- Workspace API Overview Strip -->
-							<section id="apidoc-overview" class="apidoc-overview-strip">
-								<div class="apidoc-overview-meta">
-									<div>
-										<span class="apidoc-eyebrow">SERVER BASE URL</span>
-										<code class="apidoc-overview-code" x-text="baseURL"></code>
+							<div class="apidoc-article-inner">
+								<!-- Endpoint Header & Full Callable Route -->
+								<header id="apidoc-overview" class="apidoc-endpoint-header">
+									<h1 class="apidoc-endpoint-title" x-text="endpoint.name"></h1>
+
+									<div class="apidoc-route-banner">
+										<span class="method v2-method apidoc-route-method" :class="[(endpoint?.method || 'GET').toLowerCase(), 'v2-' + (endpoint?.method || 'GET').toLowerCase()]" x-text="endpoint.method"></span>
+										<code class="apidoc-route-url">
+											<span class="apidoc-route-base" x-text="baseURL"></span><strong class="apidoc-route-path" x-text="endpoint.path"></strong>
+										</code>
+										<button type="button" class="apidoc-copy-pill" @click="copyEndpointURL()" aria-label="Copy endpoint URL">
+											@V2Icon("copy")
+											<span>Copy URL</span>
+										</button>
 									</div>
-									<div>
-										<span class="apidoc-eyebrow">FORMAT</span>
-										<code class="apidoc-overview-code">application/json</code>
+								</header>
+
+								<!-- Section 1: Request Parameters, Headers & Body -->
+								<section class="apidoc-section">
+									<div class="apidoc-section-head">
+										<h2>Request Parameters</h2>
+										<p>Parameters, headers, and request body accepted by this endpoint.</p>
 									</div>
-									<div>
-										<span class="apidoc-eyebrow">ROUTING</span>
-										<span class="apidoc-overview-text">Priority #1 → #N, then Default</span>
-									</div>
-								</div>
-							</section>
 
-							<!-- Endpoint Header & Full Callable Route -->
-							<header class="apidoc-endpoint-header">
-								<div class="apidoc-endpoint-meta">
-									<span class="apidoc-eyebrow">ENDPOINT REFERENCE</span>
-									<span class="v2-sample" x-text="scenarios.length + (scenarios.length === 1 ? ' response scenario' : ' response scenarios')"></span>
-									<span class="scenario-status-badge" :class="defaultScenarioRow?.status >= 500 ? 'status-5xx' : defaultScenarioRow?.status >= 400 ? 'status-4xx' : defaultScenarioRow?.status >= 300 ? 'status-3xx' : 'status-2xx'" x-show="defaultScenarioRow" x-text="'Default HTTP ' + (defaultScenarioRow?.status || 200)"></span>
-								</div>
-								<h1 class="apidoc-endpoint-title" x-text="endpoint.name"></h1>
-
-								<div class="apidoc-route-banner">
-									<span class="method v2-method apidoc-route-method" :class="[(endpoint?.method || 'GET').toLowerCase(), 'v2-' + (endpoint?.method || 'GET').toLowerCase()]" x-text="endpoint.method"></span>
-									<code class="apidoc-route-url">
-										<span class="apidoc-route-base" x-text="baseURL"></span><strong class="apidoc-route-path" x-text="endpoint.path"></strong>
-									</code>
-									<button type="button" class="apidoc-copy-pill" @click="copyEndpointURL()" aria-label="Copy endpoint URL">
-										@V2Icon("copy")
-										<span>Copy URL</span>
-									</button>
-								</div>
-							</header>
-
-							<!-- Section 1: Request Parameters, Headers & Body -->
-							<section class="apidoc-section">
-								<div class="apidoc-section-head">
-									<h2>Request Specification</h2>
-									<p>Parameters, headers, and payload structure accepted by this endpoint.</p>
-								</div>
-
-								<!-- Path Parameters Dictionary -->
-								<div class="apidoc-spec-group" x-show="routeParams.length">
-									<h3 class="apidoc-group-title">Path Parameters</h3>
-									<div class="apidoc-prop-list">
-										<template x-for="param in routeParams" :key="param">
-											<div class="apidoc-prop-row">
-												<div class="apidoc-prop-head">
-													<code class="apidoc-prop-name" x-text="param"></code>
-													<span class="apidoc-prop-type">string · path</span>
-													<span class="apidoc-prop-req">required</span>
+									<!-- Path Parameters Dictionary -->
+									<div class="apidoc-spec-group" x-show="routeParams.length">
+										<h3 class="apidoc-group-title">Path parameters</h3>
+										<div class="apidoc-prop-list">
+											<template x-for="param in routeParams" :key="param">
+												<div class="apidoc-prop-row">
+													<div class="apidoc-prop-head">
+														<code class="apidoc-prop-name" x-text="param"></code>
+														<span class="apidoc-prop-type">string</span>
+														<span class="apidoc-prop-req">Required</span>
+													</div>
+													<div class="apidoc-prop-desc">
+														<span>Dynamic route segment </span>
+														<code x-text="':' + param"></code>
+														<span> · Example: </span>
+														<code class="apidoc-prop-val" x-text="requestExample.params?.[param] || '123'"></code>
+													</div>
 												</div>
-												<div class="apidoc-prop-desc">
-													<span>URL route segment </span>
-													<code x-text="':' + param"></code>
-													<span> · Example value: </span>
-													<code class="apidoc-prop-val" x-text="requestExample.params?.[param] || '123'"></code>
-												</div>
-											</div>
-										</template>
-									</div>
-								</div>
-
-								<!-- Query Parameters Dictionary -->
-								<div class="apidoc-spec-group" x-show="documentedQueryParams.length">
-									<h3 class="apidoc-group-title">Query Parameters</h3>
-									<div class="apidoc-prop-list">
-										<template x-for="item in documentedQueryParams" :key="item.key">
-											<div class="apidoc-prop-row">
-												<div class="apidoc-prop-head">
-													<code class="apidoc-prop-name" x-text="item.key"></code>
-													<span class="apidoc-prop-type">string · query</span>
-													<span class="apidoc-prop-opt">optional / rule</span>
-												</div>
-												<div class="apidoc-prop-desc">
-													<span>Expected / example value: </span>
-													<code class="apidoc-prop-val" x-text="item.value || '(any)'"></code>
-												</div>
-											</div>
-										</template>
-									</div>
-								</div>
-
-								<!-- Request Headers Dictionary -->
-								<div class="apidoc-spec-group" x-show="documentedHeaders.length">
-									<h3 class="apidoc-group-title">Request Headers</h3>
-									<div class="apidoc-prop-list">
-										<template x-for="item in documentedHeaders" :key="item.key">
-											<div class="apidoc-prop-row">
-												<div class="apidoc-prop-head">
-													<code class="apidoc-prop-name" x-text="item.key"></code>
-													<span class="apidoc-prop-type">string · header</span>
-												</div>
-												<div class="apidoc-prop-desc">
-													<span>Expected / example value: </span>
-													<code class="apidoc-prop-val" x-text="item.value || '(present)'"></code>
-												</div>
-											</div>
-										</template>
-									</div>
-								</div>
-
-								<!-- Request Body Schema / Example -->
-								<div class="apidoc-spec-group" x-show="hasBodyExample">
-									<div class="apidoc-group-title-row">
-										<h3 class="apidoc-group-title">Request Body</h3>
-										<div class="apidoc-group-actions">
-											<span class="apidoc-mime-pill" x-text="requestExample.body_mode === 'form' ? 'application/x-www-form-urlencoded' : requestExample.body_mode === 'text' ? 'text/plain' : 'application/json'"></span>
-											<button type="button" class="apidoc-mini-btn" @click="copyText(formattedExampleBody, 'Request body example copied.')">Copy JSON</button>
+											</template>
 										</div>
 									</div>
-									<pre class="pub-code-block" tabindex="0"><code x-text="formattedExampleBody"></code></pre>
-								</div>
 
-								<div class="apidoc-no-params" x-show="!routeParams.length && !documentedQueryParams.length && !documentedHeaders.length && !hasBodyExample">
-									<span>No required path, query, header, or body parameters configured for this <strong x-text="endpoint.method"></strong> endpoint.</span>
-								</div>
-							</section>
-
-							<!-- Section 2: Responses & Priority Routing Scenarios -->
-							<section id="apidoc-routing-spec" class="apidoc-section">
-								<div class="apidoc-section-head">
-									<div class="apidoc-section-title-row">
-										<h2>Responses &amp; Routing Scenarios</h2>
-										<span class="v2-sample" x-text="scenarios.length + (scenarios.length === 1 ? ' scenario' : ' scenarios')"></span>
+									<!-- Query Parameters Dictionary -->
+									<div class="apidoc-spec-group" x-show="documentedQueryParams.length">
+										<h3 class="apidoc-group-title">Query parameters</h3>
+										<div class="apidoc-prop-list">
+											<template x-for="item in documentedQueryParams" :key="item.key">
+												<div class="apidoc-prop-row">
+													<div class="apidoc-prop-head">
+														<code class="apidoc-prop-name" x-text="item.key"></code>
+														<span class="apidoc-prop-type">string</span>
+														<span class="apidoc-prop-opt">Optional</span>
+													</div>
+													<div class="apidoc-prop-desc">
+														<span>Example value: </span>
+														<code class="apidoc-prop-val" x-text="item.value || '(any)'"></code>
+													</div>
+												</div>
+											</template>
+										</div>
 									</div>
-									<p>Scenarios are evaluated in priority order (<code>#1</code> first). The first matching condition returns its HTTP response; otherwise the <code>Default</code> fallback response is returned.</p>
-								</div>
 
-								<div class="apidoc-response-list">
-									<template x-for="row in scenarios" :key="row.key">
-										<article class="apidoc-response-block" :class="lastMatchedResponseID && lastMatchedResponseID === row.responseID && 'is-matched'">
+									<!-- Request Headers Dictionary -->
+									<div class="apidoc-spec-group" x-show="documentedHeaders.length">
+										<h3 class="apidoc-group-title">Request headers</h3>
+										<div class="apidoc-prop-list">
+											<template x-for="item in documentedHeaders" :key="item.key">
+												<div class="apidoc-prop-row">
+													<div class="apidoc-prop-head">
+														<code class="apidoc-prop-name" x-text="item.key"></code>
+														<span class="apidoc-prop-type">header</span>
+													</div>
+													<div class="apidoc-prop-desc">
+														<span>Example value: </span>
+														<code class="apidoc-prop-val" x-text="item.value || '(present)'"></code>
+													</div>
+												</div>
+											</template>
+										</div>
+									</div>
+
+									<!-- Request Body Schema / Example -->
+									<div class="apidoc-spec-group" x-show="hasBodyExample">
+										<div class="apidoc-group-title-row">
+											<h3 class="apidoc-group-title">Request body</h3>
+											<div class="apidoc-group-actions">
+												<span class="apidoc-mime-pill" x-text="requestExample.body_mode === 'form' ? 'application/x-www-form-urlencoded' : requestExample.body_mode === 'text' ? 'text/plain' : 'application/json'"></span>
+												<button type="button" class="apidoc-mini-btn" @click="copyText(formattedExampleBody, 'Request body example copied.')">Copy JSON</button>
+											</div>
+										</div>
+										<pre class="pub-code-block" tabindex="0"><code x-text="formattedExampleBody"></code></pre>
+									</div>
+
+									<div class="apidoc-no-params" x-show="!routeParams.length && !documentedQueryParams.length && !documentedHeaders.length && !hasBodyExample">
+										<span>No path, query, header, or body parameters are required for this <strong x-text="endpoint.method"></strong> request.</span>
+									</div>
+								</section>
+
+								<!-- Section 2: Responses & Scenario Tabs -->
+								<section id="apidoc-routing-spec" class="apidoc-section">
+									<div class="apidoc-section-head">
+										<div class="apidoc-section-title-row">
+											<h2>Responses</h2>
+											<span class="apidoc-count-pill" x-text="scenarios.length + (scenarios.length === 1 ? ' scenario' : ' scenarios')"></span>
+										</div>
+										<p>Scenarios are evaluated from Priority #1 downward. Select a response tab to view its trigger condition and payload.</p>
+									</div>
+
+									<!-- Scenario Selector Tabs -->
+									<div class="apidoc-scenario-tabs" role="tablist" aria-label="Response scenarios" x-show="scenarios.length > 1">
+										<template x-for="row in scenarios" :key="row.key">
+											<button
+												type="button"
+												role="tab"
+												class="apidoc-scenario-tab"
+												:class="[activeScenario?.key === row.key && 'is-active', lastMatchedResponseID && lastMatchedResponseID === row.responseID && 'is-matched']"
+												@click="activeScenarioKey = row.key"
+											>
+												<span class="apidoc-tab-status" :class="row.status >= 500 ? 'status-5xx' : row.status >= 400 ? 'status-4xx' : row.status >= 300 ? 'status-3xx' : 'status-2xx'" x-text="row.status"></span>
+												<span class="apidoc-tab-label" x-text="row.label"></span>
+												<span class="apidoc-tab-order" x-text="row.isDefault ? 'Default' : '#' + row.priority"></span>
+											</button>
+										</template>
+									</div>
+
+									<!-- Focused Active Scenario Panel -->
+									<template x-if="activeScenario">
+										<article class="apidoc-response-block" :class="lastMatchedResponseID && lastMatchedResponseID === activeScenario.responseID && 'is-matched'">
 											<header class="apidoc-response-head">
 												<div class="apidoc-response-identity">
-													<span class="scenario-status-badge" :class="row.status >= 500 ? 'status-5xx' : row.status >= 400 ? 'status-4xx' : row.status >= 300 ? 'status-3xx' : 'status-2xx'" x-text="'HTTP ' + row.status"></span>
-													<span class="apidoc-priority-pill" x-show="!row.isDefault" x-text="'Priority #' + row.priority"></span>
-													<span class="default-tag" x-show="row.isDefault">Default Fallback</span>
-													<strong class="apidoc-response-label" x-text="row.label"></strong>
+													<span class="scenario-status-badge" :class="activeScenario.status >= 500 ? 'status-5xx' : activeScenario.status >= 400 ? 'status-4xx' : activeScenario.status >= 300 ? 'status-3xx' : 'status-2xx'" x-text="'HTTP ' + activeScenario.status"></span>
+													<strong class="apidoc-response-label" x-text="activeScenario.label"></strong>
+													<span class="apidoc-response-meta" x-text="(activeScenario.isDefault ? 'Default fallback' : 'Priority #' + activeScenario.priority) + (activeScenario.responseMode === 'dynamic' ? ' · Dynamic' : '') + (activeScenario.delay ? ' · ' + activeScenario.delay + ' ms' : '')"></span>
 												</div>
-												<div class="apidoc-response-actions">
-													<span class="scenario-mode-badge" :class="row.responseMode === 'dynamic' ? 'mode-dynamic' : 'mode-static'" x-text="row.responseMode === 'dynamic' ? 'Dynamic JSON' : 'Static JSON'"></span>
-													<span class="scenario-delay-badge" x-show="row.delay" x-text="row.delay + ' ms'"></span>
-													<button type="button" class="apidoc-try-scenario-btn" @click="loadScenarioIntoPlayground(row)" title="Populate Playground with matching inputs">
-														<span>Try scenario →</span>
-													</button>
-												</div>
+												<button type="button" class="apidoc-try-scenario-btn" @click="loadScenarioIntoPlayground(activeScenario)" title="Populate Playground with matching inputs">
+													<span>Try in Playground →</span>
+												</button>
 											</header>
 
-											<!-- Trigger Conditions -->
-											<div class="apidoc-response-conditions" x-show="row.conditionDetails.length">
-												<div class="apidoc-cond-caption">TRIGGER CONDITIONS</div>
-												<template x-for="cond in row.conditionDetails" :key="cond.id + ':' + cond.matched">
-													<div class="scenario-cond-item" :class="cond.matched ? 'cond-match' : 'cond-nomatch'">
-														<div class="scenario-cond-head">
-															<span class="cond-state-dot" x-text="cond.matched ? '◇' : '⊘'"></span>
-															<strong x-text="cond.matched ? 'Matches' : 'Does not match'"></strong>
-															<span class="cond-meta-tag" x-text="cond.meta"></span>
+											<!-- Clean Trigger Rules -->
+											<div class="apidoc-response-conditions" x-show="activeScenario.conditionDetails.length">
+												<div class="apidoc-cond-caption">When this response is returned</div>
+												<div class="apidoc-rule-list">
+													<template x-for="cond in activeScenario.conditionDetails" :key="cond.id + ':' + cond.matched">
+														<div class="apidoc-rule-row" :class="cond.matched ? 'is-match' : 'is-nomatch'">
+															<span class="apidoc-rule-badge" x-text="cond.matched ? 'Matches' : 'Does not match'"></span>
+															<code class="apidoc-rule-code" x-text="cond.summary"></code>
+															<span class="apidoc-rule-meta" x-text="cond.meta"></span>
 														</div>
-														<code class="scenario-condition" x-text="cond.summary"></code>
-													</div>
-												</template>
+													</template>
+												</div>
 											</div>
 
-											<div class="apidoc-response-fallback" x-show="row.isDefault">
-												<span>Returned automatically when no higher-priority condition above matches the request.</span>
+											<div class="apidoc-response-fallback" x-show="activeScenario.isDefault">
+												<span>Returned automatically when no higher-priority scenario matches the incoming request.</span>
 											</div>
 
 											<!-- Response Payload Sample -->
-											<div class="apidoc-response-sample" x-show="row.body">
+											<div class="apidoc-response-sample" x-show="activeScenario.body">
 												<div class="pub-scenario-body-head">
-													<span>RESPONSE PAYLOAD</span>
-													<button type="button" class="apidoc-mini-btn" @click="copyText(formatValue(row.body), 'Scenario response body copied.')">Copy JSON</button>
+													<span>Response body (application/json)</span>
+													<button type="button" class="apidoc-mini-btn" @click="copyText(formatValue(activeScenario.body), 'Scenario response body copied.')">Copy JSON</button>
 												</div>
-												<pre class="pub-code-block compact" tabindex="0"><code x-text="formatValue(row.body)"></code></pre>
+												<pre class="pub-code-block" tabindex="0"><code x-text="formatValue(activeScenario.body)"></code></pre>
 											</div>
 										</article>
 									</template>
-								</div>
-							</section>
+								</section>
+							</div>
 						</main>
 
 						<!-- Right Pane: Sticky Developer Console (Code Samples + Live Playground) -->
@@ -363,7 +352,7 @@ templ PublicDocsPage(workspace domain.Workspace, endpoints []domain.Endpoint, pu
 											<span>Headers</span>
 											<span class="scenario-tab-badge" x-show="playHeaders.filter(h => h.key.trim()).length" x-text="playHeaders.filter(h => h.key.trim()).length"></span>
 										</button>
-										<button type="button" :class="playTab === 'body' && 'active'" @click="playTab = 'body'">
+										<button type="button" :class="playTab === 'body' && 'active'" @click="playTab = 'body'" x-show="supportsBody">
 											<span>Body</span>
 											<span class="scenario-tab-badge" x-text="playBodyMode.toUpperCase()"></span>
 										</button>
@@ -416,7 +405,7 @@ templ PublicDocsPage(workspace domain.Workspace, endpoints []domain.Endpoint, pu
 									</div>
 
 									<!-- Tab 3: Request Body -->
-									<div class="pub-play-tab-body" x-show="playTab === 'body'">
+									<div class="pub-play-tab-body" x-show="supportsBody && playTab === 'body'">
 										<div class="pub-body-mode-row">
 											<label for="pub-play-body-mode" class="v2-label">Content format</label>
 											<select id="pub-play-body-mode" class="v2-select" x-model="playBodyMode">

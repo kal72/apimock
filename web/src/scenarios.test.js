@@ -144,3 +144,15 @@ test('Table keeps distinct node paths that converge on one response',()=>{
   assert.equal(state.scenarioConditionDetails(rows[0])[0].name,condition.label);
   assert.ok(state.scenarioConditionDetails(rows[0])[0].summary.includes('Authorization'));
 });
+
+test('table condition popup opens on conditions tab for rule rows and response tab for default row',()=>{
+  const state=editor();state.openAddScenario();
+  assert.equal(state.modalTitle,'Add condition');assert.equal(state.scenarioTab,'conditions');
+  state.changeConditionKind(state.scenarioForm.conditions[0],'query');
+  assert.equal(state.scenarioTemplate,'query');assert.equal(state.scenarioForm.conditions[0].label,'Query Params 1');
+  state.saveScenario();
+  state.editScenario(state.scenarioRows[0]);
+  assert.equal(state.scenarioTab,'conditions');assert.equal(state.modalTitle,'Edit condition · Query Params 1');
+  state.editScenario(state.fallbackRow);
+  assert.equal(state.scenarioTab,'response');assert.equal(state.modalTitle,'Edit default response');
+});

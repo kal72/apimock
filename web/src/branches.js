@@ -22,13 +22,13 @@ export function scenarioBranches(flow) {
 
 export function arrangeBranches(flow) {
   const model=scenarioBranches(flow);if(!model)return;
-  model.request.x=80;model.request.y=100+model.branches.length*100;
+  model.request.x=10;model.request.y=model.branches.length?55+model.branches.length*60:175;
   model.branches.forEach(({condition,response},index)=>{
-    condition.x=450;condition.y=80+index*220;
-    response.x=820;response.y=condition.y;
+    condition.x=395;condition.y=55+index*140;
+    response.x=775;response.y=condition.y;
   });
   // Shared response nodes are displayed once; all matching branches still point to them.
-  model.fallback.x=820;model.fallback.y=80+model.branches.length*220;
+  model.fallback.x=model.branches.length?775:395;model.fallback.y=model.branches.length?55+model.branches.length*140:175;
   flow.layout='scenarios';
 }
 

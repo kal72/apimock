@@ -1,6 +1,6 @@
 # Mocklab roadmap
 
-Last updated: **2026-11-13**.
+Last updated: **2026-11-15**.
 
 This roadmap tracks implementation scope, not promised release dates. No version or Git tag has been released. Available features remain part of an MVP. Internal deployment uses the application host and /public/{workspace-slug}; no domain is provisioned by the application.
 
@@ -31,7 +31,7 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | DOC-GEN02 | Documentation UI | Searchable in-app generator reference | Done | /docs/generators, navigation links, runnable JSON examples for four existing generators, clearly labeled 25 planned generators, types/seeds/header guidance and troubleshooting. |
 | DOC-ORG01 | Documentation | Concise README and focused guides | Done | README covers description, screenshot, stack/dependencies, architecture, configuration/startup and Contributions; detailed usage and account/access references remain in dedicated guides. |
 | UI-V201 | Design | V2 static component templates | Done | Five authenticated preview pages with shared shell, compact two-row concept header, Node canvas, Light/Night styles and local sample interactions. No data integration; see docs/UI_V2.md. |
-| UI-V202 | Design | Migrate V2 to application data and actions | Todo | View models, real actions and complete responsive/accessibility QA remain future work. |
+| UI-V202 | Design | Migrate V2 to application data and actions | Partial | Main `/app` shell, compact 48px `.v2-header`, 63px `.v2-route-toolbar`, dedicated full-page views for `Environments` and `Settings`, sidebar navigation (`Endpoints`, `Environments`, `Settings`, `Docs & Reference`), enhanced Visual Flow canvas panning/scrolling, streamlined Table view without redundant Headers column, quick-copy workspace base URL pill, and overhauled V2-aligned Key-Value variables table are migrated to V2 Graphite Blue + Cloudline tokens (`--v2-*`). Unimplemented V2 features (`Mocks`, `Logs`, `Mock defaults`) and mobile/accessibility QA remain future work. |
 | HTTP-CHI01 | HTTP architecture | Chi route groups and explicit workspace policies | Done | Chi v5.5.0, grouped authentication/admin/mock routes, fail-closed workspace policy, and HEAD/OPTIONS/path-encoding regression coverage. |
 | SEC-GO01 | Security | Patch Go standard-library vulnerability findings | Done | Toolchain and container build image upgraded to Go 1.27.3; govulncheck v1.9.0 reports no vulnerabilities. See docs/ROUTING.md. |
 | M01 | Workspace | Create, read, update, and delete workspaces | Done | Unique slugs; deleting a workspace cascades to its endpoints. |
@@ -48,7 +48,7 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | M12 | Validation | Graphs, connections, JSON, headers, and size limits | Done | Rejects cycles, unreachable nodes, incomplete branches, invalid JSON, and unsafe headers. |
 | M13 | API testing | Playground responses and execution traces | Done | Tests unsaved flows; traces are displayed and highlight the canvas. |
 | M14 | UX | Unsaved-change indicator and navigation warning | Done | Drafts exist only in the browser; no autosave or persistent drafts. |
-| M15 | Environments | Private per-user Environment CRUD and Playground selection | Done | Typed string, number, boolean, and masked-secret variables are shared across a user's workspaces. Selected from topbar selector; Dynamic JSON previews resolve `environment.key`; public mock URLs intentionally do not receive private environments. |
+| M15 | Environments | Private per-user Environment CRUD and Playground selection | Done | Typed string, number, boolean, and masked-secret variables are shared across a user's workspaces. Selected from the Playground header selector or sidebar navigation; Dynamic JSON previews resolve `environment.key`; public mock URLs intentionally do not receive private environments. |
 
 ## MVP improvements and release readiness
 

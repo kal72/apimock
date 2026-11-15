@@ -11,8 +11,8 @@ export const defaultExample = () => ({ params: {}, query: {}, headers: {}, body:
 export function defaultFlow() {
   return {
     nodes: [
-      { id: 'request', type: 'request', label: 'Incoming request', x: 100, y: 130, config: { example: defaultExample() } },
-      { id: 'response', type: 'response', label: 'Success response', x: 500, y: 130, config: { status: 200, headers: { 'Content-Type': 'application/json' }, body: '{\n  "message": "Hello from Mocklab"\n}' } }
+      { id: 'request', type: 'request', label: 'Incoming request', x: 10, y: 175, config: { example: defaultExample() } },
+      { id: 'response', type: 'response', label: 'Success response', x: 395, y: 175, config: { status: 200, headers: { 'Content-Type': 'application/json' }, body: '{\n  "message": "Hello from Mocklab"\n}' } }
     ],
     edges: [{ from: 'request', to: 'response', branch: '' }]
   };

@@ -26,7 +26,7 @@ func AuthPage() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Sign in — Mocklab</title><script>try { const value=localStorage.getItem('mocklab-theme'); document.documentElement.dataset.theme=value==='night'||!['light','night'].includes(value)&&matchMedia('(prefers-color-scheme: dark)').matches?'night':'light'; } catch { document.documentElement.dataset.theme='light'; }</script><link rel=\"stylesheet\" href=\"/assets/app.css\"><script type=\"module\" src=\"/assets/app.js\"></script></head><body><main class=\"auth-screen\" x-data=\"identityLogin\"><section class=\"auth-card\"><header><span class=\"auth-cloud\" aria-hidden=\"true\">☁</span><strong>mocklab<span>.</span></strong>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><meta name=\"color-scheme\" content=\"light dark\"><title>Sign in — Mocklab</title><script>try { const value=localStorage.getItem('mocklab-theme'); document.documentElement.dataset.theme=value==='night'||!['light','night'].includes(value)&&matchMedia('(prefers-color-scheme: dark)').matches?'night':'light'; } catch { document.documentElement.dataset.theme='light'; }</script><link rel=\"stylesheet\" href=\"/assets/app.css\"><script type=\"module\" src=\"/assets/app.js\"></script></head><body><main class=\"auth-screen\" x-data=\"identityLogin\"><section class=\"auth-card\"><header><span class=\"auth-cloud\" aria-hidden=\"true\">☁</span><strong>mocklab<span>.</span></strong>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -84,7 +84,23 @@ func ThemeSwitch() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<button type=\"button\" class=\"theme-switch\" role=\"switch\" aria-label=\"Night theme\" :aria-checked=\"$store.theme.isNight\" @click=\"$store.theme.set($store.theme.isNight ? 'light' : 'night')\" :title=\"$store.theme.isNight ? 'Switch to Light' : 'Switch to Night'\"><span aria-hidden=\"true\">☀</span><span class=\"theme-switch-track\" :class=\"$store.theme.isNight && 'is-night'\"><span></span></span><span aria-hidden=\"true\">☾</span></button>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<button type=\"button\" class=\"theme-switch v2-theme\" role=\"switch\" aria-label=\"Night theme\" :aria-checked=\"$store.theme.isNight\" @click=\"$store.theme.set($store.theme.isNight ? 'light' : 'night')\" :title=\"$store.theme.isNight ? 'Switch to Light' : 'Switch to Night'\"><span class=\"v2-theme-sun\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = V2Icon("sun").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span><span class=\"v2-theme-moon\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = V2Icon("moon").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

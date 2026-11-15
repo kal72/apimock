@@ -129,3 +129,22 @@ test('editEnvironmentVariable populates form and isEditingVariable is true', () 
   assert.equal(state.variableForm.kind, 'number');
   assert.equal(state.variableForm.value, 30);
 });
+
+test('copyVariableExpression and copyVariableValue invoke copyText properly', async () => {
+  const copied = [];
+  const { state } = createMockEditor({
+    environments: [
+      { id: 'env_1', name: 'Dev', variables: [{ key: 'base_url', kind: 'string', value: 'https://api.test' }] }
+    ],
+    activeEnvironmentID: 'env_1'
+  });
+  state.copyText = async (val, msg) => { copied.push({ val, msg }); };
+
+  await state.copyVariableExpression('base_url');
+  assert.equal(copied.length, 1);
+  assert.equal(copied[0].val, '{{ environment.base_url }}');
+
+  await state.copyVariableValue(state.environmentVariables[0]);
+  assert.equal(copied.length, 2);
+  assert.equal(copied[1].val, 'https://api.test');
+});

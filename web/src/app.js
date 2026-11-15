@@ -5,6 +5,7 @@ import { createLogin } from './identity.js';
 import { createEditor } from './editor.js';
 import './app.css';
 import './conditions.css';
+import './v2.css';
 import './cloudline.css';
 import './moonlight.css';
 import './identity.css';
@@ -12,7 +13,6 @@ import './toolbar.css';
 import './environments.css';
 import './path-view.css';
 import './generator-docs.css';
-import './v2.css';
 import { createTheme } from './theme.js';
 
 window.htmx = htmx;

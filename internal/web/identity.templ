@@ -6,6 +6,7 @@ templ AuthPage() {
  <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <title>Sign in — Mocklab</title>
   <script>try { const value=localStorage.getItem('mocklab-theme'); document.documentElement.dataset.theme=value==='night'||!['light','night'].includes(value)&&matchMedia('(prefers-color-scheme: dark)').matches?'night':'light'; } catch { document.documentElement.dataset.theme='light'; }</script>
   <link rel="stylesheet" href="/assets/app.css"/>
@@ -23,5 +24,5 @@ templ IdentityDialogs() {
 
 
 templ ThemeSwitch() {
- <button type="button" class="theme-switch" role="switch" aria-label="Night theme" :aria-checked="$store.theme.isNight" @click="$store.theme.set($store.theme.isNight ? 'light' : 'night')" :title="$store.theme.isNight ? 'Switch to Light' : 'Switch to Night'"><span aria-hidden="true">☀</span><span class="theme-switch-track" :class="$store.theme.isNight && 'is-night'"><span></span></span><span aria-hidden="true">☾</span></button>
+ <button type="button" class="theme-switch v2-theme" role="switch" aria-label="Night theme" :aria-checked="$store.theme.isNight" @click="$store.theme.set($store.theme.isNight ? 'light' : 'night')" :title="$store.theme.isNight ? 'Switch to Light' : 'Switch to Night'"><span class="v2-theme-sun">@V2Icon("sun")</span><span class="v2-theme-moon">@V2Icon("moon")</span></button>
 }

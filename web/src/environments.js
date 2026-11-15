@@ -21,14 +21,15 @@ export const environmentEditor={
    this.$watch('activeEnvironmentID',value=>{try{localStorage.setItem(storageKey,value||'');}catch{}});
   }
  },
- openEnvironments(){
+ openEnvironments(asModal=true){
   this.environmentForm={name:''};
   this.resetVariableForm();
   this.dialogError='';
   if((!this.activeEnvironmentID || !this.environments.some(e=>e.id===this.activeEnvironmentID)) && this.environments.length){
    this.activeEnvironmentID=this.environments[0].id;
   }
-  this.modal='environments';
+  this.modal=asModal?'environments':null;
+  if(!asModal)this.navPage='environments';
  },
  async createEnvironment(){
   const name=this.environmentForm.name.trim();
@@ -107,6 +108,13 @@ export const environmentEditor={
    value:variable.kind==='secret'?'':(variable.kind==='boolean'?String(variable.value):(variable.value ?? ''))
   };
   this.dialogError='';
+ },
+ async copyVariableExpression(key){
+  await this.copyText('{{ environment.' + key + ' }}', 'Copied {{ environment.' + key + ' }}');
+ },
+ async copyVariableValue(variable){
+  const val = typeof variable.value === 'object' ? JSON.stringify(variable.value) : String(variable.value ?? '');
+  await this.copyText(val, 'Value copied to clipboard.');
  },
  async deleteEnvironmentVariable(variable){
   const activeID=this.activeEnvironmentID || this.activeEnvironment?.id;

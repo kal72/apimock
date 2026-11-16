@@ -87,6 +87,7 @@ export const createEditor = () => ({
   get flowIssues(){return this.endpoint ? graphIssues(this.endpoint.flow) : [];},
   get insertionSources(){return this.orderedNodes.filter(node => node.type !== 'response');},
   get baseURL(){return `${this.publicOrigin || location.origin}/public/${this.workspace?.slug || ''}`;},
+  get endpointURL(){return this.endpoint ? `${this.baseURL}${this.endpoint.path}` : this.baseURL;},
   get publicDocsURL(){return `${this.publicOrigin || location.origin}/share/${this.workspace?.slug || ''}`;},
   get modalTitle(){return {'api-keys':'MCP API Keys',environments:'Environments',members:'Workspace members',users:'User management',user:this.userForm?.id?'Edit user':'Create user',password:'Change password',view:'View request path',workspace:this.workspaceForm.id?'Edit workspace':'New workspace',endpoint:'New endpoint',templates:'Add configuration',node:this.nodeForm?.type === 'request' ? 'Edit incoming request' : 'Edit configuration',connection:'Edit connection',direct:'Use an unconditional response',palette:'Add condition node',scenario:this.scenarioScope ? 'Edit node · '+this.scenarioScope.label : this.scenarioIsNew ? 'Add condition' : this.scenarioForm?.isDefault ? 'Edit default response' : 'Edit condition · ' + (this.scenarioForm?.label || '')}[this.modal] || '';},
   async request(url,method='GET',data){
@@ -274,11 +275,32 @@ export const createEditor = () => ({
       this.rememberChange();this.endpoint={...this.endpoint,...(!this.scenarioScope || this.scenarioScope.type==='request'?form.route:{}),flow:candidate};this.testInput=JSON.stringify(candidate.nodes.find(node=>node.type==='request').config.example,null,2);this.dirty=true;this.trace=[];this.testResult=null;this.modal=null;this.scenarioDraft=null;
     }catch(error){this.scenarioTab=validationSection;this.dialogError=error.message;}
   },
+  removeScenarioRow(row){
+    if(!row || row.isDefault)return;
+    const conditionID=row.conditions?.find(item=>item.matched)?.id || (row.key!=='default'?row.key:null);
+    if(conditionID)this.removeScenarioCondition(conditionID);
+  },
   removeScenarioCondition(id){
     try{
       if(!window.confirm('Delete this condition and its response? The default response and other conditions are preserved.'))return;
-      const candidate=clone(this.endpoint.flow);removeScenario(candidate,id);if(scenarioBranches(candidate))arrangeBranches(candidate);this.rememberChange();this.endpoint.flow=candidate;this.dirty=true;this.trace=[];this.modal=null;
-    }catch(error){this.dialogError=error.message;}
+      const candidate=clone(this.endpoint.flow);
+      if(scenarioBranches(candidate)){
+        removeScenario(candidate,id);
+        arrangeBranches(candidate);
+      }else{
+        removeConfiguration(candidate,id);
+      }
+      this.rememberChange();
+      this.endpoint.flow=candidate;
+      this.dirty=true;
+      this.trace=[];
+      this.testResult=null;
+      this.modal=null;
+      this.scenarioDraft=null;
+    }catch(error){
+      if(this.modal)this.dialogError=error.message;
+      else this.notify(error.message);
+    }
   },
   scenarioConditionDetails(row){return row.conditions.map(condition=>{const node=this.endpoint.flow.nodes.find(item=>item.id===condition.id);return {id:condition.id,name:node.label,matched:condition.matched,summary:conditionSummary(node.config)};});},
   scenarioPath(row){return row.pathIDs.map(id=>this.endpoint.flow.nodes.find(node=>node.id===id)?.label || id).join(' → ');},
@@ -421,6 +443,7 @@ export const createEditor = () => ({
   async runTest(){this.testOpen=true;this.testing=true;this.trace=[];this.testResult=null;try{const input=JSON.parse(this.testInput);this.testResult=await this.request('/api/test','POST',{...input,environment_id:this.activeEnvironmentID,flow:this.endpoint.flow,method:this.endpoint.method,path:this.endpoint.path});this.trace=this.testResult.trace;}catch(error){this.notify(error.message);}finally{this.testing=false;}},
   async copyBaseURL(){await this.copyText(this.baseURL,'Workspace base URL copied.');},
   async copyPublicDocsURL(){await this.copyText(this.publicDocsURL,'Public API docs URL copied.');},
+  openPublicDocs(){if(this.workspace?.slug)window.open(this.publicDocsURL,'_blank','noopener');},
   async copyURL(){await this.copyText(this.baseURL+this.endpoint.path,'Endpoint URL copied. Replace :parameter with a value before use.');},
   async copyText(value,message){try{await navigator.clipboard.writeText(value);this.notify(message||'Copied to clipboard.');}catch{this.notify('Copied: '+value);}},
   commitModal(){if(this.modal==='node')this.saveNode();if(this.modal==='connection')this.saveConnection();if(this.modal==='direct')this.prepareDirectResponse();if(this.modal==='scenario')this.saveScenario();}

@@ -85,7 +85,7 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | U04 | Interface language | English web interface | Done | Navigation, editors, dialogs, validation, notifications, and accessibility labels use English. User-authored content is preserved. |
 | U03 | UX | Flow-ordered Table rows with one complete editor | Done | Each row represents a request-to-response path; all field edits are in its Action popup. Nested legacy graphs remain intact and path projection is capped at 128. |
 | U04 | UX | Draft save/discard/undo and in-flight save safety | Done | Sticky controls and keyboard save; earlier save responses do not overwrite newer edits or another selected endpoint. |
-| U05 | Graph editing | Preserve default and later rules when removing a condition | Done | Condition removal follows the fallback path and prunes only unused matching branches. |
+| U05 | Graph editing | Preserve default and later rules when removing a condition | Done | Condition removal follows the fallback path and prunes only unused matching branches; exposed via direct delete actions in both Node canvas and Table rows and inside condition modals. |
 
 ## Typed condition implementation
 

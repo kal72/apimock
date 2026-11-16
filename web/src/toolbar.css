@@ -572,7 +572,8 @@
   padding: 4px 0;
 }
 
-.workspace-settings-panel button {
+.workspace-settings-panel button,
+.workspace-settings-panel a {
   display: flex;
   align-items: center;
   gap: 9px;
@@ -584,23 +585,28 @@
   background: transparent;
   font-size: 11px;
   color: var(--v2-ink);
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
-.workspace-settings-panel button > span:first-child {
+.workspace-settings-panel button > span:first-child,
+.workspace-settings-panel a > span:first-child {
   width: 16px;
   text-align: center;
   font-size: 15px;
   color: var(--v2-blue);
 }
 
-.workspace-settings-panel button small {
+.workspace-settings-panel button small,
+.workspace-settings-panel a small {
   display: block;
   margin-top: 2px;
   font-size: 9.5px;
   color: var(--v2-muted);
 }
 
-.workspace-settings-panel button:hover {
+.workspace-settings-panel button:hover,
+.workspace-settings-panel a:hover {
   background: var(--v2-tint);
   color: var(--v2-blue);
 }

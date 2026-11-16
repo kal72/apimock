@@ -81,7 +81,7 @@ templ Sidebar() {
 			<p>Build before the backend.<br/>One workspace. Endless possibilities.</p>
 			<div class="v2-sidebar-meta" x-show="workspace" x-cloak>
 				<span class="v2-sample" x-text="(workspace?.role || 'viewer') + ' access'"></span>
-				<button type="button" class="v2-copy-base-inline" @click="copyBaseURL()">Copy base URL ↗</button>
+				<button type="button" class="v2-copy-base-inline" :title="baseURL" @click="copyBaseURL()">Copy base URL ↗</button>
 			</div>
 		</div>
 	</aside>
@@ -90,10 +90,10 @@ templ Sidebar() {
 templ WorkspaceSwitcher() {
 	<div class="workspace-picker" @keydown.escape.stop.prevent="workspaceMenuOpen=false; $refs.workspaceSettings?.focus()" @click.outside="workspaceMenuOpen=false" @focusout="if (!$el.contains($event.relatedTarget)) workspaceMenuOpen=false">
 		<div class="workspace-picker-row"><select id="workspace-select" class="workspace-select" aria-label="Select workspace" x-model="workspaceID" @change="workspaceMenuOpen=false; selectWorkspace(workspaceID)"><option value="">Select workspace</option><template x-for="w in workspaces" :key="w.id"><option :value="w.id" x-text="w.name"></option></template></select><button type="button" class="workspace-settings-trigger" x-show="workspace &amp;&amp; canManageWorkspace" x-cloak x-ref="workspaceSettings" aria-label="Workspace settings" title="Workspace settings" aria-controls="workspace-settings-panel" :aria-expanded="workspaceMenuOpen" @click="workspaceMenuOpen=!workspaceMenuOpen" @keydown.arrow-down.prevent="workspaceMenuOpen=true; $nextTick(()=>$refs.workspaceEdit.focus())"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" stroke="currentColor" stroke-width="1.5"></path><path d="m9 3-.6 2-2 .9-2-.5-2 3.4 1.4 1.5v2.4L2.4 14l2 3.4 2-.5 2 .9.6 2h4l.6-2 2-.9 2 .5 2-3.4-1.4-1.3v-2.4l1.4-1.5-2-3.4-2 .5-2-.9-.6-2H9Z" transform="translate(1 1)" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path></svg></button></div>
-		<div class="workspace-base-url-pill" x-show="workspace" x-cloak @click="copyBaseURL()" title="Click to copy workspace base URL">
+		<div class="workspace-base-url-pill" x-show="workspace" x-cloak @click="copyBaseURL()" :title="baseURL">
 			<span class="base-url-tag">BASE</span>
-			<span class="base-url-text truncate" x-text="baseURL"></span>
-			<button type="button" class="base-url-copy-btn" aria-label="Copy base URL" @click.stop="copyBaseURL()">
+			<span class="base-url-text truncate" x-text="baseURL" :title="baseURL"></span>
+			<button type="button" class="base-url-copy-btn" :title="baseURL" aria-label="Copy base URL" @click.stop="copyBaseURL()">
 				<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
 			</button>
 		</div>
@@ -101,7 +101,7 @@ templ WorkspaceSwitcher() {
 			<div class="workspace-settings-heading"><span>WORKSPACE SETTINGS</span><strong x-text="workspace?.name"></strong></div>
 			<div class="workspace-settings-actions">
 				<button type="button" x-ref="workspaceEdit" @click="workspaceMenuOpen=false; openWorkspace(workspace)"><span aria-hidden="true">✎</span><span>Edit workspace<small>Name and base path</small></span></button>
-				<button type="button" @click="workspaceMenuOpen=false; copyBaseURL()"><span aria-hidden="true">📋</span><span>Copy base URL<small>Copy public mock URL</small></span></button>
+				<a class="workspace-action-link" :href="publicDocsURL" target="_blank" rel="noopener" @click="workspaceMenuOpen=false"><span aria-hidden="true">📖</span><span>Public API docs ↗<small>Browse interactive docs portal</small></span></a>
 				<button type="button" @click="workspaceMenuOpen=false; openMembers()"><span aria-hidden="true">♙</span><span>Manage members<small>People and access roles</small></span></button>
 			</div>
 			<button type="button" class="workspace-delete-action" @click="workspaceMenuOpen=false; removeWorkspace()"><span aria-hidden="true">⌫</span><span>Delete workspace<small>Remove all endpoints</small></span></button>
@@ -168,9 +168,9 @@ templ EndpointBar() {
    </div>
   </div>
   <div class="v2-route-actions">
-   <div class="base-url v2-base-url" title="Click to copy workspace base URL" @click="copyBaseURL()">
-    <span>Base URL:</span>
-    <code x-text="baseURL"></code>
+   <div class="base-url v2-base-url" :title="endpointURL" @click="copyURL()">
+    <span>URL:</span>
+    <code x-text="endpointURL" :title="endpointURL"></code>
    </div>
    <button type="button" class="v2-copy-url" @click="copyURL()" aria-label="Copy endpoint URL">@V2Icon("copy") Copy URL</button>
    <div class="view-switch v2-segment" role="group" aria-label="Editor view mode">
@@ -206,7 +206,7 @@ templ FlowCanvas() {
    <template x-for="node in endpoint.flow.nodes" :key="node.id">
     <article class="flow-node v2-node" :class="[node.type, 'v2-node-' + (branchModel?.fallback.id === node.id ? 'default' : node.type === 'request' ? 'incoming' : node.type), node.id === highlightedNodeID && 'recent-node', trace.includes(node.id) && 'executed', connecting?.from === node.id && 'connecting', !branchModel && 'is-legacy-node']" :style="`left:${node.x}px;top:${node.y}px`">
      <div class="node-priority v2-priority" x-show="branchModel && node.type === 'condition'"><span x-text="'Priority #' + priorityFor(node.id)"></span><button x-show="canEditWorkspace" type="button" aria-label="Increase condition priority" :disabled="priorityFor(node.id) === 1" @click="changePriority(node.id, priorityFor(node.id)-1)">↑</button><button x-show="canEditWorkspace" type="button" aria-label="Decrease condition priority" :disabled="priorityFor(node.id) === branchModel?.branches.length" @click="changePriority(node.id, priorityFor(node.id)+1)">↓</button></div>
-     <div class="node-heading v2-node-top" @pointerdown="canEditWorkspace && startDrag($event, node)"><span class="node-icon v2-node-icon" x-text="branchModel?.fallback.id === node.id ? '!' : node.type === 'request' ? '↪' : node.type === 'response' ? '⌘' : node.type === 'condition' ? conditionIcon(node.config) : nodeIcon(node.type)"></span><strong x-text="node.label"></strong><button type="button" x-show="canEditWorkspace" class="node-edit" @pointerdown.stop @click="editNodeScenario(node)" :aria-label="'Edit ' + node.label">✎</button></div>
+     <div class="node-heading v2-node-top" @pointerdown="canEditWorkspace && startDrag($event, node)"><span class="node-icon v2-node-icon" x-text="branchModel?.fallback.id === node.id ? '!' : node.type === 'request' ? '↪' : node.type === 'response' ? '⌘' : node.type === 'condition' ? conditionIcon(node.config) : nodeIcon(node.type)"></span><strong x-text="node.label"></strong><button type="button" x-show="canEditWorkspace" class="node-edit" @pointerdown.stop @click="editNodeScenario(node)" :aria-label="'Edit ' + node.label" title="Edit node">✎</button><button type="button" x-show="canEditWorkspace && node.type === 'condition'" class="node-delete v2-node-delete" @pointerdown.stop @click="removeScenarioCondition(node.id)" :aria-label="'Delete condition ' + node.label" title="Delete condition">✕</button></div>
      <p class="v2-node-subtitle" x-text="branchModel?.fallback.id === node.id ? node.config.status + ' · Always last' : nodeSummary(node)"></p>
      <span class="v2-port v2-port-in" x-show="node.type !== 'request'"></span>
      <span class="v2-port v2-port-out" x-show="node.type !== 'response'"></span>
@@ -303,6 +303,7 @@ templ TableEditor() {
 								<div class="table-row-actions">
 									<button type="button" class="v2-btn-action scenario-view-btn" @click="viewScenario(row)" :aria-label="'View path ' + row.label" title="View path preview and execution trace">View</button>
 									<button type="button" x-show="canEditWorkspace" class="v2-btn-action primary scenario-edit-btn" @click="editScenario(row)" :aria-label="'Edit path ' + row.label" title="Edit scenario response, conditions, and headers">Edit ↗</button>
+									<button type="button" x-show="canEditWorkspace &amp;&amp; !row.isDefault" class="v2-btn-action danger scenario-delete-btn" @click="removeScenarioRow(row)" :aria-label="'Delete condition ' + row.label" title="Delete condition scenario">✕</button>
 								</div>
 							</td>
 						</tr>
@@ -723,7 +724,7 @@ templ Dialogs() {
         <span class="condition-source-badge" x-text="conditionIcon(condition.config) + ' ' + conditionKindLabel(condition.config)"></span>
         <span class="type-pill" x-show="!condition.matched">Previous condition did not match</span>
        </div>
-       <button type="button" class="text-button danger-text" x-show="condition.matched && !scenarioIsNew && !scenarioScope" @click="removeScenarioCondition(condition.id)">Delete condition</button>
+       <button type="button" class="text-button danger-text" x-show="condition.matched &amp;&amp; !scenarioIsNew &amp;&amp; (!scenarioScope || scenarioScope.type === 'condition')" @click="removeScenarioCondition(condition.id)">Delete condition</button>
       </div>
       <label>Condition name<input x-model="condition.label" placeholder="e.g. Require auth token"/></label>
       <div class="insertion-controls">

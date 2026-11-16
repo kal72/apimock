@@ -38,6 +38,10 @@ type IdentityRepository interface {
 	SessionUser(context.Context, string) (domain.User, error)
 	DeleteSession(context.Context, string) error
 	ChangePassword(context.Context, string, string, string) error
+	APIKeys(ctx context.Context, userID string) ([]domain.APIKey, error)
+	CreateAPIKey(ctx context.Context, key domain.APIKey) error
+	DeleteAPIKey(ctx context.Context, userID, keyID string) error
+	AuthenticateAPIKey(ctx context.Context, keyHash string) (domain.User, error)
 }
 type AuthService struct{ Repo IdentityRepository }
 type UserInput struct {
@@ -199,4 +203,57 @@ func (s AuthService) ChangePassword(ctx context.Context, u domain.User, current,
 		return err
 	}
 	return s.Repo.ChangePassword(ctx, u.ID, stored.PasswordHash, hash)
+}
+
+func (s AuthService) APIKeys(ctx context.Context, userID string) ([]domain.APIKey, error) {
+	return s.Repo.APIKeys(ctx, userID)
+}
+
+func (s AuthService) CreateAPIKey(ctx context.Context, userID, name string) (domain.GeneratedAPIKey, error) {
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return domain.GeneratedAPIKey{}, fmt.Errorf("%w: key name is required", domain.ErrValidation)
+	}
+	if len(name) > 100 {
+		return domain.GeneratedAPIKey{}, fmt.Errorf("%w: key name cannot exceed 100 characters", domain.ErrValidation)
+	}
+
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		return domain.GeneratedAPIKey{}, err
+	}
+	rawHex := hex.EncodeToString(b)
+	rawKey := "mlk_" + rawHex
+	prefix := "mlk_" + rawHex[:8] + "..."
+
+	key := domain.APIKey{
+		ID:        ID(),
+		UserID:    userID,
+		Name:      name,
+		KeyHash:   TokenHash(rawKey),
+		Prefix:    prefix,
+		CreatedAt: time.Now(),
+	}
+
+	if err := s.Repo.CreateAPIKey(ctx, key); err != nil {
+		return domain.GeneratedAPIKey{}, err
+	}
+
+	return domain.GeneratedAPIKey{
+		APIKey: key,
+		RawKey: rawKey,
+	}, nil
+}
+
+func (s AuthService) DeleteAPIKey(ctx context.Context, userID, keyID string) error {
+	return s.Repo.DeleteAPIKey(ctx, userID, keyID)
+}
+
+func (s AuthService) AuthenticateAPIKey(ctx context.Context, rawKey string) (domain.User, error) {
+	rawKey = strings.TrimSpace(rawKey)
+	if rawKey == "" {
+		return domain.User{}, ErrUnauthorized
+	}
+	hash := TokenHash(rawKey)
+	return s.Repo.AuthenticateAPIKey(ctx, hash)
 }

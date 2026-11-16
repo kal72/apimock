@@ -142,11 +142,11 @@ templ Toolbar() {
 			@ThemeSwitch()
 			<span class="v2-header-divider" x-show="currentUser" x-cloak aria-hidden="true"></span>
 			<div class="account-popover v2-account-wrap" x-show="currentUser" x-cloak @click.outside="accountOpen=false">
-    <button type="button" class="account-trigger v2-account" x-ref="accountTrigger" aria-label="Account settings" aria-controls="account-settings-panel" :aria-expanded="accountOpen" @click="accountOpen=!accountOpen" @keydown.arrow-down.prevent="accountOpen=true; $nextTick(()=>(currentUser?.role === 'admin' ? $refs.userAction : $refs.passwordAction).focus())">@V2Icon("user")<span class="account-first-name" x-text="currentUser?.name?.trim().split(/\s+/)[0] || 'Account'"></span><span class="account-chevron v2-chevron" aria-hidden="true">⌄</span></button>
+    <button type="button" class="account-trigger v2-account" x-ref="accountTrigger" aria-label="Account settings" aria-controls="account-settings-panel" :aria-expanded="accountOpen" @click="accountOpen=!accountOpen" @keydown.arrow-down.prevent="accountOpen=true; $nextTick(()=>($refs.apiKeysAction || $refs.userAction || $refs.passwordAction).focus())">@V2Icon("user")<span class="account-first-name" x-text="currentUser?.name?.trim().split(/\s+/)[0] || 'Account'"></span><span class="account-chevron v2-chevron" aria-hidden="true">⌄</span></button>
     <section id="account-settings-panel" class="account-settings-panel v2-account-menu" aria-label="Account settings" x-show="accountOpen" x-cloak x-transition.opacity.duration.100ms>
      <div class="account-panel-heading"><div><strong x-text="currentUser?.name"></strong><span x-text="'@' + (currentUser?.username || '')"></span></div><span class="type-pill v2-sample" x-text="currentUser?.role"></span></div>
 
-     <div class="account-panel-actions"><button type="button" x-ref="userAction" x-show="currentUser?.role === 'admin'" @click="accountOpen=false; openUsers()"><span aria-hidden="true">♙</span> User management</button><button type="button" x-ref="passwordAction" @click="accountOpen=false; openPassword()"><span aria-hidden="true">⚿</span> Change password</button></div>
+     <div class="account-panel-actions"><button type="button" x-ref="apiKeysAction" @click="accountOpen=false; openApiKeys()"><span aria-hidden="true">🔑</span> MCP API Keys</button><button type="button" x-ref="userAction" x-show="currentUser?.role === 'admin'" @click="accountOpen=false; openUsers()"><span aria-hidden="true">♙</span> User management</button><button type="button" x-ref="passwordAction" @click="accountOpen=false; openPassword()"><span aria-hidden="true">⚿</span> Change password</button></div>
      <button type="button" class="account-signout" @click="accountOpen=false; logout()"><span aria-hidden="true">↪</span> Sign out</button>
     </section>
    </div>
@@ -373,7 +373,7 @@ templ TestPanel() {
 
 templ Dialogs() {
  <div class="modal-backdrop" x-show="modal" x-cloak @click.self="modal = null" role="presentation">
-  <section class="modal" :class="{'scenario-modal': modal === 'scenario', 'path-view-modal': modal === 'view', 'users-modal': modal === 'users', 'environments-modal': modal === 'environments'}" role="dialog" aria-modal="true" :aria-label="modalTitle" x-trap.noscroll="modal" @keydown.ctrl.enter.prevent="commitModal()">
+  <section class="modal" :class="{'scenario-modal': modal === 'scenario', 'path-view-modal': modal === 'view', 'users-modal': modal === 'users', 'environments-modal': modal === 'environments', 'api-keys-modal': modal === 'api-keys'}" role="dialog" aria-modal="true" :aria-label="modalTitle" x-trap.noscroll="modal" @keydown.ctrl.enter.prevent="commitModal()">
    <header><div><span class="eyebrow">MOCKLAB BUILDER</span><h2 x-text="modalTitle"></h2></div><button @click="modal = null" aria-label="Close dialog">✕</button></header>
    <template x-if="modal === 'view' && preview">
     <div class="path-view-container">

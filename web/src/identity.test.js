@@ -18,3 +18,27 @@ test('new users default to the user role and password dialogs start empty',()=>{
 test('setup confirmation mismatch does not send credentials',async()=>{
   const login=createLogin();login.setup=true;login.password='unique long password';login.confirmation='different';await login.submit();assert.equal(login.error,'Passwords do not match.');assert.equal(login.busy,false);
 });
+
+test('api keys management in identity editor',async()=>{
+  const state=createEditor();
+  let calls=[];
+  state.request=async(url,method='GET',data)=>{
+    calls.push({url,method,data});
+    if(url==='/api/auth/api-keys'&&method==='GET'){
+      return [{id:'k1',name:'Cursor Mac',prefix:'mlk_1234...'}];
+    }
+    if(url==='/api/auth/api-keys'&&method==='POST'){
+      return {id:'k2',name:data.name,raw_key:'mlk_secret123'};
+    }
+    return {};
+  };
+
+  await state.openApiKeys();
+  assert.equal(state.modal,'api-keys');
+  assert.equal(state.apiKeys.length,1);
+
+  state.apiKeyName='New Key';
+  await state.generateApiKey();
+  assert.equal(state.newGeneratedKey.name,'New Key');
+  assert.equal(state.apiKeyName,'');
+});

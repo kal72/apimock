@@ -20,6 +20,84 @@ templ IdentityDialogs() {
  <template x-if="modal === 'users'"><div><div class="users-toolbar"><p class="help">Only administrators can manage users. Workspace access is shared.</p><button class="btn primary" @click="editUser()">+ Create user</button></div><div class="table-overflow"><table class="users-table"><thead><tr><th>USER</th><th>ROLE</th><th>STATUS</th><th>ACTIONS</th></tr></thead><tbody><template x-for="user in users" :key="user.id"><tr><td><strong x-text="user.name"></strong><span class="user-username" x-text="user.username"></span></td><td><span class="type-pill" x-text="user.role"></span></td><td x-text="user.active?'Active':'Inactive'"></td><td><div class="table-row-actions"><button class="btn" @click="editUser(user)">Edit</button><button class="btn danger-quiet" @click="deleteUser(user)" :disabled="user.id === currentUser?.id">Delete</button></div></td></tr></template></tbody></table></div></div></template>
  <template x-if="modal === 'user' && userForm"><form @submit.prevent="saveUser()"><label>Full name<input x-model="userForm.name" required maxlength="120" autocomplete="off"/></label><label>Username<input x-model="userForm.username" required minlength="3" maxlength="64" pattern="[a-z0-9][a-z0-9._-]{2,63}" autocomplete="off" autocapitalize="none" spellcheck="false"/></label><label>Role<select x-model="userForm.role" :disabled="userForm.id === currentUser?.id"><option value="user">User</option><option value="admin">Admin</option></select></label><label class="account-active"><input type="checkbox" x-model="userForm.active" :disabled="userForm.id === currentUser?.id"/> Active account</label><label x-text="userForm.id?'New password (optional)':'Password'"></label><input class="account-password" aria-label="User password" type="password" x-model="userForm.password" :required="!userForm.id" minlength="8" maxlength="1024" autocomplete="new-password"/><p class="help">Use at least 8 characters. Leave blank when editing to keep the current password. Password, role, username, or status changes revoke existing sessions.</p><div class="modal-actions"><button class="btn" type="button" @click="openUsers()">Back</button><button class="btn primary" :disabled="busy">Save user</button></div></form></template>
  <template x-if="modal === 'password'"><form @submit.prevent="changePassword()"><label>Current password<input type="password" x-model="passwordForm.current" required autocomplete="current-password" maxlength="1024"/></label><label>New password<input type="password" x-model="passwordForm.next" required minlength="8" maxlength="1024" autocomplete="new-password"/></label><label>Confirm new password<input type="password" x-model="passwordForm.confirmation" required minlength="8" maxlength="1024" autocomplete="new-password"/></label><p class="help">Changing your password signs out all sessions, including this one.</p><button class="btn primary" :disabled="busy">Change password</button></form></template>
+ <template x-if="modal === 'api-keys'">
+  <div class="api-keys-manager">
+   <div class="api-keys-header-note">
+    <p class="help">MCP API keys allow AI coding assistants (such as <strong>Cursor</strong>, <strong>Claude Desktop</strong>, and <strong>Antigravity</strong>) to connect to Mocklab over HTTP/SSE (<code>/api/mcp/sse</code>) to discover, inspect, create, and test mock APIs.</p>
+   </div>
+
+   <template x-if="newGeneratedKey">
+    <div class="api-key-new-alert">
+     <div class="api-key-new-title">
+      <span>✓</span>
+      <strong>API Key Generated Successfully</strong>
+     </div>
+     <p class="help">Make sure to copy your API key now. For security, it will not be shown again.</p>
+     <div class="api-key-token-display">
+      <code x-text="newGeneratedKey.raw_key"></code>
+      <button type="button" class="btn primary" @click="copyText(newGeneratedKey.raw_key, 'API Key copied to clipboard')">Copy Key</button>
+     </div>
+     <div class="api-key-cursor-hint">
+      <span class="help">Cursor configuration (<code>.cursor/mcp.json</code>):</span>
+      <pre class="api-key-snippet" x-text="JSON.stringify({mcpServers:{mocklab:{url: (publicOrigin || location.origin) + '/api/mcp/sse', headers:{Authorization: 'Bearer ' + newGeneratedKey.raw_key}}}}, null, 2)"></pre>
+     </div>
+     <div class="api-key-done-btn">
+      <button type="button" class="btn" @click="newGeneratedKey = null">Done</button>
+     </div>
+    </div>
+   </template>
+
+   <form class="api-key-create-form" @submit.prevent="generateApiKey()">
+    <label class="api-key-name-label">
+     <span>Generate a new key</span>
+     <div class="api-key-create-row">
+      <input x-model="apiKeyName" required placeholder="e.g. Cursor MacBook Pro" maxlength="100" autocomplete="off"/>
+      <button type="submit" class="btn primary" :disabled="busy || !apiKeyName.trim()">+ Generate Key</button>
+     </div>
+    </label>
+   </form>
+
+   <div class="table-overflow">
+    <table class="users-table api-keys-table">
+     <thead>
+      <tr>
+       <th>KEY NAME</th>
+       <th>TOKEN PREFIX</th>
+       <th>CREATED</th>
+       <th>LAST USED</th>
+       <th style="text-align: right">ACTION</th>
+      </tr>
+     </thead>
+     <tbody>
+      <template x-for="k in apiKeys" :key="k.id">
+       <tr>
+        <td>
+         <strong x-text="k.name"></strong>
+        </td>
+        <td>
+         <code class="api-key-prefix-code" x-text="k.prefix"></code>
+        </td>
+        <td>
+         <span class="api-key-date" x-text="new Date(k.created_at).toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'})"></span>
+        </td>
+        <td>
+         <span class="api-key-date" x-text="k.last_used_at ? new Date(k.last_used_at).toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'}) : 'Never'"></span>
+        </td>
+        <td style="text-align: right">
+         <button type="button" class="btn danger-quiet" @click="revokeApiKey(k)" title="Revoke this key">Revoke</button>
+        </td>
+       </tr>
+      </template>
+      <tr x-show="!apiKeys.length">
+       <td colspan="5" style="text-align: center; padding: 2rem; color: var(--v2-text-muted, #64748b);">
+        No API keys generated yet. Enter a label above to generate your first key for Cursor or Claude.
+       </td>
+      </tr>
+     </tbody>
+    </table>
+   </div>
+  </div>
+ </template>
 }
 
 

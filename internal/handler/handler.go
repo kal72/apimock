@@ -3,6 +3,7 @@ package handler
 import (
 	"apimock/internal/config"
 	"apimock/internal/domain"
+	"apimock/internal/mcp"
 	"apimock/internal/usecase"
 	"apimock/internal/web"
 	"context"
@@ -17,21 +18,25 @@ import (
 )
 
 type Handler struct {
-	Auth    *Identity
-	Config  config.Config
-	Service usecase.Service
-	Assets  http.Handler
-	Ready   func(*http.Request) error
+	Auth      *Identity
+	Config    config.Config
+	Service   usecase.Service
+	Assets    http.Handler
+	Ready     func(*http.Request) error
+	MCPServer *mcp.Server
 }
 
 func (h Handler) Routes() http.Handler {
 	r := chi.NewRouter()
 	getHead(r, "/healthz", h.health)
 	h.publicDocsRoutes(r)
+	h.mcpRoutes(r)
 	r.Group(func(management chi.Router) {
 		management.Use(h.managementAccess)
 		h.publicIdentityRoutes(management)
-		getHead(management, "/assets/*", h.Assets.ServeHTTP)
+		if h.Assets != nil {
+			getHead(management, "/assets/*", h.Assets.ServeHTTP)
+		}
 		getHead(management, "/assets", func(w http.ResponseWriter, r *http.Request) {
 			u := *r.URL
 			u.Path = "/assets/"

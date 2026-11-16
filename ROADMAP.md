@@ -1,6 +1,6 @@
 # Mocklab roadmap
 
-Last updated: **2026-11-15**.
+Last updated: **2026-11-16**.
 
 This roadmap tracks implementation scope, not promised release dates. No version or Git tag has been released. Available features remain part of an MVP. Internal deployment uses the application host and /public/{workspace-slug}; no domain is provisioned by the application.
 
@@ -109,6 +109,7 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | P05 | Deployment | Internal-domain deployment configuration | Done | Go + PostgreSQL only, /public/{workspace-slug}, managed internal mode, private host binding, optional existing HTTPS ingress, environment examples, Makefile targets, and English instructions. |
 | P06 | Deployment | Verify internal hostname and network reachability | Todo | Requires the target internal hostname/server and client-side DNS or hosts resolution; local runtime can be tested without changing machine DNS. |
 | P07 | Public Portal | Shareable public API docs & per-API playground with ON/OFF access control | Done | Optional per-workspace public viewer portal at `/share/{workspace-slug}` (`005_workspace_public_docs.sql`, disabled by default). Exposes read-only endpoint specs, priority scenarios, cURL/fetch snippets, and a live per-API playground (`POST /share/{slug}/playground`) without login while keeping private user environments isolated. |
+| P08 | Interoperability | Model Context Protocol (MCP) server via HTTP/SSE transport | Done | Full MCP (2024-11-05 spec) remote HTTP/SSE transport (GET /api/mcp/sse, POST /api/mcp/messages) supporting Cursor, Claude Desktop, Antigravity, and autonomous AI agents. Registers 9 tools (workspace discovery, endpoint CRUD, priority scenario additions, default response tuning, simulated evaluation/trace testing, and consolidated spec export) and read-only mocklab:// resources. Frictionless zero-config development mode and web UI profile-generated API key (`mlk_...`, with SHA-256 hash storage and revocation) / session token authentication in production. See docs/MCP.md. |
 
 ## Future development
 

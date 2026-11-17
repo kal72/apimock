@@ -8,6 +8,17 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Added
 
+- Added direct GitHub repository links (`https://github.com/kal72/apimock`) across the application interface featuring the official Octocat vector icon (`@V2Icon("github")`):
+  - Primary application topbar (`Toolbar` in `internal/web/page.templ`, styled via `.v2-github-link` in `web/src/toolbar.css`) alongside the theme toggle switch.
+  - Sidebar navigation (`Sidebar` in `internal/web/page.templ`) as an external navigation item (`GitHub ↗`) within `.v2-nav`.
+  - Public API documentation portal header (`PublicDocsPage` in `internal/web/public_docs.templ`) in `.apidoc-topbar-right`.
+  - Documentation & Reference header (`GeneratorDocumentation` in `internal/web/generators.templ`) in `.docs-header`.
+  - Authentication login and administrator setup card header (`AuthPage` in `internal/web/identity.templ`).
+  - Blueprint V2 design preview header (`V2Header` in `internal/web/v2.templ`).
+  - Repository badge link at the top of `README.md`.
+
+- Added branded Mocklab favicons (`favicon.svg` and multi-resolution `favicon.ico` with 16x16 and 32x32 icon layers) designed around the Mocklab brand identity (royal blue gradient squircle `#2563eb`, centered white cloud, and glowing cyan mock pulse indicator `#38bdf8`). Assets are generated in `web/public`, copied directly to `internal/web/static` by Vite (`publicDir: 'web/public'`), and embedded into the Go binary. Served directly via dedicated root routes (`GET /favicon.ico` and `GET /favicon.svg` in `internal/handler/handler.go`) and linked across all application templates (`<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg"/>` and `<link rel="alternate icon" type="image/x-icon" href="/assets/favicon.ico"/>` in `/app`, authentication screens, documentation pages, public API reference portals, and design previews).
+
 - Added condition scenario deletion across both Node and Table modes (`removeScenarioCondition` and `removeScenarioRow` in `web/src/editor.js`). In Table mode (`TableEditor`), every non-default condition scenario row features a dedicated delete button (`✕`) in the actions column. In Node mode (`FlowCanvas`), condition node cards on the Visual Flow canvas display a direct delete button (`✕`) on the card header beside the edit button. Furthermore, opening the condition edit popup from either Node or Table mode now properly displays the "Delete condition" button (`!scenarioScope || scenarioScope.type === 'condition'`). Deleting a condition preserves the default response and other conditions, automatically rearranges branch priorities (`arrangeBranches`), updates dirty status, clears stale test traces, and supports undo (`Ctrl+Z`).
 
 - Replaced the redundant "Copy base URL" option in the Workspace Settings popover menu (`WorkspaceSwitcher` in `internal/web/page.templ` and `web/src/toolbar.css`) with direct navigation to the workspace's **Public API docs** portal (`Public API docs ↗` linking to `/share/{slug}` in a new tab). Workspace base URL copying remains accessible directly via the sidebar `.workspace-base-url-pill` and footer action.
@@ -24,11 +35,22 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 - Added authenticated V2 static design previews at /app/v2 for Endpoints, Environments, Mocks, Logs and Settings. Shared templ components and scoped Graphite Blue/Cloudline styles provide Light/Night themes, Node/Table views and local sample interactions. Preview pages do not call application APIs or persist changes; proposed capabilities are illustrative. Existing UI and database schema are unchanged. See docs/UI_V2.md for migration boundaries.
 
+### Fixed
+
+- Fixed Table mode layout and cell padding inconsistencies in `web/src/cloudline.css` (`.flow-table-panel` and `.scenario-table`):
+  - Removed inner border duplication and nested corner radius from `.flow-table-panel .v2-table-wrap`, eliminating the double border inside the main `.flow-table-panel` card.
+  - Resolved a CSS cascade and specificity clash where generic `.v2-table th` and `.v2-table td` styles (declared later in `cloudline.css`) unintentionally clobbered `.scenario-table` padding, vertical alignment, and text wrapping.
+  - Aligned outer table cell edges with the card header padding (added `padding-left: 20px !important` for the first column and `padding-right: 20px !important` for the last action column, matching `.flow-table-heading` 20px inset).
+  - Increased table cell breathing room with standardized 12px 16px header padding and 14px 16px cell padding with `vertical-align: middle`.
+  - Removed resetting rules (`.scenario-table th:first-child, .scenario-table th:last-child { width: auto; }`) and restored explicit, balanced column widths (Priority `95px`, Request path `240px`, Conditions `min-width: 240px`, Response `min-width: 280px`, and Actions `165px`).
+
 ### Removed
 
 - Removed the static `MCP_API_KEY` environment variable, `.env.example` entry, and application configuration field in favor of dynamic, user-generated API keys managed directly through the Mocklab Web UI profile popover.
 
 ### Changed
+
+- Updated the primary application screenshots in `README.md` and `docs/img/main-node-mode-full.jpg` to showcase the modern Blueprint V2 Graphite Blue + Cloudline interface, featuring both the default Light theme and collapsible Moonlight Night theme captures.
 
 - Updated the endpoint toolbar in the application editor (`EndpointBar` in `internal/web/page.templ`, `web/src/editor.js`, `web/src/cloudline.css`, and `web/src/v2.css`): changed the displayed URL box from the workspace base URL to the endpoint's full path URL (`${baseURL}${endpoint.path}`), bounded its width at 320px with automatic ellipsis truncation (`text-overflow: ellipsis`) when paths exceed container bounds, added a hover tooltip displaying the complete URL (`:title="endpointURL"`), and updated the sidebar base URL pill and copy button tooltips to display the actual base URL (`:title="baseURL"`).
 

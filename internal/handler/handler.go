@@ -29,6 +29,8 @@ type Handler struct {
 func (h Handler) Routes() http.Handler {
 	r := chi.NewRouter()
 	getHead(r, "/healthz", h.health)
+	getHead(r, "/favicon.ico", http.FileServer(http.FS(web.Assets)).ServeHTTP)
+	getHead(r, "/favicon.svg", http.FileServer(http.FS(web.Assets)).ServeHTTP)
 	h.publicDocsRoutes(r)
 	h.mcpRoutes(r)
 	r.Group(func(management chi.Router) {

@@ -1,12 +1,14 @@
 # Mocklab
 
+[![GitHub Repository](https://img.shields.io/badge/GitHub-kal72%2Fapimock-181717?logo=github&logoColor=white)](https://github.com/kal72/apimock)
+
 Mocklab is a web application for building and running REST API mocks. Organize endpoints in workspaces, design Incoming → Condition → Response flows in Node or Table mode, and return Static or Dynamic JSON through callable URLs at `/public/{workspace-slug}/...`.
 
 It includes request conditions, response generators, a testing Playground, login, and Viewer/Editor/Owner workspace access.
 
-## Screenshot
+## Screenshots
 
-![Mocklab workspace showing response scenarios and the request playground](docs/img/main-node-mode-full.jpg)
+![Mocklab workspace showing response scenarios and the request playground in Light theme](docs/img/v2-header-light.jpg)
 
 ## Tech stack and dependencies
 

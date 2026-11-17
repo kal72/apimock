@@ -28,7 +28,15 @@ func GeneratorDocumentation() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Documentation &amp; Reference — Mocklab</title><script>try { const value=localStorage.getItem('mocklab-theme'); document.documentElement.dataset.theme=value==='night'||!['light','night'].includes(value)&&matchMedia('(prefers-color-scheme: dark)').matches?'night':'light'; } catch { document.documentElement.dataset.theme='light'; }</script><link rel=\"stylesheet\" href=\"/assets/app.css\"><script type=\"module\" src=\"/assets/app.js\"></script></head><body class=\"generator-docs\" x-data=\"generatorDocs\"><a href=\"#generator-content\" class=\"docs-skip\">Skip to content</a><header class=\"docs-header\"><a class=\"docs-brand\" href=\"/app\">☁ mocklab<span>.</span></a> <span class=\"docs-header-label\">DOCS &amp; REFERENCE</span> <a href=\"/app\" class=\"btn\">Open workspace ↗</a>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Documentation &amp; Reference — Mocklab</title><script>try { const value=localStorage.getItem('mocklab-theme'); document.documentElement.dataset.theme=value==='night'||!['light','night'].includes(value)&&matchMedia('(prefers-color-scheme: dark)').matches?'night':'light'; } catch { document.documentElement.dataset.theme='light'; }</script><link rel=\"icon\" type=\"image/svg+xml\" href=\"/assets/favicon.svg\"><link rel=\"alternate icon\" type=\"image/x-icon\" href=\"/assets/favicon.ico\"><link rel=\"stylesheet\" href=\"/assets/app.css\"><script type=\"module\" src=\"/assets/app.js\"></script></head><body class=\"generator-docs\" x-data=\"generatorDocs\"><a href=\"#generator-content\" class=\"docs-skip\">Skip to content</a><header class=\"docs-header\"><a class=\"docs-brand\" href=\"/app\">☁ mocklab<span>.</span></a> <span class=\"docs-header-label\">DOCS &amp; REFERENCE</span> <a href=\"https://github.com/kal72/apimock\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"v2-github-link\" title=\"GitHub: kal72/apimock\" aria-label=\"Mocklab on GitHub\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = V2Icon("github").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</a> <a href=\"/app\" class=\"btn\">Open workspace ↗</a>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -36,20 +44,20 @@ func GeneratorDocumentation() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</header><div class=\"docs-layout\"><nav class=\"docs-nav\" aria-label=\"Documentation sections\"><span class=\"eyebrow\">GUIDE &amp; ARCHITECTURE</span> <a href=\"#overview\">Overview &amp; Architecture</a> <a href=\"#dynamic-json\">Dynamic JSON &amp; Templating</a> <a href=\"#routing-scenarios\">Routing &amp; Scenarios</a> <a href=\"#environments\">Environments &amp; Secrets</a> <a href=\"#public-mocks\">Public Mock URLs</a> <span class=\"eyebrow\" style=\"margin-top: 14px\">DATA GENERATORS</span> <a href=\"#available\">Available generators · 4</a> <a href=\"#planned\">Planned catalog · 25</a> <a href=\"#rules\">Rules &amp; Limitations</a> <a href=\"#troubleshooting\">Troubleshooting</a></nav><main id=\"generator-content\" class=\"docs-content\"><section id=\"overview\" class=\"docs-hero\"><span class=\"eyebrow\">MOCKLAB REFERENCE GUIDE</span><h1>Build, simulate, and run REST API mocks.</h1><p>Mocklab is a local-first API mocking workspace. Design routes, define conditional scenario branches, interpolate live request data, and simulate realistic backends with Dynamic JSON.</p><div class=\"docs-status-note\"><strong>Static JSON remains the default.</strong> <span>Dynamic JSON processes expressions at runtime. The 25 categorized generators in the planned catalog below are proposed and are not runnable yet.</span></div></section><section id=\"dynamic-json\"><div class=\"docs-section-heading\"><h2>Dynamic JSON &amp; Templating Syntax</h2><span class=\"docs-badge available\">Syntax reference</span></div><p>When an endpoint Response is set to <strong>Dynamic JSON</strong>, template expressions wrapped in <code>&#123;&#123; ... &#125;&#125;</code> are evaluated at request time. Static JSON remains the default and keeps expressions literal.</p><div class=\"docs-rule-grid\"><article><h3><code>&#123;&#123; request.path.&lt;param&gt; &#125;&#125;</code></h3><p>Extracts URL parameters declared in route patterns. For example, route <code>/users/:id</code> extracts parameter <code>id</code>.</p></article><article><h3><code>&#123;&#123; request.query.&lt;key&gt; &#125;&#125;</code></h3><p>Extracts query parameters from URL query string. Example: <code>?page=2&amp;sort=asc</code>.</p></article><article><h3><code>&#123;&#123; request.header.&lt;key&gt; &#125;&#125;</code></h3><p>Reads incoming HTTP headers. Case-insensitive lookup (e.g. <code>Authorization</code>, <code>X-Tenant-ID</code>).</p></article><article><h3><code>&#123;&#123; request.body.&lt;field&gt; &#125;&#125;</code></h3><p>Accesses parsed JSON body fields using dot notation (e.g. <code>request.body.user.email</code>).</p></article><article><h3><code>&#123;&#123; request.raw_body &#125;&#125;</code></h3><p>Returns the raw, unparsed request payload string as received.</p></article><article><h3><code>&#123;&#123; environment.&lt;var&gt; &#125;&#125;</code></h3><p>Injects active environment variables (e.g. <code>api_base_url</code>, <code>stripe_key</code>).</p></article><article><h3>Fallback Default: <code>| default: VALUE</code></h3><p>Provides fallback when a request parameter is missing: <code>&#123;&#123; request.query.limit | default: 10 &#125;&#125;</code>.</p></article><article><h3>Native JSON Type Preservation</h3><p>An expression occupying the entire string value keeps its native JSON type (number, boolean, null) instead of becoming text.</p></article></div><p>Example Dynamic JSON response template:</p><pre><code>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</header><div class=\"docs-layout\"><nav class=\"docs-nav\" aria-label=\"Documentation sections\"><span class=\"eyebrow\">GUIDE &amp; ARCHITECTURE</span> <a href=\"#overview\">Overview &amp; Architecture</a> <a href=\"#dynamic-json\">Dynamic JSON &amp; Templating</a> <a href=\"#routing-scenarios\">Routing &amp; Scenarios</a> <a href=\"#environments\">Environments &amp; Secrets</a> <a href=\"#public-mocks\">Public Mock URLs</a> <span class=\"eyebrow\" style=\"margin-top: 14px\">DATA GENERATORS</span> <a href=\"#available\">Available generators · 4</a> <a href=\"#planned\">Planned catalog · 25</a> <a href=\"#rules\">Rules &amp; Limitations</a> <a href=\"#troubleshooting\">Troubleshooting</a></nav><main id=\"generator-content\" class=\"docs-content\"><section id=\"overview\" class=\"docs-hero\"><span class=\"eyebrow\">MOCKLAB REFERENCE GUIDE</span><h1>Build, simulate, and run REST API mocks.</h1><p>Mocklab is a local-first API mocking workspace. Design routes, define conditional scenario branches, interpolate live request data, and simulate realistic backends with Dynamic JSON.</p><div class=\"docs-status-note\"><strong>Static JSON remains the default.</strong> <span>Dynamic JSON processes expressions at runtime. The 25 categorized generators in the planned catalog below are proposed and are not runnable yet.</span></div></section><section id=\"dynamic-json\"><div class=\"docs-section-heading\"><h2>Dynamic JSON &amp; Templating Syntax</h2><span class=\"docs-badge available\">Syntax reference</span></div><p>When an endpoint Response is set to <strong>Dynamic JSON</strong>, template expressions wrapped in <code>&#123;&#123; ... &#125;&#125;</code> are evaluated at request time. Static JSON remains the default and keeps expressions literal.</p><div class=\"docs-rule-grid\"><article><h3><code>&#123;&#123; request.path.&lt;param&gt; &#125;&#125;</code></h3><p>Extracts URL parameters declared in route patterns. For example, route <code>/users/:id</code> extracts parameter <code>id</code>.</p></article><article><h3><code>&#123;&#123; request.query.&lt;key&gt; &#125;&#125;</code></h3><p>Extracts query parameters from URL query string. Example: <code>?page=2&amp;sort=asc</code>.</p></article><article><h3><code>&#123;&#123; request.header.&lt;key&gt; &#125;&#125;</code></h3><p>Reads incoming HTTP headers. Case-insensitive lookup (e.g. <code>Authorization</code>, <code>X-Tenant-ID</code>).</p></article><article><h3><code>&#123;&#123; request.body.&lt;field&gt; &#125;&#125;</code></h3><p>Accesses parsed JSON body fields using dot notation (e.g. <code>request.body.user.email</code>).</p></article><article><h3><code>&#123;&#123; request.raw_body &#125;&#125;</code></h3><p>Returns the raw, unparsed request payload string as received.</p></article><article><h3><code>&#123;&#123; environment.&lt;var&gt; &#125;&#125;</code></h3><p>Injects active environment variables (e.g. <code>api_base_url</code>, <code>stripe_key</code>).</p></article><article><h3>Fallback Default: <code>| default: VALUE</code></h3><p>Provides fallback when a request parameter is missing: <code>&#123;&#123; request.query.limit | default: 10 &#125;&#125;</code>.</p></article><article><h3>Native JSON Type Preservation</h3><p>An expression occupying the entire string value keeps its native JSON type (number, boolean, null) instead of becoming text.</p></article></div><p>Example Dynamic JSON response template:</p><pre><code>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs("{\n  \"status\": \"success\",\n  \"user_id\": \"{{ request.path.id }}\",\n  \"limit\": \"{{ request.query.limit | default: 20 }}\",\n  \"authorized_by\": \"{{ request.header.X-User-Role | default: \\\"guest\\\" }}\",\n  \"request_uuid\": \"{{ generate.uuid }}\",\n  \"in_stock\": \"{{ generate.integer: [1, 100] }}\"\n}")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 93, Col: 339}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 98, Col: 339}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</code></pre></section><section id=\"routing-scenarios\"><div class=\"docs-section-heading\"><h2>Routing Scenarios &amp; Condition Matching</h2><span class=\"docs-badge available\">Execution rules</span></div><p>Mocklab routes evaluate independent execution scenarios to determine which response node is returned.</p><div class=\"docs-rule-grid\"><article><h3>Priority-Based Evaluation</h3><p>Scenarios are evaluated in numeric order (#1, #2, #3...). Use the priority arrows in Table or Canvas view to change execution order.</p></article><article><h3>First-Match-Wins Semantics</h3><p>The first scenario whose conditions evaluate to true immediately selects its response node and terminates flow evaluation.</p></article><article><h3>Terminal Default Fallback</h3><p>If no preceding scenario condition matches the incoming request, Mocklab executes the default response scenario.</p></article><article><h3>Condition Target Sources</h3><p>Rules can match against Method, Path parameters, Query string, Headers, and Request Body (JSON fields, raw text, or form fields).</p></article></div><p><strong>Supported operators:</strong> <code>equals</code>, <code>not equals</code>, <code>contains</code>, <code>starts with</code>, <code>ends with</code>, <code>matches regex</code>, <code>exists</code>, <code>is empty</code>, <code>greater than</code>, and <code>less than</code>. Scenarios can combine multiple rules with <code>ALL</code> (AND) or <code>ANY</code> (OR) match logic.</p></section><section id=\"environments\"><div class=\"docs-section-heading\"><h2>Environments &amp; Secret Protection</h2><span class=\"docs-badge available\">Configuration</span></div><p>Environments let you test endpoints against different configuration profiles (e.g. Development, Staging, Production) without changing endpoint logic.</p><div class=\"docs-rule-grid\"><article><h3>Environment Variables</h3><p>Store key-value pairs referenced via <code>&#123;&#123; environment.key &#125;&#125;</code> in response bodies and header templates.</p></article><article><h3>Variable Data Types</h3><p>Supports String, Number, Boolean, and Secret types. Types are preserved when referenced in Dynamic JSON responses.</p></article><article><h3>🔒 Secret Protection</h3><p>Secret variables are write-only. Once saved, their values are masked with <code>••••••••</code> and never returned to the browser or REST API.</p></article><article><h3>Playground Integration</h3><p>Switch environments seamlessly in the topbar or Request Playground to test how responses render under different environments.</p></article></div></section><section id=\"public-mocks\"><div class=\"docs-section-heading\"><h2>Public Mock URLs &amp; Testing</h2><span class=\"docs-badge available\">Mock integration</span></div><p>Public mock endpoints can be consumed directly by web apps, mobile apps, frontend prototypes, or cURL.</p><div class=\"docs-rule-grid\"><article><h3>Public URL Format</h3><p>Endpoints are served under the public URL structure:<br><code>&#123;origin&#125;/public/&#123;workspace_slug&#125;/&#123;endpoint_path&#125;</code></p></article><article><h3>Parameter Interpolation</h3><p>Routes with path parameters (e.g. <code>/products/:id</code>) automatically match requests like <code>/public/demo/products/101</code>.</p></article><article><h3>CORS &amp; Preflight Support</h3><p>Mocklab automatically responds to browser <code>OPTIONS</code> preflight requests and allows cross-origin requests from frontend apps.</p></article><article><h3>Playground vs Live Public URLs</h3><p>Request Playground tests your working draft in real-time with visual execution tracing; public URLs serve the saved version.</p></article></div></section><section id=\"available\"><div class=\"docs-section-heading\"><h2>Available Data Generators</h2><span class=\"docs-badge available\">4 generators</span></div><p>Available now in Dynamic JSON responses. Use a fixed seed to repeat sequences, or leave empty for fresh randomness.</p><div class=\"docs-search\"><label for=\"generator-search\">Find a generator</label> <input id=\"generator-search\" type=\"search\" x-model=\"query\" placeholder=\"Search name, category or result type…\"> <span role=\"status\" x-text=\"copyStatus\"></span></div><div class=\"docs-generator-grid\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</code></pre></section><section id=\"routing-scenarios\"><div class=\"docs-section-heading\"><h2>Routing Scenarios &amp; Condition Matching</h2><span class=\"docs-badge available\">Execution rules</span></div><p>Mocklab routes evaluate independent execution scenarios to determine which response node is returned.</p><div class=\"docs-rule-grid\"><article><h3>Priority-Based Evaluation</h3><p>Scenarios are evaluated in numeric order (#1, #2, #3...). Use the priority arrows in Table or Canvas view to change execution order.</p></article><article><h3>First-Match-Wins Semantics</h3><p>The first scenario whose conditions evaluate to true immediately selects its response node and terminates flow evaluation.</p></article><article><h3>Terminal Default Fallback</h3><p>If no preceding scenario condition matches the incoming request, Mocklab executes the default response scenario.</p></article><article><h3>Condition Target Sources</h3><p>Rules can match against Method, Path parameters, Query string, Headers, and Request Body (JSON fields, raw text, or form fields).</p></article></div><p><strong>Supported operators:</strong> <code>equals</code>, <code>not equals</code>, <code>contains</code>, <code>starts with</code>, <code>ends with</code>, <code>matches regex</code>, <code>exists</code>, <code>is empty</code>, <code>greater than</code>, and <code>less than</code>. Scenarios can combine multiple rules with <code>ALL</code> (AND) or <code>ANY</code> (OR) match logic.</p></section><section id=\"environments\"><div class=\"docs-section-heading\"><h2>Environments &amp; Secret Protection</h2><span class=\"docs-badge available\">Configuration</span></div><p>Environments let you test endpoints against different configuration profiles (e.g. Development, Staging, Production) without changing endpoint logic.</p><div class=\"docs-rule-grid\"><article><h3>Environment Variables</h3><p>Store key-value pairs referenced via <code>&#123;&#123; environment.key &#125;&#125;</code> in response bodies and header templates.</p></article><article><h3>Variable Data Types</h3><p>Supports String, Number, Boolean, and Secret types. Types are preserved when referenced in Dynamic JSON responses.</p></article><article><h3>🔒 Secret Protection</h3><p>Secret variables are write-only. Once saved, their values are masked with <code>••••••••</code> and never returned to the browser or REST API.</p></article><article><h3>Playground Integration</h3><p>Switch environments seamlessly in the topbar or Request Playground to test how responses render under different environments.</p></article></div></section><section id=\"public-mocks\"><div class=\"docs-section-heading\"><h2>Public Mock URLs &amp; Testing</h2><span class=\"docs-badge available\">Mock integration</span></div><p>Public mock endpoints can be consumed directly by web apps, mobile apps, frontend prototypes, or cURL.</p><div class=\"docs-rule-grid\"><article><h3>Public URL Format</h3><p>Endpoints are served under the public URL structure:<br><code>&#123;origin&#125;/public/&#123;workspace_slug&#125;/&#123;endpoint_path&#125;</code></p></article><article><h3>Parameter Interpolation</h3><p>Routes with path parameters (e.g. <code>/products/:id</code>) automatically match requests like <code>/public/demo/products/101</code>.</p></article><article><h3>CORS &amp; Preflight Support</h3><p>Mocklab automatically responds to browser <code>OPTIONS</code> preflight requests and allows cross-origin requests from frontend apps.</p></article><article><h3>Playground vs Live Public URLs</h3><p>Request Playground tests your working draft in real-time with visual execution tracing; public URLs serve the saved version.</p></article></div></section><section id=\"available\"><div class=\"docs-section-heading\"><h2>Available Data Generators</h2><span class=\"docs-badge available\">4 generators</span></div><p>Available now in Dynamic JSON responses. Use a fixed seed to repeat sequences, or leave empty for fresh randomness.</p><div class=\"docs-search\"><label for=\"generator-search\">Find a generator</label> <input id=\"generator-search\" type=\"search\" x-model=\"query\" placeholder=\"Search name, category or result type…\"> <span role=\"status\" x-text=\"copyStatus\"></span></div><div class=\"docs-generator-grid\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -61,7 +69,7 @@ func GeneratorDocumentation() templ.Component {
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><p class=\"help\" x-show=\"!hasMatches(true)\">No available generators match your search.</p></section><section id=\"planned\"><div class=\"docs-section-heading\"><h2>Planned Fake-Data Catalog</h2><span class=\"docs-badge planned\">Catalog preview</span></div><p>Proposed names for 25 additional generators across Person, Internet, Address, Company, and Commerce domains. These define the planned roadmap and will fail validation in the current runtime.</p><div class=\"docs-generator-grid\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div><p class=\"help\" x-show=\"!hasMatches(true)\">No available generators match your search.</p></section><section id=\"planned\"><div class=\"docs-section-heading\"><h2>Planned Fake-Data Catalog</h2><span class=\"docs-badge planned\">Catalog preview</span></div><p>Proposed names for 25 additional generators across Person, Internet, Address, Company, and Commerce domains. These define the planned roadmap and will fail validation in the current runtime.</p><div class=\"docs-generator-grid\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -73,7 +81,7 @@ func GeneratorDocumentation() templ.Component {
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div><p class=\"help\" x-show=\"!hasMatches(false)\">No planned generators match your search.</p></section><section id=\"rules\"><h2>Types, Seeds, Headers &amp; Limits</h2><div class=\"docs-rule-grid\"><article><h3>Preserve JSON Types</h3><p>Quote expressions in the template. An expression occupying the whole string preserves its value type; text around it produces a string. Object keys stay static.</p></article><article><h3>Reproduce a Sample</h3><p>A fixed Generator seed repeats UUID, integer, and choice values. Without a seed, each render uses fresh randomness. Timestamp always uses the current time.</p></article><article><h3>Reuse an Identifier</h3><p>Identical generator expressions share one value within a response, including body and headers. Two UUID expressions produce the same ID within the response.</p></article><article><h3>Dynamic Headers</h3><p>Use an expression directly in a response header value (e.g. <code>X-Request-ID: &#123;&#123; generate.uuid &#125;&#125;</code>). Header values become text; header names remain static.</p></article></div><p><strong>System Limits:</strong> Maximum 200 expressions per response, 64 levels of template nesting, 1 MiB rendered body plus configured headers, and a seed of at most 256 bytes. Recursive interpolation and script execution are strictly disallowed.</p></section><section id=\"troubleshooting\"><h2>Troubleshooting &amp; FAQ</h2><details><summary>The expression is returned as literal text</summary><p>Verify that Response mode is set to <strong>Dynamic JSON</strong> in the node or scenario editor, then apply and save changes. Static JSON mode intentionally leaves expressions untouched.</p></details> <details><summary>The JSON body is reported as invalid</summary><p>Ensure template expressions inside strings are properly quoted: <code>\"stock\": \"&#123;&#123; generate.integer: [1, 100] &#125;&#125;\"</code>. For strings inside choices, escape internal quotes.</p></details> <details><summary>The generator name is reported as unknown</summary><p>Ensure you are using one of the 4 available generators (<code>generate.uuid</code>, <code>generate.timestamp</code>, <code>generate.integer</code>, <code>generate.choice</code>). Categorized names in the planned catalog are not yet implemented.</p></details> <details><summary>Random values repeat across requests</summary><p>Clear the Generator seed field in the Response editor. A non-empty seed intentionally pins the pseudo-random generation to reproduce identical values.</p></details> <details><summary>Preview output differs from the live public endpoint</summary><p>Preview executes against open draft form values and tests a single response node. Live public URLs evaluate full scenario condition flows against saved workspace data.</p></details> <details><summary>A request variable is missing or empty</summary><p>Provide a fallback value using the default filter: <code>&#123;&#123; request.query.sort | default: \"created_at\" &#125;&#125;</code>. In Playground, verify the test request inputs match.</p></details></section><footer class=\"docs-footer\">Mocklab Documentation &amp; Reference · Clean architecture for mock APIs.</footer></main></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div><p class=\"help\" x-show=\"!hasMatches(false)\">No planned generators match your search.</p></section><section id=\"rules\"><h2>Types, Seeds, Headers &amp; Limits</h2><div class=\"docs-rule-grid\"><article><h3>Preserve JSON Types</h3><p>Quote expressions in the template. An expression occupying the whole string preserves its value type; text around it produces a string. Object keys stay static.</p></article><article><h3>Reproduce a Sample</h3><p>A fixed Generator seed repeats UUID, integer, and choice values. Without a seed, each render uses fresh randomness. Timestamp always uses the current time.</p></article><article><h3>Reuse an Identifier</h3><p>Identical generator expressions share one value within a response, including body and headers. Two UUID expressions produce the same ID within the response.</p></article><article><h3>Dynamic Headers</h3><p>Use an expression directly in a response header value (e.g. <code>X-Request-ID: &#123;&#123; generate.uuid &#125;&#125;</code>). Header values become text; header names remain static.</p></article></div><p><strong>System Limits:</strong> Maximum 200 expressions per response, 64 levels of template nesting, 1 MiB rendered body plus configured headers, and a seed of at most 256 bytes. Recursive interpolation and script execution are strictly disallowed.</p></section><section id=\"troubleshooting\"><h2>Troubleshooting &amp; FAQ</h2><details><summary>The expression is returned as literal text</summary><p>Verify that Response mode is set to <strong>Dynamic JSON</strong> in the node or scenario editor, then apply and save changes. Static JSON mode intentionally leaves expressions untouched.</p></details> <details><summary>The JSON body is reported as invalid</summary><p>Ensure template expressions inside strings are properly quoted: <code>\"stock\": \"&#123;&#123; generate.integer: [1, 100] &#125;&#125;\"</code>. For strings inside choices, escape internal quotes.</p></details> <details><summary>The generator name is reported as unknown</summary><p>Ensure you are using one of the 4 available generators (<code>generate.uuid</code>, <code>generate.timestamp</code>, <code>generate.integer</code>, <code>generate.choice</code>). Categorized names in the planned catalog are not yet implemented.</p></details> <details><summary>Random values repeat across requests</summary><p>Clear the Generator seed field in the Response editor. A non-empty seed intentionally pins the pseudo-random generation to reproduce identical values.</p></details> <details><summary>Preview output differs from the live public endpoint</summary><p>Preview executes against open draft form values and tests a single response node. Live public URLs evaluate full scenario condition flows against saved workspace data.</p></details> <details><summary>A request variable is missing or empty</summary><p>Provide a fallback value using the default filter: <code>&#123;&#123; request.query.sort | default: \"created_at\" &#125;&#125;</code>. In Playground, verify the test request inputs match.</p></details></section><footer class=\"docs-footer\">Mocklab Documentation &amp; Reference · Clean architecture for mock APIs.</footer></main></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -98,154 +106,154 @@ func GeneratorCard(generator GeneratorDoc) templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<article class=\"docs-generator-card\" data-generator=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<article class=\"docs-generator-card\" data-generator=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templruntime.NewAttributeExpression(generator.Name).Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 275, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 280, Col: 69}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" data-search=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" data-search=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templruntime.NewAttributeExpression(generator.Name + " " + generator.Category + " " + generator.ResultType).Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 275, Col: 156}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 280, Col: 156}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" data-available=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" data-available=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templruntime.NewAttributeExpression(strconv.FormatBool(generator.Available)).Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 275, Col: 215}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 280, Col: 215}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" x-show=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" x-show=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templruntime.NewAttributeExpression("matches(" + strconv.Quote(generator.Name+" "+generator.Category+" "+generator.ResultType) + ")").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 275, Col: 323}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 280, Col: 323}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\"><div class=\"docs-card-meta\"><span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\"><div class=\"docs-card-meta\"><span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(generator.Category)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 277, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 282, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</span> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</span> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if generator.Available {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<span class=\"docs-badge available\">Available</span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<span class=\"docs-badge available\">Available</span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<span class=\"docs-badge planned\">Planned</span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<span class=\"docs-badge planned\">Planned</span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div><h3><code>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div><h3><code>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(generator.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 284, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 289, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</code></h3><span class=\"docs-result-type\">Returns ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</code></h3><span class=\"docs-result-type\">Returns ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(generator.ResultType)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 285, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 290, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</span><p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</span><p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(generator.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 286, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 291, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</p><details><summary>JSON example</summary><pre><code>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</p><details><summary>JSON example</summary><pre><code>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(generator.Example)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 289, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/generators.templ`, Line: 294, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</code></pre>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</code></pre>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if generator.Available {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<button type=\"button\" class=\"btn\" @click=\"copyExample($el.previousElementSibling.innerText)\">Copy JSON</button>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<button type=\"button\" class=\"btn\" @click=\"copyExample($el.previousElementSibling.innerText)\">Copy JSON</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<p class=\"docs-planned-caption\">Reference only · not executable in the current version.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<p class=\"docs-planned-caption\">Reference only · not executable in the current version.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</details></article>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</details></article>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

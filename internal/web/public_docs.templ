@@ -17,6 +17,8 @@ templ PublicDocsPage(workspace domain.Workspace, endpoints []domain.Endpoint, pu
 			<meta name="color-scheme" content="light dark"/>
 			<title>{ workspace.Name } — Public API Docs &amp; Playground | Mocklab</title>
 			<script>try { const value=localStorage.getItem('mocklab-theme'); document.documentElement.dataset.theme=value==='night'||!['light','night'].includes(value)&&matchMedia('(prefers-color-scheme: dark)').matches?'night':'light'; } catch { document.documentElement.dataset.theme='light'; }</script>
+			<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg"/>
+			<link rel="alternate icon" type="image/x-icon" href="/assets/favicon.ico"/>
 			<link rel="stylesheet" href="/assets/app.css"/>
 			@templ.JSONScript("public-docs-data", PublicDocsPayload{
 				Workspace:     workspace,
@@ -55,6 +57,9 @@ templ PublicDocsPage(workspace domain.Workspace, endpoints []domain.Endpoint, pu
 						@V2Icon("copy")
 						<span>Share Docs</span>
 					</button>
+					<a href="https://github.com/kal72/apimock" target="_blank" rel="noopener noreferrer" class="v2-github-link" title="GitHub: kal72/apimock" aria-label="Mocklab on GitHub">
+						@V2Icon("github")
+					</a>
 					@ThemeSwitch()
 				</div>
 			</header>
@@ -491,6 +496,8 @@ templ PublicDocsDisabledPage(slug string) {
 			<meta name="color-scheme" content="light dark"/>
 			<title>Public API Docs Unavailable — Mocklab</title>
 			<script>try { const value=localStorage.getItem('mocklab-theme'); document.documentElement.dataset.theme=value==='night'||!['light','night'].includes(value)&&matchMedia('(prefers-color-scheme: dark)').matches?'night':'light'; } catch { document.documentElement.dataset.theme='light'; }</script>
+			<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg"/>
+			<link rel="alternate icon" type="image/x-icon" href="/assets/favicon.ico"/>
 			<link rel="stylesheet" href="/assets/app.css"/>
 		</head>
 		<body class="apidoc-body">

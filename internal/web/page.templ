@@ -11,6 +11,8 @@ templ Page() {
   <script>
    try { const value = localStorage.getItem('mocklab-theme'); const night = value === 'night' || !['light','night'].includes(value) && matchMedia('(prefers-color-scheme: dark)').matches; document.documentElement.dataset.theme = night ? 'night' : 'light'; document.documentElement.style.colorScheme = night ? 'dark' : 'light'; } catch { document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'light'; }
   </script>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg"/>
+  <link rel="alternate icon" type="image/x-icon" href="/assets/favicon.ico"/>
   <link rel="stylesheet" href="/assets/app.css"/>
   <script type="module" src="/assets/app.js"></script>
  </head>
@@ -60,6 +62,7 @@ templ Sidebar() {
 			<button type="button" class="v2-nav-item" :class="navPage === 'environments' && 'v2-active'" :aria-current="navPage === 'environments' ? 'page' : 'false'" @click="openPage('environments')"><span>◈</span>Environments</button>
 			<button type="button" class="v2-nav-item" x-show="workspace" x-cloak :class="navPage === 'settings' && 'v2-active'" :aria-current="navPage === 'settings' ? 'page' : 'false'" @click="openPage('settings')"><span>⚙</span>Settings</button>
 			<a class="v2-nav-item" href="/docs/generators" target="_blank" rel="noopener"><span>≡</span>Docs &amp; Reference ↗</a>
+			<a class="v2-nav-item" href="https://github.com/kal72/apimock" target="_blank" rel="noopener noreferrer" title="Mocklab on GitHub"><span>@V2Icon("github")</span>GitHub ↗</a>
 		</nav>
 		<section class="v2-endpoint-list">
 			<header>
@@ -139,6 +142,9 @@ templ Toolbar() {
 		<div class="topbar-actions v2-header-actions">
 			<span class="topbar-saved v2-saved" x-show="navPage === 'endpoints' && endpoint && !dirty" x-cloak>@V2Icon("check") Saved</span>
 			<span class="topbar-unsaved" x-show="navPage === 'endpoints' && endpoint && dirty" x-cloak :title="canEditWorkspace ? 'Unsaved changes · Save via draft bar or Ctrl+S' : 'Unsaved changes'" @click="canEditWorkspace && readyToSave && saveEndpoint()"><span aria-hidden="true">●</span> <span x-text="busy ? 'Saving…' : 'Unsaved'"></span></span>
+			<a href="https://github.com/kal72/apimock" target="_blank" rel="noopener noreferrer" class="v2-github-link" title="GitHub: kal72/apimock" aria-label="Mocklab on GitHub">
+				@V2Icon("github")
+			</a>
 			@ThemeSwitch()
 			<span class="v2-header-divider" x-show="currentUser" x-cloak aria-hidden="true"></span>
 			<div class="account-popover v2-account-wrap" x-show="currentUser" x-cloak @click.outside="accountOpen=false">

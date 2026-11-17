@@ -3,7 +3,7 @@ import { workspaceEditor } from './workspace.js';
 import { identityEditor } from './identity.js';
 import { environmentEditor } from './environments.js';
 import { scenarioBranches, arrangeBranches, branchEdges, branchRows, setPriority } from './branches.js';
-import { formatValue, pathPreview } from './preview.js';
+import { formatValue, httpStatusText, pathPreview } from './preview.js';
 import { conditionKinds, pathParameters, typedCondition, normalizeCondition, conditionDiagnostics, conditionSummary, conditionKindLabel, flowConditionConflicts, flowConditionWarnings } from './conditions.js';
 import { conditionTemplates, responseTemplates, projectScenarios, defaultScenario, addConditionScenario, applyResponseTemplate, responseForm, scenarioForm, removeScenario } from './scenarios.js';
 import { clone, defaultExample, defaultFlow, outgoingBranches, setConnection, insertBlock, graphIssues, nodeRows, connectionPoints, parseObject, headersFromRows, preferredResponse, directResponseFlow, removeConfiguration } from './flow.js';
@@ -28,7 +28,7 @@ export const createEditor = () => ({
   get isEditingVariable(){return Boolean(this.variableForm.key && this.environmentVariables.some(v => v.key === this.variableForm.key));},
   workspaces:[], endpoints:[], workspaceID:'', workspace:null, endpoint:null, publicOrigin:'',
   methods:['GET','POST','PUT','PATCH','DELETE','HEAD','OPTIONS'],
-  preview:null, formatValue,
+  preview:null, formatValue, httpStatusText,
   conditionKinds, conditionTemplates, responseTemplates, scenarioForm:null, scenarioDraft:null, scenarioScope:null, scenarioTab:'response', scenarioTemplate:'header', scenarioIsNew:false,
   highlightedNodeID:null, navPage:'endpoints', settingsTab:'general', envSearch:'', mode:'node', search:'', modal:null, dialogError:'', notice:'', noticeTimer:null, dismissedWarningKey:'', busy:false, dirty:false,
   workspaceForm:{}, endpointForm:{}, nodeForm:null, headerRows:[], connecting:null, drag:null, pan:null, zoom:1, minZoom:0.5, maxZoom:2, zoomStep:0.25,

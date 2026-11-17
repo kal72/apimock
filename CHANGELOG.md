@@ -50,11 +50,10 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Changed
 
-- Redesigned the Table mode Scenario View modal (`modal === 'view'`, `.path-view-modal` in `internal/web/page.templ` and `web/src/path-view.css`) for a cleaner, unified developer experience without nested "cards inside cards":
-  - Eliminated nested card boundaries (`.path-view-card`, `.path-view-hero`, `.path-view-condition-box`, and `.path-view-subcard`), replacing them with flat semantic sections, clean typographic headers, and subtle hairline dividers.
-  - Replaced the heavy boxed hero header with an integrated route and metadata bar featuring Mocklab standard method pills, monospace route paths, status pills, delay badges, and a seamless 1-click URL copy strip.
-  - Streamlined routing conditions into clean key-value rule lines (`field`, `operator`, `value`, `required`) and an elegant accent callout for unconditional/default fallback scenarios.
-  - Refined request parameters, headers, and response body displays into clean labeled monospace code surfaces with full Light (Cloudline) and Night (Moonlight) theme support.
+- Simplified the Table mode Scenario View modal (`modal === 'view'`, `.path-view-modal` in `internal/web/page.templ` and `web/src/path-view.css`) into a clean, minimalist 1-page inspector without tabs or visual clutter:
+  - Eliminated navigation tabs, multi-level toolbars, verbose explanatory banners, and extraneous request payload examples so users immediately see only the essential scenario details without fragmented clicks or sensory overload.
+  - Streamlined the layout into an intuitive single-page vertical flow: Method & Route with prominent HTTP Status badge (`HTTP 200 OK`, `HTTP 404 Not Found`, etc.) and delay indicator; 1-click Copy URL bar; compact condition summary (e.g. `Default fallback`, `Unconditional`, or concise rule chips); full-width Response Body with 1-click Copy button; and an optional compact Response Headers list when custom headers are configured.
+  - Optimized dialog footprint (`width: min(740px, 94vw)`) with unified Light (Cloudline) and Night (Moonlight) high-contrast theme styling.
 
 ### Fixed
 

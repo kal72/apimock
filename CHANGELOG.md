@@ -8,6 +8,19 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Added
 
+- Enhanced Moonlight Night mode artwork and celestial theme on the authentication and login screen (`AuthPage` in `internal/web/identity.templ`, styled across `web/src/identity.css` and `web/src/moonlight.css`):
+  - Restored multi-layered night sky vector clouds (`#2a4365` to `#142238`, `#243956` to `#101c30`, `#1e304b` to `#0c1626`) in `.auth-screen:before`, repositioned to drift comfortably below the crescent moon so the moon remains completely clear, unobstructed, and prominently visible.
+  - Upgraded the crescent moon with a luminous pearlescent lunar core (`#ffffff` -> `#e0f2fe` -> `#93c5fd`), multi-stop lunar cyan-blue corona glow (`#60a5fa`, `#38bdf8`, `#1d4ed8`), and signature concentric dashed orbit rings (`r=52` and `r=70`).
+  - Enriched the night sky with brilliant 4-point star sparkles (`✧`, `✦`) in silver and cyan, plus multi-size starfield pinpricks across the open sky.
+  - Restored the 3-layer nocturnal horizon cloudbank in `.auth-screen:after` with deep midnight gradients (`#1e3250`, `#264066`, `#2d4c78`) and distant twinkling star clusters.
+  - Deepened the `[data-theme=night] .auth-screen` midnight background gradient with ambient cyan lunar glow in the upper right and smooth indigo-navy transitions (`#070d18` to `#111d33`).
+
+- Added daylight sky artwork (sun, clouds, and radiant daylight atmosphere) to the authentication and login screen (`AuthPage` in `internal/web/identity.templ`, styled in `web/src/identity.css`) for Light mode (Cloudline), complementing the existing Moonlight night theme:
+  - Added a radiant golden sun in the upper right sky via `.auth-screen:before` (radial warm corona glow `#fde047`/`#f59e0b`, dashed orbit ray rings, bright sun disc `#fffef0` -> `#ffdc7c` -> `#f59e0b`, and golden daylight sparkles).
+  - Added vector daylight clouds floating in the upper sky (`.auth-screen:before`) and a layered horizon cloudbank in the lower screen (`.auth-screen:after`) with soft sky-blue gradients (`#ffffff`, `#e0f2fe`, `#bae6fd`).
+  - Enriched the `.auth-screen` daylight gradient with subtle sun diffusion and soft cerulean blue sky tones (`#eef6ff` to `#f4f9ff`).
+  - Switching to Night mode (`[data-theme=night]`) seamlessly transitions from the daylight sun and day clouds to the crescent moon and starfield without layout shift or visual interference with the authentication card.
+
 - Added direct GitHub repository links (`https://github.com/kal72/apimock`) across the application interface featuring the official Octocat vector icon (`@V2Icon("github")`):
   - Primary application topbar (`Toolbar` in `internal/web/page.templ`, styled via `.v2-github-link` in `web/src/toolbar.css`) alongside the theme toggle switch.
   - Sidebar navigation (`Sidebar` in `internal/web/page.templ`) as an external navigation item (`GitHub ↗`) within `.v2-nav`.
@@ -35,7 +48,26 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 - Added authenticated V2 static design previews at /app/v2 for Endpoints, Environments, Mocks, Logs and Settings. Shared templ components and scoped Graphite Blue/Cloudline styles provide Light/Night themes, Node/Table views and local sample interactions. Preview pages do not call application APIs or persist changes; proposed capabilities are illustrative. Existing UI and database schema are unchanged. See docs/UI_V2.md for migration boundaries.
 
+### Changed
+
+- Redesigned the Table mode Scenario View modal (`modal === 'view'`, `.path-view-modal` in `internal/web/page.templ` and `web/src/path-view.css`) for a cleaner, unified developer experience without nested "cards inside cards":
+  - Eliminated nested card boundaries (`.path-view-card`, `.path-view-hero`, `.path-view-condition-box`, and `.path-view-subcard`), replacing them with flat semantic sections, clean typographic headers, and subtle hairline dividers.
+  - Replaced the heavy boxed hero header with an integrated route and metadata bar featuring Mocklab standard method pills, monospace route paths, status pills, delay badges, and a seamless 1-click URL copy strip.
+  - Streamlined routing conditions into clean key-value rule lines (`field`, `operator`, `value`, `required`) and an elegant accent callout for unconditional/default fallback scenarios.
+  - Refined request parameters, headers, and response body displays into clean labeled monospace code surfaces with full Light (Cloudline) and Night (Moonlight) theme support.
+
 ### Fixed
+
+- Fixed CD deployment workflow (`.github/workflows/cd.yml`) not automatically running when a pull request targeting branch `main` is opened or updated:
+  - Added `pull_request` event trigger for target branch `main` to automatically execute CI checks, build the container image with version tag `:dev` on GitHub Container Registry (GHCR), and trigger SSH deployment to the `dev` VPS environment.
+  - Added security filter to ensure SSH deployment executes on internal repository pull requests while safely skipping SSH access on public fork pull requests.
+  - Tagged container builds with the exact PR head commit SHA alongside the `:dev` rolling tag.
+
+- Fixed Table mode action button squashing where the "Edit" button collapsed into a vertical square with the title "Edit" on top and the arrow icon "↗" below on condition scenario rows:
+  - Enforced `white-space: nowrap !important; flex-shrink: 0 !important;` and `display: inline-flex !important; align-items: center !important; justify-content: center !important;` on `.v2-btn-action` and `.scenario-actions-cell button`, preventing button labels and icons from wrapping into multiple lines.
+  - Wrapped "Edit" and the arrow "↗" in dedicated inline elements (`<span>Edit</span> <span class="v2-btn-arrow" aria-hidden="true">↗</span>`) with `white-space: nowrap` in `internal/web/page.templ`.
+  - Increased Actions column width allocation to `185px` (`width: 185px !important; min-width: 185px !important;`) across both `.scenario-th-actions` and `td.scenario-actions-cell` in `web/src/cloudline.css`, providing ample horizontal clearance for all three row action buttons ("View", "Edit ↗", and "✕") plus cell padding without flex compression.
+  - Enforced `flex-wrap: nowrap !important; white-space: nowrap !important;` on `.scenario-actions-cell .table-row-actions`.
 
 - Fixed Table mode layout and cell padding inconsistencies in `web/src/cloudline.css` (`.flow-table-panel` and `.scenario-table`):
   - Removed inner border duplication and nested corner radius from `.flow-table-panel .v2-table-wrap`, eliminating the double border inside the main `.flow-table-panel` card.

@@ -1225,19 +1225,28 @@ body {
 
 .v2-table.scenario-table .scenario-th-actions,
 .scenario-th-actions {
-  width: 165px !important;
-  min-width: 165px !important;
+  width: 185px !important;
+  min-width: 185px !important;
   text-align: right !important;
 }
 
 /* Neutralize legacy app.css nth-child overrides for scenario-table */
 .scenario-table td:nth-child(2),
 .scenario-table td:nth-child(3),
-.scenario-table td:nth-child(4),
-.scenario-table td:last-child {
+.scenario-table td:nth-child(4) {
   min-width: unset !important;
   max-width: unset !important;
   width: auto;
+}
+
+.v2-table.scenario-table td.scenario-actions-cell,
+.scenario-table td.scenario-actions-cell,
+.scenario-actions-cell {
+  width: 185px !important;
+  min-width: 185px !important;
+  white-space: nowrap !important;
+  text-align: right;
+  vertical-align: middle;
 }
 
 .scenario-table tbody tr {
@@ -1597,16 +1606,48 @@ body {
 /* Actions Cell */
 .scenario-actions-cell {
   white-space: nowrap !important;
-  width: 160px;
+  width: 185px !important;
+  min-width: 185px !important;
   text-align: right;
   vertical-align: middle;
 }
 
 .scenario-actions-cell .table-row-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 6px !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+}
+
+.scenario-actions-cell .v2-btn-action {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 24px !important;
+  line-height: 1 !important;
+}
+
+.scenario-actions-cell .v2-btn-action.scenario-edit-btn {
+  gap: 4px !important;
+  padding: 4px 10px !important;
+}
+
+.scenario-actions-cell .v2-btn-action.scenario-edit-btn span {
+  white-space: nowrap !important;
+  display: inline-block;
+}
+
+.scenario-actions-cell .v2-btn-arrow {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.scenario-actions-cell .v2-btn-action.scenario-view-btn {
+  padding: 4px 8px !important;
 }
 
 .scenario-actions-cell .v2-btn-action.primary {
@@ -1621,7 +1662,8 @@ body {
 
 .scenario-actions-cell .v2-btn-action.danger {
   color: var(--v2-muted) !important;
-  padding: 3px 6px !important;
+  padding: 4px 7px !important;
+  min-width: 24px !important;
 }
 
 .scenario-actions-cell .v2-btn-action.danger:hover {
@@ -2754,12 +2796,19 @@ footer.v2-footer {
 .v2-btn-action {
   font-size: 11px !important;
   font-weight: 550 !important;
-  padding: 3px 8px !important;
+  padding: 4px 8px !important;
   border-radius: 5px !important;
   background: var(--v2-surface) !important;
   border: 1px solid var(--v2-border) !important;
   color: var(--v2-ink) !important;
   cursor: pointer;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  line-height: 1.2 !important;
   transition: all 0.15s ease;
 }
 

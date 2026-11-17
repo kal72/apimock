@@ -308,7 +308,7 @@ templ TableEditor() {
 							<td class="scenario-actions-cell">
 								<div class="table-row-actions">
 									<button type="button" class="v2-btn-action scenario-view-btn" @click="viewScenario(row)" :aria-label="'View path ' + row.label" title="View path preview and execution trace">View</button>
-									<button type="button" x-show="canEditWorkspace" class="v2-btn-action primary scenario-edit-btn" @click="editScenario(row)" :aria-label="'Edit path ' + row.label" title="Edit scenario response, conditions, and headers">Edit ↗</button>
+									<button type="button" x-show="canEditWorkspace" class="v2-btn-action primary scenario-edit-btn" @click="editScenario(row)" :aria-label="'Edit path ' + row.label" title="Edit scenario response, conditions, and headers"><span>Edit</span> <span class="v2-btn-arrow" aria-hidden="true">↗</span></button>
 									<button type="button" x-show="canEditWorkspace &amp;&amp; !row.isDefault" class="v2-btn-action danger scenario-delete-btn" @click="removeScenarioRow(row)" :aria-label="'Delete condition ' + row.label" title="Delete condition scenario">✕</button>
 								</div>
 							</td>
@@ -384,63 +384,66 @@ templ Dialogs() {
    <header><div><span class="eyebrow">MOCKLAB BUILDER</span><h2 x-text="modalTitle"></h2></div><button @click="modal = null" aria-label="Close dialog">✕</button></header>
    <template x-if="modal === 'view' && preview">
     <div class="path-view-container">
-     <div class="path-view-hero">
-      <div class="path-view-hero-top">
-       <div class="path-view-route-badge">
-        <span class="route-method" x-text="preview.method"></span>
+     <!-- Clean Header & Endpoint URL Bar -->
+     <div class="path-view-head">
+      <div class="path-view-route-row">
+       <div class="path-view-route-left">
+        <span class="v2-method" :class="'v2-' + preview.method.toLowerCase()" x-text="preview.method"></span>
         <code class="path-view-route-path" x-text="preview.path"></code>
-        <strong class="path-view-route-name" x-text="preview.name"></strong>
+        <span class="path-view-route-name" x-text="preview.name" :title="preview.name"></span>
        </div>
        <div class="path-view-badges">
-        <span class="path-view-status-badge" :class="preview.status >= 500 ? 'status-5xx' : preview.status >= 400 ? 'status-4xx' : preview.status >= 300 ? 'status-3xx' : 'status-2xx'" x-text="'HTTP ' + preview.status"></span>
-        <span class="path-view-pill" x-text="preview.delay ? preview.delay + ' ms delay' : '0 ms delay'"></span>
-        <span class="default-tag" x-show="preview.isDefault">DEFAULT PATH</span>
-        <span class="path-view-pill" x-show="!preview.isDefault && preview.conditions.length" x-text="preview.conditions.length + (preview.conditions.length === 1 ? ' condition' : ' conditions')"></span>
-        <span class="type-pill" x-text="preview.responseMode === 'dynamic' ? 'Dynamic' : 'Static'"></span>
+        <span class="v2-status-pill" :class="preview.status >= 500 ? 'status-5xx' : preview.status >= 400 ? 'status-4xx' : preview.status >= 300 ? 'status-3xx' : 'status-2xx'" x-text="'HTTP ' + preview.status"></span>
+        <span class="v2-sample" x-show="preview.delay" x-text="preview.delay + ' ms delay'"></span>
+        <span class="v2-sample" :class="preview.responseMode === 'dynamic' ? 'is-dynamic' : 'is-static'" x-text="preview.responseMode === 'dynamic' ? 'Dynamic' : 'Static'"></span>
+        <span class="v2-order-chip is-default" x-show="preview.isDefault">DEFAULT FALLBACK</span>
+        <span class="v2-order-chip is-numbered" x-show="!preview.isDefault && preview.conditions.length" x-text="preview.conditions.length + (preview.conditions.length === 1 ? ' condition' : ' conditions')"></span>
         <span class="view-draft-note" x-show="dirty">Draft preview</span>
        </div>
       </div>
-      <div class="path-view-url-row">
-       <span class="path-view-url-tag">ENDPOINT URL</span>
-       <code class="path-view-url-code" x-text="preview.url"></code>
-       <button type="button" class="path-view-copy-btn" @click="copyText(preview.url, 'Endpoint URL copied')" title="Copy URL">Copy URL ↗</button>
+      <div class="path-view-url-strip">
+       <span class="path-view-url-label">ENDPOINT URL</span>
+       <code class="path-view-url-val" x-text="preview.url"></code>
+       <button type="button" class="path-view-url-copy" @click="copyText(preview.url, 'Endpoint URL copied')" title="Copy full endpoint URL">Copy URL ↗</button>
       </div>
      </div>
 
-     <div class="path-view-grid">
-      <!-- Left Column: Request Specs & Matching Rules -->
-      <div class="path-view-col">
-       <!-- Routing Conditions Card -->
-       <section class="path-view-card">
-        <header class="path-view-card-header">
-         <h4><span aria-hidden="true">⚡</span> Routing Conditions</h4>
+     <!-- Clean 2-Column Panes (No cards inside cards) -->
+     <div class="path-view-panes">
+      <!-- Left Pane: Routing Conditions & Request Data -->
+      <div class="path-view-pane">
+       <!-- Routing Conditions -->
+       <section class="path-view-section">
+        <div class="path-view-section-head">
+         <h4><span class="section-icon" aria-hidden="true">⚡</span> Routing Conditions</h4>
          <span class="path-view-count" x-text="preview.conditions.length ? preview.conditions.length + (preview.conditions.length === 1 ? ' rule' : ' rules') : 'Unconditional'"></span>
-        </header>
-        <div class="path-view-card-body">
-         <div class="path-view-callout" x-show="!preview.conditions.length">
-          <strong x-text="preview.isDefault && conditions.length ? 'Fallback Scenario (Default)' : 'Unconditional Scenario'"></strong>
-          <p class="help" x-text="preview.isDefault && conditions.length ? 'Executes when no preceding condition matches incoming requests.' : 'Executes for all requests matching this endpoint path.'"></p>
+        </div>
+        <div class="path-view-section-body">
+         <div class="path-view-unconditional-note" x-show="!preview.conditions.length">
+          <div class="unconditional-icon" x-text="preview.isDefault && conditions.length ? '↪' : '✓'"></div>
+          <div>
+           <strong x-text="preview.isDefault && conditions.length ? 'Fallback Scenario (Default)' : 'Unconditional Scenario'"></strong>
+           <p x-text="preview.isDefault && conditions.length ? 'Executes when no preceding condition matches incoming requests.' : 'Executes for all incoming requests matching this endpoint path.'"></p>
+          </div>
          </div>
          <div class="path-view-conditions-list" x-show="preview.conditions.length">
           <template x-for="(condition, index) in preview.conditions" :key="index">
-           <div class="path-view-condition-box">
-            <div class="condition-box-header">
-             <div class="condition-box-tags">
+           <div class="path-view-cond-group">
+            <div class="path-view-cond-header">
+             <div class="path-view-cond-tags">
               <span class="condition-kind-badge" x-text="condition.condition_type"></span>
               <span class="condition-match-badge" x-text="condition.match === 'any' ? 'OR' : 'AND'"></span>
               <span class="condition-extra-badge" x-show="condition.condition_type === 'body'" x-text="condition.body_mode + (condition.body_mode === 'raw' ? ' · ' + condition.raw_format : '')"></span>
              </div>
-             <span class="condition-outcome" :class="condition.matched ? 'outcome-match' : 'outcome-nomatch'" x-text="condition.matched ? 'Matches' : 'Does not match'"></span>
+             <span class="condition-outcome" :class="condition.matched ? 'outcome-match' : 'outcome-nomatch'" x-text="condition.matched ? '✓ Matches' : 'Does not match'"></span>
             </div>
-            <div class="condition-box-rules">
+            <div class="path-view-rules-list">
              <template x-for="(rule, ruleIndex) in condition.rules" :key="ruleIndex">
-              <div class="view-rule-item">
-               <div class="view-rule-header">
-                <code class="view-rule-field" x-text="rule.field"></code>
-                <span class="view-rule-op" x-text="rule.operator"></span>
-                <span class="view-rule-req" x-show="rule.required">Required</span>
-               </div>
-               <pre class="view-rule-val" x-show="!['exists','empty'].includes(rule.operator)" x-text="formatValue(rule.value)"></pre>
+              <div class="path-view-rule-line">
+               <code class="rule-field-name" x-text="rule.field"></code>
+               <span class="rule-op-badge" x-text="rule.operator"></span>
+               <code class="rule-field-val" x-show="!['exists','empty'].includes(rule.operator)" x-text="formatValue(rule.value)"></code>
+               <span class="rule-required-pill" x-show="rule.required">Required</span>
               </div>
              </template>
             </div>
@@ -450,67 +453,67 @@ templ Dialogs() {
         </div>
        </section>
 
-       <!-- Example Request Data Card -->
-       <section class="path-view-card">
-        <header class="path-view-card-header">
-         <h4><span aria-hidden="true">⇥</span> Example Request Data</h4>
+       <!-- Example Request Data -->
+       <section class="path-view-section">
+        <div class="path-view-section-head">
+         <h4><span class="section-icon" aria-hidden="true">⇥</span> Example Request Data</h4>
          <span class="path-view-badge" x-text="'Body: ' + (preview.example.body_mode || 'json')"></span>
-        </header>
-        <div class="path-view-card-body">
-         <div class="path-view-subcard" x-show="preview.example.params && Object.keys(preview.example.params).length">
-          <label>Path parameters</label>
-          <pre class="path-view-pre" x-text="formatValue(preview.example.params)"></pre>
+        </div>
+        <div class="path-view-section-body">
+         <div class="path-view-data-group" x-show="preview.example.params && Object.keys(preview.example.params).length">
+          <span class="data-group-label">Path parameters</span>
+          <pre class="path-view-code" x-text="formatValue(preview.example.params)"></pre>
          </div>
-         <div class="path-view-subcard" x-show="preview.example.query && Object.keys(preview.example.query).length">
-          <label>Query parameters</label>
-          <pre class="path-view-pre" x-text="formatValue(preview.example.query)"></pre>
+         <div class="path-view-data-group" x-show="preview.example.query && Object.keys(preview.example.query).length">
+          <span class="data-group-label">Query parameters</span>
+          <pre class="path-view-code" x-text="formatValue(preview.example.query)"></pre>
          </div>
-         <div class="path-view-subcard" x-show="preview.example.headers && Object.keys(preview.example.headers).length">
-          <label>Request headers</label>
-          <pre class="path-view-pre" x-text="formatValue(preview.example.headers)"></pre>
+         <div class="path-view-data-group" x-show="preview.example.headers && Object.keys(preview.example.headers).length">
+          <span class="data-group-label">Request headers</span>
+          <pre class="path-view-code" x-text="formatValue(preview.example.headers)"></pre>
          </div>
-         <div class="path-view-empty-note" x-show="(!preview.example.params || !Object.keys(preview.example.params).length) && (!preview.example.query || !Object.keys(preview.example.query).length) && (!preview.example.headers || !Object.keys(preview.example.headers).length)">
+         <div class="path-view-empty-hint" x-show="(!preview.example.params || !Object.keys(preview.example.params).length) && (!preview.example.query || !Object.keys(preview.example.query).length) && (!preview.example.headers || !Object.keys(preview.example.headers).length)">
           No path parameters, query parameters, or custom request headers.
          </div>
-         <div class="path-view-subcard">
-          <label x-text="'Request body · ' + (preview.example.body_mode || 'json')"></label>
-          <pre class="path-view-pre" x-text="formatValue(preview.example.body_mode === 'form' ? preview.example.form || {} : preview.example.raw_body || preview.example.body || {})"></pre>
+         <div class="path-view-data-group">
+          <span class="data-group-label" x-text="'Request body · ' + (preview.example.body_mode || 'json')"></span>
+          <pre class="path-view-code" x-text="formatValue(preview.example.body_mode === 'form' ? preview.example.form || {} : preview.example.raw_body || preview.example.body || {})"></pre>
          </div>
         </div>
        </section>
       </div>
 
-      <!-- Right Column: Response Mock Details -->
-      <div class="path-view-col">
-       <!-- Effective Response Headers Card -->
-       <section class="path-view-card">
-        <header class="path-view-card-header">
-         <h4><span aria-hidden="true">☵</span> Response Headers</h4>
+      <!-- Right Pane: Response Headers & Response Body -->
+      <div class="path-view-pane">
+       <!-- Response Headers -->
+       <section class="path-view-section">
+        <div class="path-view-section-head">
+         <h4><span class="section-icon" aria-hidden="true">☵</span> Response Headers</h4>
          <span class="path-view-count" x-text="(Object.keys(preview.headers || {}).length) + ' headers'"></span>
-        </header>
-        <div class="path-view-card-body">
-         <p class="help">Cascade includes header nodes along this path and response node overrides.</p>
-         <pre class="path-view-pre" x-show="preview.headers && Object.keys(preview.headers).length" x-text="formatValue(preview.headers)"></pre>
-         <div class="path-view-empty-note" x-show="!preview.headers || !Object.keys(preview.headers).length">
+        </div>
+        <div class="path-view-section-body">
+         <p class="path-view-section-hint">Cascade includes header nodes along this path and response node overrides.</p>
+         <pre class="path-view-code" x-show="preview.headers && Object.keys(preview.headers).length" x-text="formatValue(preview.headers)"></pre>
+         <div class="path-view-empty-hint" x-show="!preview.headers || !Object.keys(preview.headers).length">
           No additional response headers configured along this path.
          </div>
         </div>
        </section>
 
-       <!-- Response Body Card -->
-       <section class="path-view-card">
-        <header class="path-view-card-header">
+       <!-- Response Body -->
+       <section class="path-view-section">
+        <div class="path-view-section-head">
          <div class="flex items-center gap-2">
-          <h4><span aria-hidden="true">↵</span> Response Body</h4>
-          <span class="type-pill" x-text="preview.responseMode === 'dynamic' ? 'Dynamic' : 'Static'"></span>
+          <h4><span class="section-icon" aria-hidden="true">↵</span> Response Body</h4>
+          <span class="v2-sample" :class="preview.responseMode === 'dynamic' ? 'is-dynamic' : 'is-static'" x-text="preview.responseMode === 'dynamic' ? 'Dynamic' : 'Static'"></span>
          </div>
          <button type="button" class="btn text-xs" @click="copyText(preview.body ? formatValue(preview.body) : '', 'Response body copied')">Copy body</button>
-        </header>
-        <div class="path-view-card-body">
-         <div class="path-view-dynamic-banner" x-show="preview.responseMode === 'dynamic'">
-          <span>Dynamic JSON template. Use Playground to inspect rendered output with evaluated variables.</span>
+        </div>
+        <div class="path-view-section-body">
+         <div class="path-view-dynamic-hint" x-show="preview.responseMode === 'dynamic'">
+          <span>Dynamic JSON template. Use Playground to inspect evaluated variables and functions.</span>
          </div>
-         <pre class="path-view-pre response-body-pre" x-text="preview.body ? formatValue(preview.body) : '(empty body)'"></pre>
+         <pre class="path-view-code path-view-response-code" x-text="preview.body ? formatValue(preview.body) : '(empty body)'"></pre>
         </div>
        </section>
       </div>

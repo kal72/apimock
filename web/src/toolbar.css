@@ -170,6 +170,33 @@
   box-shadow: 0 0 8px #60a5fa30;
 }
 
+/* GitHub Link Pill */
+.v2-github-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 29px;
+  height: 29px;
+  border-radius: 18px;
+  border: 1px solid var(--v2-border);
+  background: var(--v2-soft);
+  color: var(--v2-muted);
+  text-decoration: none;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.v2-github-link .v2-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.v2-github-link:hover {
+  border-color: var(--v2-blue);
+  color: var(--v2-ink);
+  background: var(--v2-tint);
+}
+
 .v2-header-divider {
   height: 20px;
   width: 1px;
@@ -572,7 +599,8 @@
   padding: 4px 0;
 }
 
-.workspace-settings-panel button {
+.workspace-settings-panel button,
+.workspace-settings-panel a {
   display: flex;
   align-items: center;
   gap: 9px;
@@ -584,23 +612,28 @@
   background: transparent;
   font-size: 11px;
   color: var(--v2-ink);
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
-.workspace-settings-panel button > span:first-child {
+.workspace-settings-panel button > span:first-child,
+.workspace-settings-panel a > span:first-child {
   width: 16px;
   text-align: center;
   font-size: 15px;
   color: var(--v2-blue);
 }
 
-.workspace-settings-panel button small {
+.workspace-settings-panel button small,
+.workspace-settings-panel a small {
   display: block;
   margin-top: 2px;
   font-size: 9.5px;
   color: var(--v2-muted);
 }
 
-.workspace-settings-panel button:hover {
+.workspace-settings-panel button:hover,
+.workspace-settings-panel a:hover {
   background: var(--v2-tint);
   color: var(--v2-blue);
 }

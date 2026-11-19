@@ -11,6 +11,8 @@ templ Page() {
   <script>
    try { const value = localStorage.getItem('mocklab-theme'); const night = value === 'night' || !['light','night'].includes(value) && matchMedia('(prefers-color-scheme: dark)').matches; document.documentElement.dataset.theme = night ? 'night' : 'light'; document.documentElement.style.colorScheme = night ? 'dark' : 'light'; } catch { document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'light'; }
   </script>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg"/>
+  <link rel="alternate icon" type="image/x-icon" href="/assets/favicon.ico"/>
   <link rel="stylesheet" href="/assets/app.css"/>
   <script type="module" src="/assets/app.js"></script>
  </head>
@@ -59,7 +61,6 @@ templ Sidebar() {
 			<button type="button" class="v2-nav-item" :class="navPage === 'endpoints' && !modal && 'v2-active'" :aria-current="navPage === 'endpoints' ? 'page' : 'false'" @click="openPage('endpoints')"><span>⌘</span>Endpoints</button>
 			<button type="button" class="v2-nav-item" :class="navPage === 'environments' && 'v2-active'" :aria-current="navPage === 'environments' ? 'page' : 'false'" @click="openPage('environments')"><span>◈</span>Environments</button>
 			<button type="button" class="v2-nav-item" x-show="workspace" x-cloak :class="navPage === 'settings' && 'v2-active'" :aria-current="navPage === 'settings' ? 'page' : 'false'" @click="openPage('settings')"><span>⚙</span>Settings</button>
-			<a class="v2-nav-item" href="/docs/generators" target="_blank" rel="noopener"><span>≡</span>Docs &amp; Reference ↗</a>
 		</nav>
 		<section class="v2-endpoint-list">
 			<header>
@@ -78,10 +79,10 @@ templ Sidebar() {
 		</section>
 		<div class="sidebar-bottom v2-sidebar-note">
 			<span class="v2-kicker">API WORKSPACE</span>
-			<p>Build before the backend.<br/>One workspace. Endless possibilities.</p>
+			<a class="v2-sidebar-docs-link" href="/docs/generators" target="_blank" rel="noopener">Docs &amp; Reference ↗</a>
 			<div class="v2-sidebar-meta" x-show="workspace" x-cloak>
 				<span class="v2-sample" x-text="(workspace?.role || 'viewer') + ' access'"></span>
-				<button type="button" class="v2-copy-base-inline" @click="copyBaseURL()">Copy base URL ↗</button>
+				<button type="button" class="v2-copy-base-inline" :title="baseURL" @click="copyBaseURL()">Copy base URL ↗</button>
 			</div>
 		</div>
 	</aside>
@@ -90,10 +91,10 @@ templ Sidebar() {
 templ WorkspaceSwitcher() {
 	<div class="workspace-picker" @keydown.escape.stop.prevent="workspaceMenuOpen=false; $refs.workspaceSettings?.focus()" @click.outside="workspaceMenuOpen=false" @focusout="if (!$el.contains($event.relatedTarget)) workspaceMenuOpen=false">
 		<div class="workspace-picker-row"><select id="workspace-select" class="workspace-select" aria-label="Select workspace" x-model="workspaceID" @change="workspaceMenuOpen=false; selectWorkspace(workspaceID)"><option value="">Select workspace</option><template x-for="w in workspaces" :key="w.id"><option :value="w.id" x-text="w.name"></option></template></select><button type="button" class="workspace-settings-trigger" x-show="workspace &amp;&amp; canManageWorkspace" x-cloak x-ref="workspaceSettings" aria-label="Workspace settings" title="Workspace settings" aria-controls="workspace-settings-panel" :aria-expanded="workspaceMenuOpen" @click="workspaceMenuOpen=!workspaceMenuOpen" @keydown.arrow-down.prevent="workspaceMenuOpen=true; $nextTick(()=>$refs.workspaceEdit.focus())"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" stroke="currentColor" stroke-width="1.5"></path><path d="m9 3-.6 2-2 .9-2-.5-2 3.4 1.4 1.5v2.4L2.4 14l2 3.4 2-.5 2 .9.6 2h4l.6-2 2-.9 2 .5 2-3.4-1.4-1.3v-2.4l1.4-1.5-2-3.4-2 .5-2-.9-.6-2H9Z" transform="translate(1 1)" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path></svg></button></div>
-		<div class="workspace-base-url-pill" x-show="workspace" x-cloak @click="copyBaseURL()" title="Click to copy workspace base URL">
+		<div class="workspace-base-url-pill" x-show="workspace" x-cloak @click="copyBaseURL()" :title="baseURL">
 			<span class="base-url-tag">BASE</span>
-			<span class="base-url-text truncate" x-text="baseURL"></span>
-			<button type="button" class="base-url-copy-btn" aria-label="Copy base URL" @click.stop="copyBaseURL()">
+			<span class="base-url-text truncate" x-text="baseURL" :title="baseURL"></span>
+			<button type="button" class="base-url-copy-btn" :title="baseURL" aria-label="Copy base URL" @click.stop="copyBaseURL()">
 				<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
 			</button>
 		</div>
@@ -101,7 +102,7 @@ templ WorkspaceSwitcher() {
 			<div class="workspace-settings-heading"><span>WORKSPACE SETTINGS</span><strong x-text="workspace?.name"></strong></div>
 			<div class="workspace-settings-actions">
 				<button type="button" x-ref="workspaceEdit" @click="workspaceMenuOpen=false; openWorkspace(workspace)"><span aria-hidden="true">✎</span><span>Edit workspace<small>Name and base path</small></span></button>
-				<button type="button" @click="workspaceMenuOpen=false; copyBaseURL()"><span aria-hidden="true">📋</span><span>Copy base URL<small>Copy public mock URL</small></span></button>
+				<a class="workspace-action-link" :href="publicDocsURL" target="_blank" rel="noopener" @click="workspaceMenuOpen=false"><span aria-hidden="true">📖</span><span>Public API docs ↗<small>Browse interactive docs portal</small></span></a>
 				<button type="button" @click="workspaceMenuOpen=false; openMembers()"><span aria-hidden="true">♙</span><span>Manage members<small>People and access roles</small></span></button>
 			</div>
 			<button type="button" class="workspace-delete-action" @click="workspaceMenuOpen=false; removeWorkspace()"><span aria-hidden="true">⌫</span><span>Delete workspace<small>Remove all endpoints</small></span></button>
@@ -139,14 +140,17 @@ templ Toolbar() {
 		<div class="topbar-actions v2-header-actions">
 			<span class="topbar-saved v2-saved" x-show="navPage === 'endpoints' && endpoint && !dirty" x-cloak>@V2Icon("check") Saved</span>
 			<span class="topbar-unsaved" x-show="navPage === 'endpoints' && endpoint && dirty" x-cloak :title="canEditWorkspace ? 'Unsaved changes · Save via draft bar or Ctrl+S' : 'Unsaved changes'" @click="canEditWorkspace && readyToSave && saveEndpoint()"><span aria-hidden="true">●</span> <span x-text="busy ? 'Saving…' : 'Unsaved'"></span></span>
+			<a href="https://github.com/kal72/apimock" target="_blank" rel="noopener noreferrer" class="v2-github-link" title="GitHub: kal72/apimock" aria-label="Mocklab on GitHub">
+				@V2Icon("github")
+			</a>
 			@ThemeSwitch()
 			<span class="v2-header-divider" x-show="currentUser" x-cloak aria-hidden="true"></span>
 			<div class="account-popover v2-account-wrap" x-show="currentUser" x-cloak @click.outside="accountOpen=false">
-    <button type="button" class="account-trigger v2-account" x-ref="accountTrigger" aria-label="Account settings" aria-controls="account-settings-panel" :aria-expanded="accountOpen" @click="accountOpen=!accountOpen" @keydown.arrow-down.prevent="accountOpen=true; $nextTick(()=>(currentUser?.role === 'admin' ? $refs.userAction : $refs.passwordAction).focus())">@V2Icon("user")<span class="account-first-name" x-text="currentUser?.name?.trim().split(/\s+/)[0] || 'Account'"></span><span class="account-chevron v2-chevron" aria-hidden="true">⌄</span></button>
+    <button type="button" class="account-trigger v2-account" x-ref="accountTrigger" aria-label="Account settings" aria-controls="account-settings-panel" :aria-expanded="accountOpen" @click="accountOpen=!accountOpen" @keydown.arrow-down.prevent="accountOpen=true; $nextTick(()=>($refs.apiKeysAction || $refs.userAction || $refs.passwordAction).focus())">@V2Icon("user")<span class="account-first-name" x-text="currentUser?.name?.trim().split(/\s+/)[0] || 'Account'"></span><span class="account-chevron v2-chevron" aria-hidden="true">⌄</span></button>
     <section id="account-settings-panel" class="account-settings-panel v2-account-menu" aria-label="Account settings" x-show="accountOpen" x-cloak x-transition.opacity.duration.100ms>
      <div class="account-panel-heading"><div><strong x-text="currentUser?.name"></strong><span x-text="'@' + (currentUser?.username || '')"></span></div><span class="type-pill v2-sample" x-text="currentUser?.role"></span></div>
 
-     <div class="account-panel-actions"><button type="button" x-ref="userAction" x-show="currentUser?.role === 'admin'" @click="accountOpen=false; openUsers()"><span aria-hidden="true">♙</span> User management</button><button type="button" x-ref="passwordAction" @click="accountOpen=false; openPassword()"><span aria-hidden="true">⚿</span> Change password</button></div>
+     <div class="account-panel-actions"><button type="button" x-ref="apiKeysAction" @click="accountOpen=false; openApiKeys()"><span aria-hidden="true">🔑</span> MCP API Keys</button><button type="button" x-ref="userAction" x-show="currentUser?.role === 'admin'" @click="accountOpen=false; openUsers()"><span aria-hidden="true">♙</span> User management</button><button type="button" x-ref="passwordAction" @click="accountOpen=false; openPassword()"><span aria-hidden="true">⚿</span> Change password</button></div>
      <button type="button" class="account-signout" @click="accountOpen=false; logout()"><span aria-hidden="true">↪</span> Sign out</button>
     </section>
    </div>
@@ -168,9 +172,9 @@ templ EndpointBar() {
    </div>
   </div>
   <div class="v2-route-actions">
-   <div class="base-url v2-base-url" title="Click to copy workspace base URL" @click="copyBaseURL()">
-    <span>Base URL:</span>
-    <code x-text="baseURL"></code>
+   <div class="base-url v2-base-url" :title="endpointURL" @click="copyURL()">
+    <span>URL:</span>
+    <code x-text="endpointURL" :title="endpointURL"></code>
    </div>
    <button type="button" class="v2-copy-url" @click="copyURL()" aria-label="Copy endpoint URL">@V2Icon("copy") Copy URL</button>
    <div class="view-switch v2-segment" role="group" aria-label="Editor view mode">
@@ -193,7 +197,7 @@ templ FlowValidation() {
 
 templ FlowCanvas() {
  <section class="canvas-section v2-canvas-panel" x-show="mode === 'node'">
-  <header class="canvas-toolbar v2-canvas-header"><div><strong>Visual flow <span class="first-match-note v2-sample" x-show="branchModel">First match wins</span><span class="first-match-note v2-sample" x-show="!branchModel">Legacy graph · connections preserved</span></strong><span class="v2-node-count" x-text="endpoint.flow.nodes.length + ' nodes'"></span></div><div class="canvas-actions"><button type="button" x-show="canEditWorkspace" class="v2-add-condition" @click="openAddScenario()">+ Add condition</button></div></header>
+  <header class="canvas-toolbar v2-canvas-header"><div><strong>Visual flow <span class="first-match-note v2-sample" x-show="branchModel">First match wins</span><span class="first-match-note v2-sample" x-show="!branchModel">Legacy graph · connections preserved</span></strong><span class="v2-node-count" x-text="endpoint.flow.nodes.length + ' nodes'"></span></div><div class="canvas-actions"><button type="button" x-show="canEditWorkspace" class="v2-add-condition" @click="openAddScenario()">+ Add scenario</button></div></header>
   <div class="canvas-scroll v2-canvas" :class="pan && 'is-panning'" @pointerdown="startCanvasPan($event)"><div class="canvas-extent" :style="`width:${canvasWidth * zoom}px;height:${canvasHeight * zoom}px`"><div class="flow-canvas v2-graph" :style="`width:${canvasWidth}px;height:${canvasHeight}px;transform:scale(${zoom})`" @pointermove.window="moveNode($event)" @pointerup.window="drag = null; pan = null" @pointercancel.window="drag = null; pan = null">
    <template x-for="edge in canvasEdges" :key="edge.from + ':' + (edge.branch || '')">
     <svg class="connections v2-connections" :width="canvasWidth" :height="canvasHeight" aria-label="Flow connections">
@@ -206,7 +210,7 @@ templ FlowCanvas() {
    <template x-for="node in endpoint.flow.nodes" :key="node.id">
     <article class="flow-node v2-node" :class="[node.type, 'v2-node-' + (branchModel?.fallback.id === node.id ? 'default' : node.type === 'request' ? 'incoming' : node.type), node.id === highlightedNodeID && 'recent-node', trace.includes(node.id) && 'executed', connecting?.from === node.id && 'connecting', !branchModel && 'is-legacy-node']" :style="`left:${node.x}px;top:${node.y}px`">
      <div class="node-priority v2-priority" x-show="branchModel && node.type === 'condition'"><span x-text="'Priority #' + priorityFor(node.id)"></span><button x-show="canEditWorkspace" type="button" aria-label="Increase condition priority" :disabled="priorityFor(node.id) === 1" @click="changePriority(node.id, priorityFor(node.id)-1)">↑</button><button x-show="canEditWorkspace" type="button" aria-label="Decrease condition priority" :disabled="priorityFor(node.id) === branchModel?.branches.length" @click="changePriority(node.id, priorityFor(node.id)+1)">↓</button></div>
-     <div class="node-heading v2-node-top" @pointerdown="canEditWorkspace && startDrag($event, node)"><span class="node-icon v2-node-icon" x-text="branchModel?.fallback.id === node.id ? '!' : node.type === 'request' ? '↪' : node.type === 'response' ? '⌘' : node.type === 'condition' ? conditionIcon(node.config) : nodeIcon(node.type)"></span><strong x-text="node.label"></strong><button type="button" x-show="canEditWorkspace" class="node-edit" @pointerdown.stop @click="editNodeScenario(node)" :aria-label="'Edit ' + node.label">✎</button></div>
+     <div class="node-heading v2-node-top" @pointerdown="canEditWorkspace && startDrag($event, node)"><span class="node-icon v2-node-icon" x-text="branchModel?.fallback.id === node.id ? '!' : node.type === 'request' ? '↪' : node.type === 'response' ? '⌘' : node.type === 'condition' ? conditionIcon(node.config) : nodeIcon(node.type)"></span><strong x-text="node.label"></strong><button type="button" x-show="canEditWorkspace" class="node-edit" @pointerdown.stop @click="editNodeScenario(node)" :aria-label="'Edit ' + node.label" title="Edit node">✎</button><button type="button" x-show="canEditWorkspace && node.type === 'condition'" class="node-delete v2-node-delete" @pointerdown.stop @click="removeScenarioCondition(node.id)" :aria-label="'Delete condition ' + node.label" title="Delete condition">✕</button></div>
      <p class="v2-node-subtitle" x-text="branchModel?.fallback.id === node.id ? node.config.status + ' · Always last' : nodeSummary(node)"></p>
      <span class="v2-port v2-port-in" x-show="node.type !== 'request'"></span>
      <span class="v2-port v2-port-out" x-show="node.type !== 'response'"></span>
@@ -232,7 +236,7 @@ templ TableEditor() {
 				</div>
 				<p class="scenario-heading-desc">Independent execution paths evaluated from top to bottom. The first matching rule wins; default response acts as the terminal fallback.</p>
 			</div>
-			<button type="button" x-show="canEditWorkspace" class="v2-primary v2-add-condition-btn" @click="openAddScenario()">+ Add condition</button>
+			<button type="button" x-show="canEditWorkspace" class="v2-primary v2-add-condition-btn" @click="openAddScenario()">+ Add scenario</button>
 		</header>
 		<div class="table-overflow v2-table-wrap">
 			<table class="v2-table scenario-table">
@@ -301,8 +305,9 @@ templ TableEditor() {
 							</td>
 							<td class="scenario-actions-cell">
 								<div class="table-row-actions">
-									<button type="button" class="v2-btn-action scenario-view-btn" @click="viewScenario(row)" :aria-label="'View path ' + row.label" title="View path preview and execution trace">View</button>
-									<button type="button" x-show="canEditWorkspace" class="v2-btn-action primary scenario-edit-btn" @click="editScenario(row)" :aria-label="'Edit path ' + row.label" title="Edit scenario response, conditions, and headers">Edit ↗</button>
+									<button type="button" class="v2-btn-action scenario-view-btn" @click="viewScenario(row)" :aria-label="'View scenario ' + row.label" title="View scenario details and execution trace">View</button>
+									<button type="button" x-show="canEditWorkspace" class="v2-btn-action primary scenario-edit-btn" @click="editScenario(row)" :aria-label="'Edit scenario ' + row.label" title="Edit scenario response, conditions, and headers"><span>Edit</span> <span class="v2-btn-arrow" aria-hidden="true">↗</span></button>
+									<button type="button" x-show="canEditWorkspace &amp;&amp; !row.isDefault" class="v2-btn-action danger scenario-delete-btn" @click="removeScenarioRow(row)" :aria-label="'Delete scenario ' + row.label" title="Delete scenario">✕</button>
 								</div>
 							</td>
 						</tr>
@@ -373,144 +378,84 @@ templ TestPanel() {
 
 templ Dialogs() {
  <div class="modal-backdrop" x-show="modal" x-cloak @click.self="modal = null" role="presentation">
-  <section class="modal" :class="{'scenario-modal': modal === 'scenario', 'path-view-modal': modal === 'view', 'users-modal': modal === 'users', 'environments-modal': modal === 'environments'}" role="dialog" aria-modal="true" :aria-label="modalTitle" x-trap.noscroll="modal" @keydown.ctrl.enter.prevent="commitModal()">
+  <section class="modal" :class="{'scenario-modal': modal === 'scenario', 'path-view-modal': modal === 'view', 'users-modal': modal === 'users', 'environments-modal': modal === 'environments', 'api-keys-modal': modal === 'api-keys'}" role="dialog" aria-modal="true" :aria-label="modalTitle" x-trap.noscroll="modal" @keydown.ctrl.enter.prevent="commitModal()">
    <header><div><span class="eyebrow">MOCKLAB BUILDER</span><h2 x-text="modalTitle"></h2></div><button @click="modal = null" aria-label="Close dialog">✕</button></header>
    <template x-if="modal === 'view' && preview">
     <div class="path-view-container">
+     <!-- Route & Status Row -->
      <div class="path-view-hero">
-      <div class="path-view-hero-top">
-       <div class="path-view-route-badge">
-        <span class="route-method" x-text="preview.method"></span>
-        <code class="path-view-route-path" x-text="preview.path"></code>
-        <strong class="path-view-route-name" x-text="preview.name"></strong>
-       </div>
-       <div class="path-view-badges">
-        <span class="path-view-status-badge" :class="preview.status >= 500 ? 'status-5xx' : preview.status >= 400 ? 'status-4xx' : preview.status >= 300 ? 'status-3xx' : 'status-2xx'" x-text="'HTTP ' + preview.status"></span>
-        <span class="path-view-pill" x-text="preview.delay ? preview.delay + ' ms delay' : '0 ms delay'"></span>
-        <span class="default-tag" x-show="preview.isDefault">DEFAULT PATH</span>
-        <span class="path-view-pill" x-show="!preview.isDefault && preview.conditions.length" x-text="preview.conditions.length + (preview.conditions.length === 1 ? ' condition' : ' conditions')"></span>
-        <span class="type-pill" x-text="preview.responseMode === 'dynamic' ? 'Dynamic' : 'Static'"></span>
-        <span class="view-draft-note" x-show="dirty">Draft preview</span>
-       </div>
+      <div class="path-view-hero-left">
+       <span class="v2-method" :class="'v2-' + preview.method.toLowerCase()" x-text="preview.method"></span>
+       <code class="path-view-hero-path" x-text="preview.path"></code>
+       <span class="path-view-hero-name" x-show="preview.name" x-text="preview.name"></span>
       </div>
-      <div class="path-view-url-row">
-       <span class="path-view-url-tag">ENDPOINT URL</span>
-       <code class="path-view-url-code" x-text="preview.url"></code>
-       <button type="button" class="path-view-copy-btn" @click="copyText(preview.url, 'Endpoint URL copied')" title="Copy URL">Copy URL ↗</button>
+      <div class="path-view-hero-right">
+       <span class="v2-status-pill" :class="preview.status >= 500 ? 'status-5xx' : preview.status >= 400 ? 'status-4xx' : preview.status >= 300 ? 'status-3xx' : 'status-2xx'">
+        <strong x-text="'HTTP ' + preview.status"></strong>
+        <span x-show="preview.statusText" x-text="preview.statusText"></span>
+       </span>
+       <span class="v2-sample" x-show="preview.delay" x-text="preview.delay + 'ms delay'"></span>
       </div>
      </div>
 
-     <div class="path-view-grid">
-      <!-- Left Column: Request Specs & Matching Rules -->
-      <div class="path-view-col">
-       <!-- Routing Conditions Card -->
-       <section class="path-view-card">
-        <header class="path-view-card-header">
-         <h4><span aria-hidden="true">⚡</span> Routing Conditions</h4>
-         <span class="path-view-count" x-text="preview.conditions.length ? preview.conditions.length + (preview.conditions.length === 1 ? ' rule' : ' rules') : 'Unconditional'"></span>
-        </header>
-        <div class="path-view-card-body">
-         <div class="path-view-callout" x-show="!preview.conditions.length">
-          <strong x-text="preview.isDefault && conditions.length ? 'Fallback Scenario (Default)' : 'Unconditional Scenario'"></strong>
-          <p class="help" x-text="preview.isDefault && conditions.length ? 'Executes when no preceding condition matches incoming requests.' : 'Executes for all requests matching this endpoint path.'"></p>
-         </div>
-         <div class="path-view-conditions-list" x-show="preview.conditions.length">
-          <template x-for="(condition, index) in preview.conditions" :key="index">
-           <div class="path-view-condition-box">
-            <div class="condition-box-header">
-             <div class="condition-box-tags">
-              <span class="condition-kind-badge" x-text="condition.condition_type"></span>
-              <span class="condition-match-badge" x-text="condition.match === 'any' ? 'OR' : 'AND'"></span>
-              <span class="condition-extra-badge" x-show="condition.condition_type === 'body'" x-text="condition.body_mode + (condition.body_mode === 'raw' ? ' · ' + condition.raw_format : '')"></span>
-             </div>
-             <span class="condition-outcome" :class="condition.matched ? 'outcome-match' : 'outcome-nomatch'" x-text="condition.matched ? 'Matches' : 'Does not match'"></span>
-            </div>
-            <div class="condition-box-rules">
-             <template x-for="(rule, ruleIndex) in condition.rules" :key="ruleIndex">
-              <div class="view-rule-item">
-               <div class="view-rule-header">
-                <code class="view-rule-field" x-text="rule.field"></code>
-                <span class="view-rule-op" x-text="rule.operator"></span>
-                <span class="view-rule-req" x-show="rule.required">Required</span>
-               </div>
-               <pre class="view-rule-val" x-show="!['exists','empty'].includes(rule.operator)" x-text="formatValue(rule.value)"></pre>
-              </div>
-             </template>
-            </div>
-           </div>
+     <!-- Endpoint URL Bar with Copy Button -->
+     <div class="path-view-url-strip">
+      <code class="path-view-url-val" x-text="preview.url"></code>
+      <button type="button" class="path-view-url-copy" @click="copyText(preview.url, 'Endpoint URL copied')">Copy URL</button>
+     </div>
+
+     <!-- Scenario Section -->
+     <div class="path-view-section">
+      <div class="path-view-section-header">
+       <span class="path-view-label">SCENARIO</span>
+      </div>
+      <div class="path-view-condition-box">
+       <span class="path-view-chip is-default" x-show="preview.isDefault">Default fallback</span>
+       <span class="path-view-chip is-unconditional" x-show="!preview.isDefault && !preview.conditions.length">Unconditional</span>
+       <div class="path-view-rules-compact" x-show="preview.conditions.length">
+        <template x-for="(condition, cIdx) in preview.conditions" :key="cIdx">
+         <div class="path-view-cond-item">
+          <span class="condition-match-badge" x-show="preview.conditions.length > 1" x-text="condition.match === 'any' ? 'OR' : 'AND'"></span>
+          <template x-for="(rule, rIdx) in condition.rules" :key="rIdx">
+           <span class="path-view-rule-chip">
+            <code class="rule-field" x-text="rule.field"></code>
+            <span class="rule-op" x-text="rule.operator"></span>
+            <code class="rule-val" x-show="!['exists','empty'].includes(rule.operator)" x-text="formatValue(rule.value)"></code>
+            <span class="rule-req" x-show="rule.required" title="Required">*</span>
+           </span>
           </template>
          </div>
-        </div>
-       </section>
-
-       <!-- Example Request Data Card -->
-       <section class="path-view-card">
-        <header class="path-view-card-header">
-         <h4><span aria-hidden="true">⇥</span> Example Request Data</h4>
-         <span class="path-view-badge" x-text="'Body: ' + (preview.example.body_mode || 'json')"></span>
-        </header>
-        <div class="path-view-card-body">
-         <div class="path-view-subcard" x-show="preview.example.params && Object.keys(preview.example.params).length">
-          <label>Path parameters</label>
-          <pre class="path-view-pre" x-text="formatValue(preview.example.params)"></pre>
-         </div>
-         <div class="path-view-subcard" x-show="preview.example.query && Object.keys(preview.example.query).length">
-          <label>Query parameters</label>
-          <pre class="path-view-pre" x-text="formatValue(preview.example.query)"></pre>
-         </div>
-         <div class="path-view-subcard" x-show="preview.example.headers && Object.keys(preview.example.headers).length">
-          <label>Request headers</label>
-          <pre class="path-view-pre" x-text="formatValue(preview.example.headers)"></pre>
-         </div>
-         <div class="path-view-empty-note" x-show="(!preview.example.params || !Object.keys(preview.example.params).length) && (!preview.example.query || !Object.keys(preview.example.query).length) && (!preview.example.headers || !Object.keys(preview.example.headers).length)">
-          No path parameters, query parameters, or custom request headers.
-         </div>
-         <div class="path-view-subcard">
-          <label x-text="'Request body · ' + (preview.example.body_mode || 'json')"></label>
-          <pre class="path-view-pre" x-text="formatValue(preview.example.body_mode === 'form' ? preview.example.form || {} : preview.example.raw_body || preview.example.body || {})"></pre>
-         </div>
-        </div>
-       </section>
+        </template>
+       </div>
       </div>
+     </div>
 
-      <!-- Right Column: Response Mock Details -->
-      <div class="path-view-col">
-       <!-- Effective Response Headers Card -->
-       <section class="path-view-card">
-        <header class="path-view-card-header">
-         <h4><span aria-hidden="true">☵</span> Response Headers</h4>
-         <span class="path-view-count" x-text="(Object.keys(preview.headers || {}).length) + ' headers'"></span>
-        </header>
-        <div class="path-view-card-body">
-         <p class="help">Cascade includes header nodes along this path and response node overrides.</p>
-         <pre class="path-view-pre" x-show="preview.headers && Object.keys(preview.headers).length" x-text="formatValue(preview.headers)"></pre>
-         <div class="path-view-empty-note" x-show="!preview.headers || !Object.keys(preview.headers).length">
-          No additional response headers configured along this path.
-         </div>
-        </div>
-       </section>
+     <!-- Response Body -->
+     <div class="path-view-section">
+      <div class="path-view-section-header">
+       <span class="path-view-label">RESPONSE BODY</span>
+       <button type="button" class="path-view-copy-btn" @click="copyText(preview.body ? formatValue(preview.body) : '', 'Response body copied')">Copy</button>
+      </div>
+      <pre class="path-view-code" x-text="preview.body ? formatValue(preview.body) : '(empty body)'"></pre>
+     </div>
 
-       <!-- Response Body Card -->
-       <section class="path-view-card">
-        <header class="path-view-card-header">
-         <div class="flex items-center gap-2">
-          <h4><span aria-hidden="true">↵</span> Response Body</h4>
-          <span class="type-pill" x-text="preview.responseMode === 'dynamic' ? 'Dynamic' : 'Static'"></span>
-         </div>
-         <button type="button" class="btn text-xs" @click="copyText(preview.body ? formatValue(preview.body) : '', 'Response body copied')">Copy body</button>
-        </header>
-        <div class="path-view-card-body">
-         <div class="path-view-dynamic-banner" x-show="preview.responseMode === 'dynamic'">
-          <span>Dynamic JSON template. Use Playground to inspect rendered output with evaluated variables.</span>
-         </div>
-         <pre class="path-view-pre response-body-pre" x-text="preview.body ? formatValue(preview.body) : '(empty body)'"></pre>
+     <!-- Response Headers (Only shown if custom headers configured) -->
+     <div class="path-view-section" x-show="preview.headers && Object.keys(preview.headers).length">
+      <div class="path-view-section-header">
+       <span class="path-view-label">RESPONSE HEADERS</span>
+      </div>
+      <div class="path-view-headers-list">
+       <template x-for="(val, key) in (preview.headers || {})" :key="key">
+        <div class="path-view-header-item">
+         <code class="header-name" x-text="key + ':'"></code>
+         <code class="header-value" x-text="val"></code>
         </div>
-       </section>
+       </template>
       </div>
      </div>
 
      <footer class="scenario-popup-footer">
-      <span class="help">Read-only configuration preview. No live API request is executed.</span>
+      <div></div>
       <button type="button" class="btn primary" @click="modal=null">Close</button>
      </footer>
     </div>
@@ -723,7 +668,7 @@ templ Dialogs() {
         <span class="condition-source-badge" x-text="conditionIcon(condition.config) + ' ' + conditionKindLabel(condition.config)"></span>
         <span class="type-pill" x-show="!condition.matched">Previous condition did not match</span>
        </div>
-       <button type="button" class="text-button danger-text" x-show="condition.matched && !scenarioIsNew && !scenarioScope" @click="removeScenarioCondition(condition.id)">Delete condition</button>
+       <button type="button" class="text-button danger-text" x-show="condition.matched &amp;&amp; !scenarioIsNew &amp;&amp; (!scenarioScope || scenarioScope.type === 'condition')" @click="removeScenarioCondition(condition.id)">Delete condition</button>
       </div>
       <label>Condition name<input x-model="condition.label" placeholder="e.g. Require auth token"/></label>
       <div class="insertion-controls">
@@ -736,7 +681,7 @@ templ Dialogs() {
       <div class="condition-rules-scroll"><div class="condition-rules-head"><span>FIELD</span><span>OPERATOR</span><span>VALUE</span><span>REQUIRED</span><span></span></div><template x-for="(rule,index) in condition.config.rules" :key="index"><div class="condition-rule-row"><template x-if="condition.config.condition_type === 'path'"><select aria-label="Path parameter field" x-model="rule.field"><option value="">Select parameter</option><template x-for="field in availablePathFields" :key="field"><option :value="field" x-text="field"></option></template></select></template><template x-if="condition.config.condition_type !== 'path'"><input aria-label="Condition field" x-model="rule.field" :readonly="condition.config.condition_type === 'body' && condition.config.body_mode === 'raw' && condition.config.raw_format === 'text'" :placeholder="condition.config.condition_type === 'header' ? 'Authorization' : condition.config.condition_type === 'query' ? 'page' : 'user.email'"/></template><select aria-label="Condition operator" x-model="rule.operator"><option value="exists">Exists</option><option value="equals">Equals</option><option value="not_equals">Not equals</option><option value="contains">Contains</option><option value="empty">Empty / missing</option></select><input aria-label="Condition value" x-model="rule.value" :disabled="['exists','empty'].includes(rule.operator)" :placeholder="['exists','empty'].includes(rule.operator) ? 'Not needed' : 'Comparison value'"/><label class="required-check"><input type="checkbox" x-model="rule.required" aria-label="Field must not be empty"/><span>Required</span></label><button type="button" @click="condition.config.rules.splice(index,1)" :disabled="condition.config.rules.length === 1" aria-label="Delete condition field">✕</button></div></template></div>
       <p class="help">Required: the field must be present and nonempty for this rule to match. Null, whitespace, and empty objects/arrays are rejected; 0 and false remain valid. Exists without Required only checks presence. OR matches when any rule is satisfied.</p>
      </div></template>
-     <p class="help" x-show="!scenarioForm.conditions.length">Incoming requests go directly to the default response. Use Add condition if another scenario is needed.</p>
+     <p class="help" x-show="!scenarioForm.conditions.length">Incoming requests go directly to the default response. Use Add scenario if another scenario is needed.</p>
     </section>
     <template x-if="scenarioForm.response"><section x-show="scenarioTab === 'response'">
      <div class="default-rule-note" x-show="scenarioForm.isDefault && !scenarioScope">This default response is returned when no condition matches incoming requests.</div>
@@ -749,7 +694,7 @@ templ Dialogs() {
      <template x-for="block in scenarioForm.legacyHeaders" :key="block.id"><div class="scenario-condition-editor"><strong x-text="block.label"></strong>@ScenarioHeaders("block.headers")</div></template>
      <template x-for="block in scenarioForm.legacyDelays" :key="block.id"><label><span x-text="block.label + ' (ms)'"></span><input type="number" min="0" max="10000" x-model.number="block.delay_ms"/></label></template>
     </section>
-    <div class="scenario-popup-footer"><button type="button" class="btn" @click="modal=null">Cancel</button><button class="btn primary" x-text="scenarioScope ? 'Apply node to draft' : scenarioIsNew ? 'Add condition to draft' : scenarioForm.isDefault ? 'Apply default response' : 'Apply condition to draft'"></button></div>
+    <div class="scenario-popup-footer"><button type="button" class="btn" @click="modal=null">Cancel</button><button class="btn primary" x-text="scenarioScope ? 'Apply node to draft' : scenarioIsNew ? 'Add scenario to draft' : scenarioForm.isDefault ? 'Apply default response' : 'Apply scenario to draft'"></button></div>
    </form></template>
    <template x-if="modal === 'connection' && !branchModel"><form @submit.prevent="saveConnection()"><label>From step<select x-model="connectionForm.from" @change="connectionSourceChanged()"><template x-for="source in insertionSources" :key="source.id"><option :value="source.id" x-text="source.label"></option></template></select></label><label>Branch<select x-model="connectionForm.branch" @change="connectionBranchChanged()"><template x-for="branch in branchesFor(connectionForm.from)" :key="branch"><option :value="branch" x-text="branch === 'true' ? 'Yes / match' : branch === 'false' ? 'No / fallback' : 'Next'"></option></template></select></label><label>To step<select x-model="connectionForm.to"><option value="">Not connected</option><template x-for="target in orderedNodes.filter(node => node.id !== connectionForm.from && node.type !== 'request')" :key="target.id"><option :value="target.id" x-text="target.label"></option></template></select></label><p class="help">One destination per branch. Cycles are rejected. Connect every branch before saving the endpoint.</p><div class="modal-actions"><button type="button" class="btn danger-quiet" x-show="originalConnection" @click="removeConnection()">Delete connection</button><button class="btn primary">Save connection</button></div></form></template>
    <template x-if="modal === 'connection' && branchModel"><form @submit.prevent="saveConnection()"><p class="help" x-text="connectionForm.branch === 'default' ? 'Used only when no condition matches. Default always runs last.' : 'Used when this condition matches. A failed condition continues to the next priority.'"></p><label>Response<select x-model="connectionForm.to"><template x-for="response in responses" :key="response.id"><option :value="response.id" x-text="response.label + ' · ' + response.config.status"></option></template></select></label><p class="help">An unused response is removed from the draft when its last connection is replaced. You can undo the change.</p><button class="btn primary">Apply connection to draft</button></form></template>

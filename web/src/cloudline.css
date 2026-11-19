@@ -180,6 +180,14 @@ body {
   width: 18px;
   text-align: center;
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.v2-nav-item > span .v2-icon {
+  width: 15px;
+  height: 15px;
 }
 
 .v2-nav-item:hover:not(:disabled),
@@ -353,14 +361,14 @@ body {
   background: color-mix(in oklab, var(--v2-cyan) 12%, var(--v2-surface));
 }
 
-/* Sidebar Bottom Note */
+/* Sidebar Bottom Note & Docs Link */
 .sidebar .v2-sidebar-note {
   display: flex;
   flex-direction: column;
   gap: 6px;
   margin-top: auto;
   border-top: 1px solid var(--v2-border);
-  padding-top: 14px;
+  padding-top: 12px;
   font-size: 10px;
   color: var(--v2-muted);
 }
@@ -369,6 +377,22 @@ body {
   margin: 0;
   line-height: 1.45;
   color: var(--v2-muted);
+}
+
+.v2-sidebar-docs-link {
+  color: var(--v2-blue);
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 550;
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  transition: opacity 0.15s;
+}
+
+.v2-sidebar-docs-link:hover {
+  text-decoration: underline;
+  opacity: 0.85;
 }
 
 .v2-sidebar-meta {
@@ -612,7 +636,7 @@ body {
   align-items: center;
   gap: 7px;
   min-width: 0;
-  max-width: 360px;
+  max-width: 320px;
   font-size: 11px;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
@@ -628,9 +652,13 @@ body {
   letter-spacing: 0;
   color: var(--v2-muted);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .base-url.v2-base-url code {
+  flex: 1;
+  min-width: 0;
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -929,6 +957,28 @@ body {
   color: var(--v2-blue);
 }
 
+.v2-node-top .node-delete {
+  padding: 2px 5px;
+  border: 0;
+  border-radius: 5px;
+  font-size: 11px;
+  line-height: 1;
+  background: transparent;
+  color: var(--v2-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.v2-node-top .node-delete:hover:not(:disabled) {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+:root[data-theme="night"] .v2-node-top .node-delete:hover:not(:disabled) {
+  background: #7f1d1d40;
+  color: #f87171;
+}
+
 .flow-node.v2-node .v2-node-subtitle {
   margin: 8px 0 0 29px;
   font-size: 10px;
@@ -1061,6 +1111,11 @@ body {
   overflow: hidden;
 }
 
+.flow-table-panel .v2-table-wrap {
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
 .flow-table-heading {
   display: flex;
   align-items: center;
@@ -1107,69 +1162,107 @@ body {
 }
 
 /* Scenario Table */
+.v2-table.scenario-table,
 .scenario-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
   table-layout: auto;
-  white-space: normal;
+  white-space: normal !important;
 }
 
+.v2-table.scenario-table thead,
+.scenario-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.v2-table.scenario-table th,
 .scenario-table th {
   text-align: left;
   color: var(--v2-muted);
-  font-size: 9px;
+  font-size: 9.5px;
   letter-spacing: 0.8px;
   text-transform: uppercase;
   background: var(--v2-soft);
-  padding: 11px 16px;
+  padding: 12px 16px !important;
   border-bottom: 1px solid var(--v2-border);
   font-weight: 650;
-  white-space: nowrap;
+  white-space: nowrap !important;
 }
 
-.scenario-th-priority {
-  width: 90px;
-}
-
-.scenario-th-route {
-  width: 220px;
-}
-
-.scenario-th-conditions {
-  min-width: 200px;
-}
-
-.scenario-th-response {
-  min-width: 280px;
-}
-
-.scenario-th-actions {
-  width: 140px;
-  text-align: right !important;
-}
-
+.v2-table.scenario-table td,
 .scenario-table td {
-  padding: 13px 16px;
+  padding: 14px 16px !important;
   border-bottom: 1px solid var(--v2-border);
   vertical-align: middle;
   color: var(--v2-ink);
-  white-space: normal;
+  white-space: normal !important;
+}
+
+/* Align outer cell edges with header padding (20px left/right) */
+.v2-table.scenario-table th:first-child,
+.v2-table.scenario-table td:first-child,
+.scenario-table th:first-child,
+.scenario-table td:first-child {
+  padding-left: 20px !important;
+}
+
+.v2-table.scenario-table th:last-child,
+.v2-table.scenario-table td:last-child,
+.scenario-table th:last-child,
+.scenario-table td:last-child {
+  padding-right: 20px !important;
+}
+
+.v2-table.scenario-table .scenario-th-priority,
+.scenario-th-priority {
+  width: 95px !important;
+  min-width: 95px !important;
+  max-width: 95px !important;
+}
+
+.v2-table.scenario-table .scenario-th-route,
+.scenario-th-route {
+  width: 240px !important;
+  min-width: 200px !important;
+}
+
+.v2-table.scenario-table .scenario-th-conditions,
+.scenario-th-conditions {
+  min-width: 240px !important;
+}
+
+.v2-table.scenario-table .scenario-th-response,
+.scenario-th-response {
+  min-width: 280px !important;
+}
+
+.v2-table.scenario-table .scenario-th-actions,
+.scenario-th-actions {
+  width: 185px !important;
+  min-width: 185px !important;
+  text-align: right !important;
 }
 
 /* Neutralize legacy app.css nth-child overrides for scenario-table */
 .scenario-table td:nth-child(2),
 .scenario-table td:nth-child(3),
-.scenario-table td:nth-child(4),
-.scenario-table td:last-child {
+.scenario-table td:nth-child(4) {
   min-width: unset !important;
   max-width: unset !important;
   width: auto;
 }
 
-.scenario-table th:first-child,
-.scenario-table th:last-child {
-  width: auto;
+.v2-table.scenario-table td.scenario-actions-cell,
+.scenario-table td.scenario-actions-cell,
+.scenario-actions-cell {
+  width: 185px !important;
+  min-width: 185px !important;
+  white-space: nowrap !important;
+  text-align: right;
+  vertical-align: middle;
 }
 
 .scenario-table tbody tr {
@@ -1529,16 +1622,48 @@ body {
 /* Actions Cell */
 .scenario-actions-cell {
   white-space: nowrap !important;
-  width: 140px;
+  width: 185px !important;
+  min-width: 185px !important;
   text-align: right;
   vertical-align: middle;
 }
 
 .scenario-actions-cell .table-row-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 6px !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+}
+
+.scenario-actions-cell .v2-btn-action {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 24px !important;
+  line-height: 1 !important;
+}
+
+.scenario-actions-cell .v2-btn-action.scenario-edit-btn {
+  gap: 4px !important;
+  padding: 4px 10px !important;
+}
+
+.scenario-actions-cell .v2-btn-action.scenario-edit-btn span {
+  white-space: nowrap !important;
+  display: inline-block;
+}
+
+.scenario-actions-cell .v2-btn-arrow {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.scenario-actions-cell .v2-btn-action.scenario-view-btn {
+  padding: 4px 8px !important;
 }
 
 .scenario-actions-cell .v2-btn-action.primary {
@@ -1549,6 +1674,24 @@ body {
 
 .scenario-actions-cell .v2-btn-action.primary:hover {
   filter: brightness(1.08);
+}
+
+.scenario-actions-cell .v2-btn-action.danger {
+  color: var(--v2-muted) !important;
+  padding: 4px 7px !important;
+  min-width: 24px !important;
+}
+
+.scenario-actions-cell .v2-btn-action.danger:hover {
+  background: #fef2f2 !important;
+  border-color: #fca5a5 !important;
+  color: #dc2626 !important;
+}
+
+:root[data-theme="night"] .scenario-actions-cell .v2-btn-action.danger:hover {
+  background: #7f1d1d33 !important;
+  border-color: #ef444455 !important;
+  color: #f87171 !important;
 }
 
 /* Summary Footer */
@@ -2669,12 +2812,19 @@ footer.v2-footer {
 .v2-btn-action {
   font-size: 11px !important;
   font-weight: 550 !important;
-  padding: 3px 8px !important;
+  padding: 4px 8px !important;
   border-radius: 5px !important;
   background: var(--v2-surface) !important;
   border: 1px solid var(--v2-border) !important;
   color: var(--v2-ink) !important;
   cursor: pointer;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  line-height: 1.2 !important;
   transition: all 0.15s ease;
 }
 

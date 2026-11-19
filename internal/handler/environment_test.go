@@ -33,6 +33,10 @@ func (m *mockEnvRepo) SessionUser(context.Context, string) (domain.User, error) 
 }
 func (m *mockEnvRepo) DeleteSession(context.Context, string) error { return nil }
 func (m *mockEnvRepo) ChangePassword(context.Context, string, string, string) error { return nil }
+func (m *mockEnvRepo) APIKeys(context.Context, string) ([]domain.APIKey, error) { return nil, nil }
+func (m *mockEnvRepo) CreateAPIKey(context.Context, domain.APIKey) error { return nil }
+func (m *mockEnvRepo) DeleteAPIKey(context.Context, string, string) error { return nil }
+func (m *mockEnvRepo) AuthenticateAPIKey(context.Context, string) (domain.User, error) { return domain.User{}, usecase.ErrUnauthorized }
 
 func (m *mockEnvRepo) Environments(_ context.Context, userID string) ([]domain.Environment, error) {
 	return m.environments, nil

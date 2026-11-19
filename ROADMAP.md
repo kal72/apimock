@@ -1,6 +1,6 @@
 # Mocklab roadmap
 
-Last updated: **2026-11-15**.
+Last updated: **2026-11-17**.
 
 This roadmap tracks implementation scope, not promised release dates. No version or Git tag has been released. Available features remain part of an MVP. Internal deployment uses the application host and /public/{workspace-slug}; no domain is provisioned by the application.
 
@@ -31,7 +31,7 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | DOC-GEN02 | Documentation UI | Searchable in-app generator reference | Done | /docs/generators, navigation links, runnable JSON examples for four existing generators, clearly labeled 25 planned generators, types/seeds/header guidance and troubleshooting. |
 | DOC-ORG01 | Documentation | Concise README and focused guides | Done | README covers description, screenshot, stack/dependencies, architecture, configuration/startup and Contributions; detailed usage and account/access references remain in dedicated guides. |
 | UI-V201 | Design | V2 static component templates | Done | Five authenticated preview pages with shared shell, compact two-row concept header, Node canvas, Light/Night styles and local sample interactions. No data integration; see docs/UI_V2.md. |
-| UI-V202 | Design | Migrate V2 to application data and actions | Partial | Main `/app` shell, compact 48px `.v2-header`, 63px `.v2-route-toolbar`, dedicated full-page views for `Environments` and `Settings`, sidebar navigation (`Endpoints`, `Environments`, `Settings`, `Docs & Reference`), enhanced Visual Flow canvas panning/scrolling, streamlined Table view without redundant Headers column, quick-copy workspace base URL pill, and overhauled V2-aligned Key-Value variables table are migrated to V2 Graphite Blue + Cloudline tokens (`--v2-*`). Unimplemented V2 features (`Mocks`, `Logs`, `Mock defaults`) and mobile/accessibility QA remain future work. |
+| UI-V202 | Design | Migrate V2 to application data and actions | Partial | Main `/app` shell, compact 48px `.v2-header`, 63px `.v2-route-toolbar`, dedicated full-page views for `Environments` and `Settings`, sidebar navigation (`Endpoints`, `Environments`, `Settings`, `Docs & Reference`), branded SVG/ICO favicon, enhanced Visual Flow canvas panning/scrolling, streamlined Table view with refined padding and single card border, quick-copy workspace base URL pill, and overhauled V2-aligned Key-Value variables table are migrated to V2 Graphite Blue + Cloudline tokens (`--v2-*`). Unimplemented V2 features (`Mocks`, `Logs`, `Mock defaults`) and mobile/accessibility QA remain future work. |
 | HTTP-CHI01 | HTTP architecture | Chi route groups and explicit workspace policies | Done | Chi v5.5.0, grouped authentication/admin/mock routes, fail-closed workspace policy, and HEAD/OPTIONS/path-encoding regression coverage. |
 | SEC-GO01 | Security | Patch Go standard-library vulnerability findings | Done | Toolchain and container build image upgraded to Go 1.27.3; govulncheck v1.9.0 reports no vulnerabilities. See docs/ROUTING.md. |
 | M01 | Workspace | Create, read, update, and delete workspaces | Done | Unique slugs; deleting a workspace cascades to its endpoints. |
@@ -85,7 +85,7 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | U04 | Interface language | English web interface | Done | Navigation, editors, dialogs, validation, notifications, and accessibility labels use English. User-authored content is preserved. |
 | U03 | UX | Flow-ordered Table rows with one complete editor | Done | Each row represents a request-to-response path; all field edits are in its Action popup. Nested legacy graphs remain intact and path projection is capped at 128. |
 | U04 | UX | Draft save/discard/undo and in-flight save safety | Done | Sticky controls and keyboard save; earlier save responses do not overwrite newer edits or another selected endpoint. |
-| U05 | Graph editing | Preserve default and later rules when removing a condition | Done | Condition removal follows the fallback path and prunes only unused matching branches. |
+| U05 | Graph editing | Preserve default and later rules when removing a condition | Done | Condition removal follows the fallback path and prunes only unused matching branches; exposed via direct delete actions in both Node canvas and Table rows and inside condition modals. |
 
 ## Typed condition implementation
 
@@ -109,6 +109,7 @@ This roadmap tracks implementation scope, not promised release dates. No version
 | P05 | Deployment | Internal-domain deployment configuration | Done | Go + PostgreSQL only, /public/{workspace-slug}, managed internal mode, private host binding, optional existing HTTPS ingress, environment examples, Makefile targets, and English instructions. |
 | P06 | Deployment | Verify internal hostname and network reachability | Todo | Requires the target internal hostname/server and client-side DNS or hosts resolution; local runtime can be tested without changing machine DNS. |
 | P07 | Public Portal | Shareable public API docs & per-API playground with ON/OFF access control | Done | Optional per-workspace public viewer portal at `/share/{workspace-slug}` (`005_workspace_public_docs.sql`, disabled by default). Exposes read-only endpoint specs, priority scenarios, cURL/fetch snippets, and a live per-API playground (`POST /share/{slug}/playground`) without login while keeping private user environments isolated. |
+| P08 | Interoperability | Model Context Protocol (MCP) server via HTTP/SSE transport | Done | Full MCP (2024-11-05 spec) remote HTTP/SSE transport (GET /api/mcp/sse, POST /api/mcp/messages) supporting Cursor, Claude Desktop, Antigravity, and autonomous AI agents. Registers 9 tools (workspace discovery, endpoint CRUD, priority scenario additions, default response tuning, simulated evaluation/trace testing, and consolidated spec export) and read-only mocklab:// resources. Frictionless zero-config development mode and web UI profile-generated API key (`mlk_...`, with SHA-256 hash storage and revocation) / session token authentication in production. See docs/MCP.md. |
 
 ## Future development
 

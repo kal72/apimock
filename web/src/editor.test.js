@@ -136,3 +136,57 @@ test('node dragging converts screen movement to canvas coordinates at each zoom'
     assert.equal(node.x,original.x+50/zoom);assert.equal(node.y,original.y+25/zoom);
   }
 });
+
+test('endpointURL returns the full path URL', () => {
+  const state = editor();
+  state.publicOrigin = 'http://localhost:8080';
+  assert.equal(state.baseURL, 'http://localhost:8080/public/demo');
+  assert.equal(state.endpointURL, 'http://localhost:8080/public/demo/products/:id');
+});
+
+test('removeScenarioCondition and removeScenarioRow delete condition scenarios and preserve default', () => {
+  const state = editor();
+  state.addConfiguration('condition');
+  state.saveNode();
+  assert.equal(state.conditions.length, 1);
+  const condition = state.conditions[0];
+
+  // In Table mode: delete via removeScenarioRow
+  const initialRows = state.scenarioRows;
+  assert.equal(initialRows.length, 2);
+  const conditionRow = initialRows[0];
+  assert.equal(conditionRow.isDefault, false);
+
+  // Default row cannot be deleted
+  const defaultRow = initialRows[1];
+  assert.equal(defaultRow.isDefault, true);
+  state.removeScenarioRow(defaultRow);
+  assert.equal(state.scenarioRows.length, 2);
+
+  // Deleting non-default row in Table mode
+  const origConfirm = globalThis.window?.confirm;
+  if (!globalThis.window) globalThis.window = {};
+  globalThis.window.confirm = () => true;
+
+  state.removeScenarioRow(conditionRow);
+  assert.equal(state.conditions.length, 0);
+  assert.equal(state.scenarioRows.length, 1);
+  assert.equal(state.dirty, true);
+
+  if (origConfirm) globalThis.window.confirm = origConfirm;
+});
+
+test('openPublicDocs opens public docs in new tab', () => {
+  const state = editor();
+  state.publicOrigin = 'http://localhost:8080';
+  let openedURL = '';
+  const origOpen = globalThis.window?.open;
+  if (!globalThis.window) globalThis.window = {};
+  globalThis.window.open = (url) => { openedURL = url; };
+
+  state.openPublicDocs();
+  assert.equal(openedURL, 'http://localhost:8080/share/demo');
+
+  if (origOpen) globalThis.window.open = origOpen;
+});
+

@@ -6,6 +6,18 @@ export function formatValue(value) {
   try { return JSON.stringify(JSON.parse(value), null, 2); } catch { return value; }
 }
 
+export function httpStatusText(status) {
+  const map = {
+    200: 'OK', 201: 'Created', 202: 'Accepted', 204: 'No Content',
+    301: 'Moved Permanently', 302: 'Found', 304: 'Not Modified',
+    400: 'Bad Request', 401: 'Unauthorized', 403: 'Forbidden', 404: 'Not Found',
+    405: 'Method Not Allowed', 408: 'Request Timeout', 409: 'Conflict',
+    422: 'Unprocessable Entity', 429: 'Too Many Requests',
+    500: 'Internal Server Error', 502: 'Bad Gateway', 503: 'Service Unavailable', 504: 'Gateway Timeout'
+  };
+  return map[status] || '';
+}
+
 export function pathPreview(endpoint, row, baseURL) {
   const nodes = new Map(endpoint.flow.nodes.map(node => [node.id, node]));
   const request = endpoint.flow.nodes.find(node => node.type === 'request');
@@ -27,6 +39,9 @@ export function pathPreview(endpoint, row, baseURL) {
     name: endpoint.name, method: endpoint.method, path: endpoint.path, url: baseURL + endpoint.path,
     example: clone(request.config.example || {}),
     conditions: row.conditions.map(item => ({ matched: item.matched, ...normalizeCondition(nodes.get(item.id).config) })),
-    responseMode:response.config.response_mode || 'static', status: response.config.status, delay, headers, body: response.config.body || '', isDefault: row.isDefault
+    responseMode: response.config.response_mode || 'static',
+    status: response.config.status,
+    statusText: httpStatusText(response.config.status),
+    delay, headers, body: response.config.body || '', isDefault: row.isDefault
   };
 }

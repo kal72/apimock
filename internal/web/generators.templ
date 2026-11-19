@@ -10,6 +10,8 @@ templ GeneratorDocumentation() {
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 		<title>Documentation &amp; Reference — Mocklab</title>
 		<script>try { const value=localStorage.getItem('mocklab-theme'); document.documentElement.dataset.theme=value==='night'||!['light','night'].includes(value)&&matchMedia('(prefers-color-scheme: dark)').matches?'night':'light'; } catch { document.documentElement.dataset.theme='light'; }</script>
+		<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg"/>
+		<link rel="alternate icon" type="image/x-icon" href="/assets/favicon.ico"/>
 		<link rel="stylesheet" href="/assets/app.css"/>
 		<script type="module" src="/assets/app.js"></script>
 	</head>
@@ -18,6 +20,9 @@ templ GeneratorDocumentation() {
 		<header class="docs-header">
 			<a class="docs-brand" href="/app">☁ mocklab<span>.</span></a>
 			<span class="docs-header-label">DOCS &amp; REFERENCE</span>
+			<a href="https://github.com/kal72/apimock" target="_blank" rel="noopener noreferrer" class="v2-github-link" title="GitHub: kal72/apimock" aria-label="Mocklab on GitHub">
+				@V2Icon("github")
+			</a>
 			<a href="/app" class="btn">Open workspace ↗</a>
 			@ThemeSwitch()
 		</header>

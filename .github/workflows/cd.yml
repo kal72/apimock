@@ -3,7 +3,10 @@ name: Deployment
 on:
   push:
     branches:
-      - main       # Auto-run triggers on push to main (deploys to dev with image tag :dev)
+      - main       # Auto-run triggers on push or merge to main (deploys to dev with image tag :dev)
+  pull_request:
+    branches:
+      - main       # Auto-run triggers on pull request targeting main (deploys to dev with image tag :dev)
   workflow_dispatch:
     inputs:
       environment:
@@ -149,7 +152,8 @@ jobs:
           IMAGE_BASE: ${{ steps.meta.outputs.image_base }}
         run: |
           echo "--> Building image ${IMAGE_NAME}..."
-          BUILD_TAGS="-t ${IMAGE_NAME} -t ${IMAGE_BASE}:${GITHUB_SHA}"
+          COMMIT_TAG="${{ github.event.pull_request.head.sha || github.sha }}"
+          BUILD_TAGS="-t ${IMAGE_NAME} -t ${IMAGE_BASE}:${COMMIT_TAG}"
           if [ "${TARGET_ENV}" = "prod" ]; then
             BUILD_TAGS="${BUILD_TAGS} -t ${IMAGE_BASE}:latest"
           fi
@@ -159,7 +163,7 @@ jobs:
 
           echo "--> Pushing ${IMAGE_NAME} to ghcr.io..."
           podman push "${IMAGE_NAME}"
-          podman push "${IMAGE_BASE}:${GITHUB_SHA}"
+          podman push "${IMAGE_BASE}:${COMMIT_TAG}"
           if [ "${TARGET_ENV}" = "prod" ]; then
             podman push "${IMAGE_BASE}:latest"
           fi
@@ -169,6 +173,7 @@ jobs:
   deploy-vps:
     name: Deploy to VPS (${{ needs.build-and-push.outputs.target_env }})
     needs: [build-and-push]
+    if: always() && (needs.build-and-push.result == 'success') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     environment:
       name: ${{ needs.build-and-push.outputs.target_env }}

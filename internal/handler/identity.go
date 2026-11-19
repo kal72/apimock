@@ -204,6 +204,24 @@ func (h Handler) privateIdentityRoutes(r chi.Router) {
 		}
 		respond(w, map[string]bool{"changed": err == nil}, err)
 	})
+	getHead(r, "/api/auth/api-keys", func(w http.ResponseWriter, r *http.Request) {
+		keys, err := h.Auth.Service.APIKeys(r.Context(), principal(r).User.ID)
+		respond(w, keys, err)
+	})
+	r.Post("/api/auth/api-keys", func(w http.ResponseWriter, r *http.Request) {
+		var input struct {
+			Name string `json:"name"`
+		}
+		if !decode(w, r, &input) {
+			return
+		}
+		key, err := h.Auth.Service.CreateAPIKey(r.Context(), principal(r).User.ID, input.Name)
+		respond(w, key, err)
+	})
+	r.Delete("/api/auth/api-keys/{id}", func(w http.ResponseWriter, r *http.Request) {
+		err := h.Auth.Service.DeleteAPIKey(r.Context(), principal(r).User.ID, routeParam(r, "id"))
+		respond(w, map[string]bool{"deleted": err == nil}, err)
+	})
 	r.Group(func(r chi.Router) {
 		r.Use(h.requireAdmin)
 		getHead(r, "/api/users", func(w http.ResponseWriter, r *http.Request) {

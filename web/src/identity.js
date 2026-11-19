@@ -17,6 +17,11 @@ export function createLogin() {
 
 export const identityEditor={
   currentUser:null,csrfToken:'',users:[],userForm:null,passwordForm:{current:'',next:'',confirmation:''},
+  apiKeys:[],apiKeyName:'',newGeneratedKey:null,
+  async openApiKeys(){this.apiKeyName='';this.newGeneratedKey=null;this.dialogError='';this.modal='api-keys';await this.loadApiKeys();},
+  async loadApiKeys(){try{this.apiKeys=(await this.request('/api/auth/api-keys'))||[];}catch(error){this.notify(error.message);}},
+  async generateApiKey(){if(!this.apiKeyName.trim())return;this.busy=true;this.dialogError='';try{const res=await this.request('/api/auth/api-keys','POST',{name:this.apiKeyName.trim()});this.newGeneratedKey=res;this.apiKeyName='';await this.loadApiKeys();}catch(error){this.dialogError=error.message;}finally{this.busy=false;}},
+  async revokeApiKey(key){if(!window.confirm(`Revoke API key "${key.name}" (${key.prefix})? External AI agents using this key will immediately lose access.`))return;try{await this.request('/api/auth/api-keys/'+key.id,'DELETE');if(this.newGeneratedKey&&this.newGeneratedKey.id===key.id)this.newGeneratedKey=null;await this.loadApiKeys();this.notify('API key revoked.');}catch(error){this.notify(error.message);}},
   async loadIdentity(){const data=await this.request('/api/auth/me');this.currentUser=data.user;this.csrfToken=data.csrf_token;},
   async logout(){if(!this.mayDiscard())return;try{await this.request('/api/auth/logout','POST',{});window.location.assign('/login');}catch(error){this.notify(error.message);}},
   async openUsers(){try{this.users=await this.request('/api/users');this.modal='users';this.dialogError='';}catch(error){this.notify(error.message);}},

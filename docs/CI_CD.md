@@ -54,7 +54,7 @@ flowchart TD
    - Validates standalone container builds with `podman build`.
 
 2. **`.github/workflows/cd.yml`**:
-   - Triggers automatically on push to `develop` (targets `dev`) and `main` (targets `prod`).
+   - Triggers automatically on push/merge to `main` and pull requests targeting `main` (builds and deploys image tag `:dev` to the `dev` VPS environment).
    - Supports manual execution anytime via `workflow_dispatch` with branch selection and environment selector (`dev` or `prod`).
    - **Builds container image once on GitHub Actions runners** and pushes to **GitHub Container Registry (`ghcr.io`)**.
    - **No source code sync to VPS**: The VPS host does not need repository files, `rsync` of code, Node, or Go compilers.
@@ -199,9 +199,10 @@ All builds also generate an immutable commit-SHA tag (`ghcr.io/username/apimock:
 
 ## Triggering Deployments
 
-### Automatic Deployment (Main Branch Only)
-- **Push to `main` branch**: Automatically triggers CI/CD, builds the container image with version tag **`:dev`**, and deploys it to the **`dev`** environment on your VPS.
-- No other branch triggers automatic deployment.
+### Automatic Deployment (Main Branch & Pull Requests)
+- **Push or merge to `main` branch**: Automatically triggers CI/CD, builds the container image with version tag **`:dev`**, and deploys it to the **`dev`** environment on your VPS.
+- **Pull request targeting `main` branch**: Automatically triggers CI/CD tests, builds the container image with version tag **`:dev`**, and deploys it to the **`dev`** environment on your VPS (for repository branches).
+- External fork PRs run CI tests while skipping remote VPS SSH deployment for credential security.
 
 ### Manual Deployment (Production & On-Demand Dev)
 Deployment to **`prod` is strictly manual** to prevent accidental production releases:

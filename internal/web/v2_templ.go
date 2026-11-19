@@ -28,7 +28,7 @@ func V2Page(page string) templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Mocklab V2 — Design preview</title><link rel=\"stylesheet\" href=\"/assets/app.css\"><script type=\"module\" src=\"/assets/app.js\"></script></head><body class=\"v2-body\"><div class=\"v2\" x-data=\"{ night: false, table: false, tab: 'General', environment: 'Development', inspector: false, notice: '', zoom: 1, tested: false }\" :class=\"night && 'v2-night'\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Mocklab V2 — Design preview</title><link rel=\"icon\" type=\"image/svg+xml\" href=\"/assets/favicon.svg\"><link rel=\"alternate icon\" type=\"image/x-icon\" href=\"/assets/favicon.ico\"><link rel=\"stylesheet\" href=\"/assets/app.css\"><script type=\"module\" src=\"/assets/app.js\"></script></head><body class=\"v2-body\"><div class=\"v2\" x-data=\"{ night: false, table: false, tab: 'General', environment: 'Development', inspector: false, notice: '', zoom: 1, tested: false }\" :class=\"night && 'v2-night'\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -75,7 +75,7 @@ func V2Page(page string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<footer class=\"v2-footer\"><span>MOCKLAB / Graphite Blue + Cloudline</span><span>V2 · Sample data only · <a href=\"/app\">Return to current app ↗</a></span></footer></main><div class=\"v2-overlay\" x-show=\"inspector\" x-cloak @click.self=\"inspector = false\" @keydown.escape.window=\"inspector = false\"><section class=\"v2-dialog\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Condition preview\" x-trap.inert.noscroll=\"inspector\"><header><h2>Edit condition</h2><button @click=\"inspector = false\" aria-label=\"Close condition preview\">×</button></header><p>Preview form · changes are not saved.</p><label>Name<input value=\"Product found\"></label><label>Source<select><option>Path params</option><option>Headers</option><option>Query params</option><option>Body</option></select></label><div class=\"v2-form-grid\"><label>Field<input value=\"id\"></label><label>Operator<select><option>Equals</option><option>Required</option></select></label></div><label>Value<input value=\"123\"></label><label class=\"v2-check\"><input type=\"checkbox\" checked> Required</label><button class=\"v2-primary\" @click=\"inspector = false; notice = 'Preview closed. No configuration was saved.'\">Done</button></section></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<footer class=\"v2-footer\"><span>MOCKLAB / Graphite Blue + Cloudline</span><span>V2 · Sample data only · <a href=\"/app\">Return to current app ↗</a></span></footer></main><div class=\"v2-overlay\" x-show=\"inspector\" x-cloak @click.self=\"inspector = false\" @keydown.escape.window=\"inspector = false\"><section class=\"v2-dialog\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Scenario preview\" x-trap.inert.noscroll=\"inspector\"><header><h2>Edit scenario</h2><button @click=\"inspector = false\" aria-label=\"Close scenario preview\">×</button></header><p>Preview form · changes are not saved.</p><label>Name<input value=\"Product found\"></label><label>Source<select><option>Path params</option><option>Headers</option><option>Query params</option><option>Body</option></select></label><div class=\"v2-form-grid\"><label>Field<input value=\"id\"></label><label>Operator<select><option>Equals</option><option>Required</option></select></label></div><label>Value<input value=\"123\"></label><label class=\"v2-check\"><input type=\"checkbox\" checked> Required</label><button class=\"v2-primary\" @click=\"inspector = false; notice = 'Preview closed. No configuration was saved.'\">Done</button></section></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -285,7 +285,15 @@ func V2Header(page string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, " Saved</span> <button class=\"v2-theme\" role=\"switch\" :aria-checked=\"night\" @click=\"night = !night\" aria-label=\"Night theme\"><span class=\"v2-theme-sun\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, " Saved</span> <a href=\"https://github.com/kal72/apimock\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"v2-github-link\" title=\"GitHub: kal72/apimock\" aria-label=\"Mocklab on GitHub\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = V2Icon("github").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</a> <button class=\"v2-theme\" role=\"switch\" :aria-checked=\"night\" @click=\"night = !night\" aria-label=\"Night theme\"><span class=\"v2-theme-sun\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -293,7 +301,7 @@ func V2Header(page string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</span><span class=\"v2-theme-moon\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</span><span class=\"v2-theme-moon\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -301,7 +309,7 @@ func V2Header(page string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</span></button> <span class=\"v2-header-divider\" aria-hidden=\"true\"></span><div class=\"v2-account-wrap\" x-data=\"{ accountOpen: false }\" @click.outside=\"accountOpen = false\" @keydown.escape.window=\"accountOpen = false\"><button class=\"v2-account\" @click=\"accountOpen = !accountOpen\" :aria-expanded=\"accountOpen\" aria-controls=\"v2-account-menu\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</span></button> <span class=\"v2-header-divider\" aria-hidden=\"true\"></span><div class=\"v2-account-wrap\" x-data=\"{ accountOpen: false }\" @click.outside=\"accountOpen = false\" @keydown.escape.window=\"accountOpen = false\"><button class=\"v2-account\" @click=\"accountOpen = !accountOpen\" :aria-expanded=\"accountOpen\" aria-controls=\"v2-account-menu\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -309,7 +317,7 @@ func V2Header(page string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<span>Alex</span><span class=\"v2-chevron\">⌄</span></button><div class=\"v2-account-menu\" id=\"v2-account-menu\" x-show=\"accountOpen\" x-cloak><strong>Alex Morgan</strong><small>Owner · Sample account</small><a href=\"/app/v2/settings\">Workspace settings</a><a href=\"/app\">Return to current app ↗</a></div></div></div><div class=\"v2-sky\" aria-hidden=\"true\"><span class=\"v2-sun\"></span><span class=\"v2-cloud v2-cloud-one\"></span><span class=\"v2-cloud v2-cloud-two\"></span><span class=\"v2-stars\">✧ · ✦ ·</span></div></header>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<span>Alex</span><span class=\"v2-chevron\">⌄</span></button><div class=\"v2-account-menu\" id=\"v2-account-menu\" x-show=\"accountOpen\" x-cloak><strong>Alex Morgan</strong><small>Owner · Sample account</small><a href=\"/app/v2/settings\">Workspace settings</a><a href=\"/app\">Return to current app ↗</a></div></div></div><div class=\"v2-sky\" aria-hidden=\"true\"><span class=\"v2-sun\"></span><span class=\"v2-cloud v2-cloud-one\"></span><span class=\"v2-cloud v2-cloud-two\"></span><span class=\"v2-stars\">✧ · ✦ ·</span></div></header>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -334,43 +342,48 @@ func V2Icon(name string) templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<svg class=\"v2-icon\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<svg class=\"v2-icon\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		switch name {
 		case "home":
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<path d=\"m3 10 9-7 9 7M5 9v11h5v-7h4v7h5V9\"></path>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<path d=\"m3 10 9-7 9 7M5 9v11h5v-7h4v7h5V9\"></path>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case "check":
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<path d=\"m5 12 4 4L19 6\"></path>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<path d=\"m5 12 4 4L19 6\"></path>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case "sun":
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5\"></path>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5\"></path>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case "moon":
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<path d=\"M20 15.4A9 9 0 0 1 8.6 4 9 9 0 1 0 20 15.4Z\"></path>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<path d=\"M20 15.4A9 9 0 0 1 8.6 4 9 9 0 1 0 20 15.4Z\"></path>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case "user":
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<circle cx=\"12\" cy=\"8\" r=\"3.2\"></circle><path d=\"M5 20v-2a7 7 0 0 1 14 0v2Z\"></path>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<circle cx=\"12\" cy=\"8\" r=\"3.2\"></circle><path d=\"M5 20v-2a7 7 0 0 1 14 0v2Z\"></path>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case "copy":
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<rect x=\"8\" y=\"8\" width=\"12\" height=\"13\" rx=\"2\"></rect><path d=\"M16 8V3H3v13h5\"></path>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<rect x=\"8\" y=\"8\" width=\"12\" height=\"13\" rx=\"2\"></rect><path d=\"M16 8V3H3v13h5\"></path>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		case "github":
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<path fill=\"currentColor\" stroke=\"none\" d=\"M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z\"></path>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</svg>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -395,33 +408,33 @@ func V2Title(title, subtitle string) templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<div class=\"v2-title\"><div><span class=\"v2-kicker\">COMMERCE API</span><h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<div class=\"v2-title\"><div><span class=\"v2-kicker\">COMMERCE API</span><h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 92, Col: 82}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 97, Col: 82}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</h1><p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "</h1><p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(subtitle)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 92, Col: 102}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 97, Col: 102}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</p></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</p></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -450,7 +463,7 @@ func V2Node(kind, title, subtitle, position string) templ.Component {
 			templ_7745c5c3_ElementWriter := templ_7745c5c3_Buffer
 			templ_7745c5c3_Buffer := templ.GetBuffer()
 			var templ_7745c5c3_ElementScripts []templ.ComponentScript
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<article class=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<article class=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -468,7 +481,7 @@ func V2Node(kind, title, subtitle, position string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -482,59 +495,59 @@ func V2Node(kind, title, subtitle, position string) templ.Component {
 			}
 			templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "><div class=\"v2-node-top\"><span class=\"v2-node-icon\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "><div class=\"v2-node-top\"><span class=\"v2-node-icon\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(map[string]string{"incoming": "↪", "condition": "◇", "response": "⌘", "default": "!"}[kind])
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 96, Col: 216}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 101, Col: 216}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</span><strong>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</span><strong>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 96, Col: 240}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 101, Col: 240}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</strong><button @click=\"inspector = true\" aria-label=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</strong><button @click=\"inspector = true\" aria-label=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templruntime.NewAttributeExpression("Edit " + title).Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 96, Col: 311}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 101, Col: 311}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var21)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\">✎</button></div><p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "\">✎</button></div><p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(subtitle)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 96, Col: 345}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 101, Col: 345}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</p><span class=\"v2-port v2-port-in\"></span><span class=\"v2-port v2-port-out\"></span></article>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</p><span class=\"v2-port v2-port-in\"></span><span class=\"v2-port v2-port-out\"></span></article>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -559,7 +572,7 @@ func V2Endpoints() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div class=\"v2-editor-layout\"><div class=\"v2-editor\"><section class=\"v2-route-toolbar\"><div><h1>Get product <span>✎</span></h1><div class=\"v2-route\"><span class=\"v2-method\">GET</span><code>/products/:id</code></div></div><div class=\"v2-route-actions\"><div class=\"v2-base-url\"><span>Base URL:</span><code>http://localhost:18080/public/commerce</code></div><button class=\"v2-copy-url\" @click=\"notice = 'Example URL: /public/commerce/products/123'\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<div class=\"v2-editor-layout\"><div class=\"v2-editor\"><section class=\"v2-route-toolbar\"><div><h1>Get product <span>✎</span></h1><div class=\"v2-route\"><span class=\"v2-method\">GET</span><code>/products/:id</code></div></div><div class=\"v2-route-actions\"><div class=\"v2-base-url\"><span>Base URL:</span><code>http://localhost:18080/public/commerce</code></div><button class=\"v2-copy-url\" @click=\"notice = 'Example URL: /public/commerce/products/123'\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -567,7 +580,7 @@ func V2Endpoints() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, " Copy URL</button><div class=\"v2-segment\"><button :class=\"!table && 'selected'\" @click=\"table = false\">⌘ Node</button><button :class=\"table && 'selected'\" @click=\"table = true\">▤ Table</button></div></div></section><section class=\"v2-canvas-panel\" x-show=\"!table\"><header><strong>Visual flow <span class=\"v2-sample\">First match wins</span></strong><button @click=\"notice = 'Choose Header, Query, Body or Path params · Preview only.'\">+ Add condition</button></header><div class=\"v2-canvas\"><div class=\"v2-graph\" :style=\"'transform: scale(' + zoom + ')'\"><svg class=\"v2-connections\" viewBox=\"0 0 1040 450\" aria-label=\"Incoming request connects to two conditions and a default response\"><defs><marker id=\"v2-arrow\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M 1 1 L 9 5 L 1 9\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"></path></marker></defs><path d=\"M 250 220 C 320 220 320 100 395 100\"></path><path d=\"M 250 220 C 320 220 320 240 395 240\"></path><path d=\"M 250 220 C 410 220 440 380 775 380\"></path><path d=\"M 635 100 L 775 100\"></path><path d=\"M 635 240 L 775 240\"></path><text x=\"660\" y=\"85\">Match</text><text x=\"660\" y=\"225\">Match</text><text x=\"560\" y=\"360\">Default</text></svg>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, " Copy URL</button><div class=\"v2-segment\"><button :class=\"!table && 'selected'\" @click=\"table = false\">⌘ Node</button><button :class=\"table && 'selected'\" @click=\"table = true\">▤ Table</button></div></div></section><section class=\"v2-canvas-panel\" x-show=\"!table\"><header><strong>Visual flow <span class=\"v2-sample\">First match wins</span></strong><button @click=\"notice = 'Choose Header, Query, Body or Path params · Preview only.'\">+ Add scenario</button></header><div class=\"v2-canvas\"><div class=\"v2-graph\" :style=\"'transform: scale(' + zoom + ')'\"><svg class=\"v2-connections\" viewBox=\"0 0 1040 450\" aria-label=\"Incoming request connects to two conditions and a default response\"><defs><marker id=\"v2-arrow\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M 1 1 L 9 5 L 1 9\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"></path></marker></defs><path d=\"M 250 220 C 320 220 320 100 395 100\"></path><path d=\"M 250 220 C 320 220 320 240 395 240\"></path><path d=\"M 250 220 C 410 220 440 380 775 380\"></path><path d=\"M 635 100 L 775 100\"></path><path d=\"M 635 240 L 775 240\"></path><text x=\"660\" y=\"85\">Match</text><text x=\"660\" y=\"225\">Match</text><text x=\"560\" y=\"360\">Default</text></svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -575,7 +588,7 @@ func V2Endpoints() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<span class=\"v2-priority v2-priority-one\">Priority #1</span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "<span class=\"v2-priority v2-priority-one\">Priority #1</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -583,7 +596,7 @@ func V2Endpoints() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<span class=\"v2-priority v2-priority-two\">Priority #2</span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "<span class=\"v2-priority v2-priority-two\">Priority #2</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -603,7 +616,7 @@ func V2Endpoints() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</div></div><footer><span>Drag and connection editing will be connected during migration.</span><div class=\"v2-zoom\"><button @click=\"zoom = Math.max(0.5, zoom - 0.25)\" :disabled=\"zoom <= 0.5\" aria-label=\"Zoom out\">−</button><button @click=\"zoom = 1\" x-text=\"Math.round(zoom * 100) + '%'\" aria-label=\"Reset zoom\"></button><button @click=\"zoom = Math.min(1.5, zoom + 0.25)\" :disabled=\"zoom >= 1.5\" aria-label=\"Zoom in\">+</button></div></footer></section><section class=\"v2-card\" x-show=\"table\" x-cloak><h2>Response scenarios</h2>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</div></div><footer><span>Drag and connection editing will be connected during migration.</span><div class=\"v2-zoom\"><button @click=\"zoom = Math.max(0.5, zoom - 0.25)\" :disabled=\"zoom <= 0.5\" aria-label=\"Zoom out\">−</button><button @click=\"zoom = 1\" x-text=\"Math.round(zoom * 100) + '%'\" aria-label=\"Reset zoom\"></button><button @click=\"zoom = Math.min(1.5, zoom + 0.25)\" :disabled=\"zoom >= 1.5\" aria-label=\"Zoom in\">+</button></div></footer></section><section class=\"v2-card\" x-show=\"table\" x-cloak><h2>Response scenarios</h2>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -611,7 +624,7 @@ func V2Endpoints() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</section><section class=\"v2-playground\"><div><header><h2>⌁ Request playground</h2><span class=\"v2-sample\">Sample execution</span></header><div class=\"v2-run\"><span class=\"v2-method\">GET</span><input aria-label=\"Sample request URL\" value=\"/public/commerce/products/123\"><button class=\"v2-primary\" @click=\"tested = true\">▶ Run request</button></div></div><div class=\"v2-result\"><header><h2>Response <span class=\"v2-method\" x-show=\"tested\">200 OK</span></h2><small>Static preview</small></header><pre x-show=\"tested\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</section><section class=\"v2-playground\"><div><header><h2>⌁ Request playground</h2><span class=\"v2-sample\">Sample execution</span></header><div class=\"v2-run\"><span class=\"v2-method\">GET</span><input aria-label=\"Sample request URL\" value=\"/public/commerce/products/123\"><button class=\"v2-primary\" @click=\"tested = true\">▶ Run request</button></div></div><div class=\"v2-result\"><header><h2>Response <span class=\"v2-method\" x-show=\"tested\">200 OK</span></h2><small>Static preview</small></header><pre x-show=\"tested\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -620,13 +633,13 @@ func V2Endpoints() templ.Component {
   "name": "Wireless headphones",
   "price": 99.99 }`)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 114, Col: 19}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 119, Col: 19}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</pre><p x-show=\"!tested\">Run the sample to preview a formatted response.</p></div></section></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</pre><p x-show=\"!tested\">Run the sample to preview a formatted response.</p></div></section></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -651,7 +664,7 @@ func V2ScenarioTable() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<div class=\"v2-table-wrap\"><table><thead><tr><th>Priority</th><th>Request path</th><th>Conditions</th><th>Response</th><th>Action</th></tr></thead><tbody><tr><td>#1</td><td>GET /products/:id</td><td>Path · id equals 123</td><td>200 OK</td><td><button @click=\"inspector = true\">Edit ↗</button></td></tr><tr><td>#2</td><td>GET /products/:id</td><td>Path · id is empty</td><td>400 Bad Request</td><td><button @click=\"inspector = true\">Edit ↗</button></td></tr><tr><td>Default</td><td>GET /products/:id</td><td>When no condition matches</td><td>404 Not Found</td><td><button @click=\"inspector = true\">Edit ↗</button></td></tr></tbody></table></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "<div class=\"v2-table-wrap\"><table><thead><tr><th>Priority</th><th>Request path</th><th>Conditions</th><th>Response</th><th>Action</th></tr></thead><tbody><tr><td>#1</td><td>GET /products/:id</td><td>Path · id equals 123</td><td>200 OK</td><td><button @click=\"inspector = true\">Edit ↗</button></td></tr><tr><td>#2</td><td>GET /products/:id</td><td>Path · id is empty</td><td>400 Bad Request</td><td><button @click=\"inspector = true\">Edit ↗</button></td></tr><tr><td>Default</td><td>GET /products/:id</td><td>When no condition matches</td><td>404 Not Found</td><td><button @click=\"inspector = true\">Edit ↗</button></td></tr></tbody></table></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -676,7 +689,7 @@ func V2Environments() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "<div class=\"v2-content\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<div class=\"v2-content\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -684,105 +697,105 @@ func V2Environments() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "<div class=\"v2-environments\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "<div class=\"v2-environments\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, name := range []string{"Development", "Staging", "Production"} {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<button class=\"v2-env-card\" :class=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<button class=\"v2-env-card\" :class=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var27 string
 			templ_7745c5c3_Var27, templ_7745c5c3_Err = templruntime.NewAttributeExpression("environment === '" + name + "' && 'selected'").Resolve(ctx)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 125, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 130, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "\" @click=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\" @click=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var28 string
 			templ_7745c5c3_Var28, templ_7745c5c3_Err = templruntime.NewAttributeExpression("environment = '" + name + "'").Resolve(ctx)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 125, Col: 118}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 130, Col: 118}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "\"><span>◈</span><strong>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "\"><span>◈</span><strong>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var29 string
 			templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 125, Col: 151}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 130, Col: 151}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "</strong><small>Sample environment</small></button>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "</strong><small>Sample environment</small></button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</div><div class=\"v2-split\"><section class=\"v2-card\"><header><h2>Variables <span class=\"v2-sample\" x-text=\"environment\"></span></h2><button @click=\"notice = 'Variable creation is a visual placeholder.'\">+ Add variable</button></header><p class=\"v2-info\">Preview values only. Public mock behavior is unchanged.</p><div class=\"v2-table-wrap\"><table><thead><tr><th>Key</th><th>Value</th><th>Type</th><th>Action</th></tr></thead><tbody>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "</div><div class=\"v2-split\"><section class=\"v2-card\"><header><h2>Variables <span class=\"v2-sample\" x-text=\"environment\"></span></h2><button @click=\"notice = 'Variable creation is a visual placeholder.'\">+ Add variable</button></header><p class=\"v2-info\">Preview values only. Public mock behavior is unchanged.</p><div class=\"v2-table-wrap\"><table><thead><tr><th>Key</th><th>Value</th><th>Type</th><th>Action</th></tr></thead><tbody>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, row := range [][]string{{"api_url", "/public/commerce", "String"}, {"currency", "USD", "String"}, {"delay_ms", "150", "Number"}, {"feature_enabled", "true", "Boolean"}, {"demo_token", "••••••••", "Secret"}} {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<tr><td><code>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "<tr><td><code>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var30 string
 			templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(row[0])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 129, Col: 23}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 134, Col: 23}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "</code></td><td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</code></td><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var31 string
 			templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(row[1])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 129, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 134, Col: 49}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</td><td><span class=\"v2-sample\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</td><td><span class=\"v2-sample\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var32 string
 			templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(row[2])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 129, Col: 92}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 134, Col: 92}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</span></td><td><button @click=\"notice = 'Use the sample variable form on the right.'\">Edit</button></td></tr>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "</span></td><td><button @click=\"notice = 'Use the sample variable form on the right.'\">Edit</button></td></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</tbody></table></div><footer>5 sample variables</footer></section><section class=\"v2-card\"><h2>Edit variable</h2><p>Changes are local to this preview.</p><label>Key<input value=\"currency\"></label><label>Value<input value=\"USD\"></label><label>Type<select><option>String</option><option>Number</option><option>Boolean</option><option>Secret</option></select></label><button class=\"v2-primary\" @click=\"notice = 'Preview only. No variable was saved.'\">Save variable</button></section></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "</tbody></table></div><footer>5 sample variables</footer></section><section class=\"v2-card\"><h2>Edit variable</h2><p>Changes are local to this preview.</p><label>Key<input value=\"currency\"></label><label>Value<input value=\"USD\"></label><label>Type<select><option>String</option><option>Number</option><option>Boolean</option><option>Secret</option></select></label><button class=\"v2-primary\" @click=\"notice = 'Preview only. No variable was saved.'\">Save variable</button></section></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -807,7 +820,7 @@ func V2Mocks() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "<div class=\"v2-content\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "<div class=\"v2-content\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -815,82 +828,82 @@ func V2Mocks() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "<div class=\"v2-stats\"><div><span>ENDPOINTS</span><strong>12</strong><small>Across this workspace</small></div><div><span>ENABLED</span><strong>10</strong><small>Ready for requests</small></div><div><span>CONDITIONS</span><strong>24</strong><small>Priority-based scenarios</small></div></div><section class=\"v2-card\"><header><div><h2>Workspace mocks</h2><p>Base URL · /public/commerce</p></div><a class=\"v2-primary\" href=\"/app/v2/endpoints\">+ New endpoint</a></header><div class=\"v2-filters\"><input placeholder=\"Search mocks…\" aria-label=\"Search sample mocks\" @input=\"notice = 'Search is a visual placeholder.'\"><select aria-label=\"Sample method filter\"><option>All methods</option><option>GET</option><option>POST</option></select></div><div class=\"v2-table-wrap\"><table><thead><tr><th>Name / Path</th><th>Method</th><th>Scenarios</th><th>Response mode</th><th>Status</th><th>Action</th></tr></thead><tbody>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "<div class=\"v2-stats\"><div><span>ENDPOINTS</span><strong>12</strong><small>Across this workspace</small></div><div><span>ENABLED</span><strong>10</strong><small>Ready for requests</small></div><div><span>CONDITIONS</span><strong>24</strong><small>Priority-based scenarios</small></div></div><section class=\"v2-card\"><header><div><h2>Workspace mocks</h2><p>Base URL · /public/commerce</p></div><a class=\"v2-primary\" href=\"/app/v2/endpoints\">+ New endpoint</a></header><div class=\"v2-filters\"><input placeholder=\"Search mocks…\" aria-label=\"Search sample mocks\" @input=\"notice = 'Search is a visual placeholder.'\"><select aria-label=\"Sample method filter\"><option>All methods</option><option>GET</option><option>POST</option></select></div><div class=\"v2-table-wrap\"><table><thead><tr><th>Name / Path</th><th>Method</th><th>Scenarios</th><th>Response mode</th><th>Status</th><th>Action</th></tr></thead><tbody>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, row := range [][]string{{"Get product", "/products/:id", "GET", "3", "Dynamic JSON"}, {"Create product", "/products", "POST", "2", "Static JSON"}, {"List orders", "/orders", "GET", "4", "Dynamic JSON"}, {"Health check", "/health", "GET", "1", "Static JSON"}} {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "<tr><td><strong>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "<tr><td><strong>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var34 string
 			templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(row[0])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 137, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 142, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "</strong><code class=\"v2-block\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "</strong><code class=\"v2-block\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var35 string
 			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(row[1])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 137, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 142, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "</code></td><td><span class=\"v2-method\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "</code></td><td><span class=\"v2-method\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var36 string
 			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(row[2])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 137, Col: 117}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 142, Col: 117}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "</span></td><td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "</span></td><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var37 string
 			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(row[3])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 137, Col: 143}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 142, Col: 143}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "</td><td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "</td><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var38 string
 			templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(row[4])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 137, Col: 162}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 142, Col: 162}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "</td><td><span class=\"v2-status\">● Enabled</span></td><td><a class=\"v2-button\" href=\"/app/v2/endpoints\">Open flow ↗</a></td></tr>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "</td><td><span class=\"v2-status\">● Enabled</span></td><td><a class=\"v2-button\" href=\"/app/v2/endpoints\">Open flow ↗</a></td></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "</tbody></table></div><footer>Showing 4 sample mocks · Counts are illustrative</footer></section></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "</tbody></table></div><footer>Showing 4 sample mocks · Counts are illustrative</footer></section></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -915,7 +928,7 @@ func V2Logs() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "<div class=\"v2-content\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "<div class=\"v2-content\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -923,82 +936,82 @@ func V2Logs() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "<div class=\"v2-split\"><section class=\"v2-card\"><header><h2>Recent requests</h2><span class=\"v2-status\">● Sample stream</span></header><div class=\"v2-filters\"><input placeholder=\"Search path or request ID…\" aria-label=\"Search sample logs\" @input=\"notice = 'Log search is a visual placeholder.'\"><select aria-label=\"Time range\"><option>Last 30 minutes</option><option>Last 24 hours</option></select></div><div class=\"v2-table-wrap\"><table><thead><tr><th>Time</th><th>Method</th><th>Path</th><th>Status</th><th>Duration</th></tr></thead><tbody>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "<div class=\"v2-split\"><section class=\"v2-card\"><header><h2>Recent requests</h2><span class=\"v2-status\">● Sample stream</span></header><div class=\"v2-filters\"><input placeholder=\"Search path or request ID…\" aria-label=\"Search sample logs\" @input=\"notice = 'Log search is a visual placeholder.'\"><select aria-label=\"Time range\"><option>Last 30 minutes</option><option>Last 24 hours</option></select></div><div class=\"v2-table-wrap\"><table><thead><tr><th>Time</th><th>Method</th><th>Path</th><th>Status</th><th>Duration</th></tr></thead><tbody>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, row := range [][]string{{"14:32:08", "GET", "/products/123", "200", "12 ms"}, {"14:32:02", "GET", "/products/invalid", "400", "8 ms"}, {"14:31:58", "GET", "/products/999", "404", "9 ms"}, {"14:31:51", "POST", "/products", "201", "16 ms"}, {"14:31:44", "GET", "/orders", "200", "18 ms"}} {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "<tr><td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "<tr><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var40 string
 			templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(row[0])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 145, Col: 17}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 150, Col: 17}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "</td><td><span class=\"v2-method\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "</td><td><span class=\"v2-method\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var41 string
 			templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(row[1])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 145, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 150, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "</span></td><td><code>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "</span></td><td><code>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var42 string
 			templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(row[2])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 145, Col: 92}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 150, Col: 92}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "</code></td><td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "</code></td><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var43 string
 			templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(row[3])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 145, Col: 118}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 150, Col: 118}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "</td><td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "</td><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var44 string
 			templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(row[4])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 145, Col: 137}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 150, Col: 137}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "</td></tr>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "</td></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "</tbody></table></div><footer>5 sample requests · No request history is collected here</footer></section><section class=\"v2-card\"><header><h2>GET /products/123</h2><span class=\"v2-method\">200 OK</span></header><p>Request ID · req_8f21</p><div class=\"v2-trace\"><div><span>↪</span><strong>Incoming request</strong><small>GET /products/123</small></div><div><span>◇</span><strong>Condition #1 · Product found</strong><small>Matched · id equals 123</small></div><div><span>✓</span><strong>Response · 200 OK</strong><small>Default was not evaluated</small></div></div><h3>Response body</h3><pre>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "</tbody></table></div><footer>5 sample requests · No request history is collected here</footer></section><section class=\"v2-card\"><header><h2>GET /products/123</h2><span class=\"v2-method\">200 OK</span></header><p>Request ID · req_8f21</p><div class=\"v2-trace\"><div><span>↪</span><strong>Incoming request</strong><small>GET /products/123</small></div><div><span>◇</span><strong>Condition #1 · Product found</strong><small>Matched · id equals 123</small></div><div><span>✓</span><strong>Response · 200 OK</strong><small>Default was not evaluated</small></div></div><h3>Response body</h3><pre>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1007,13 +1020,13 @@ func V2Logs() templ.Component {
   "name": "Wireless headphones",
   "price": 99.99 }`)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 149, Col: 19}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 154, Col: 19}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "</pre><a class=\"v2-button v2-block\" href=\"/app/v2/endpoints\">Open in Node editor ↗</a></section></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "</pre><a class=\"v2-button v2-block\" href=\"/app/v2/endpoints\">Open in Node editor ↗</a></section></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1038,7 +1051,7 @@ func V2Settings() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "<div class=\"v2-content\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "<div class=\"v2-content\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1046,105 +1059,105 @@ func V2Settings() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "<div class=\"v2-tabs\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, "<div class=\"v2-tabs\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, name := range []string{"General", "Members", "Mock defaults"} {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "<button :class=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "<button :class=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var47 string
 			templ_7745c5c3_Var47, templ_7745c5c3_Err = templruntime.NewAttributeExpression("tab === '" + name + "' && 'selected'").Resolve(ctx)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 155, Col: 52}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 160, Col: 52}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var47)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, "\" @click=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "\" @click=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var48 string
 			templ_7745c5c3_Var48, templ_7745c5c3_Err = templruntime.NewAttributeExpression("tab = '" + name + "'").Resolve(ctx)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 155, Col: 82}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 160, Col: 82}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var48)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var49 string
 			templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 155, Col: 91}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 160, Col: 91}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var49))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "</button>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "</div><div x-show=\"tab === 'General'\" class=\"v2-split\"><section class=\"v2-card\"><h2>Workspace details</h2><label>Workspace name<input value=\"Commerce API\"></label><label>Workspace slug<input value=\"commerce\"></label><p>Changing the slug would change all public mock URLs.</p><label>Public base URL<input value=\"http://localhost:18080/public/commerce\" readonly></label><label>Description<textarea>Mock APIs for storefront integration.</textarea></label><button class=\"v2-primary\" @click=\"notice = 'Preview only. No workspace changes were saved.'\">Save changes</button></section><div class=\"v2-stack\"><section class=\"v2-card\"><h2>Access summary</h2><dl><dt>Your role</dt><dd>Owner</dd><dt>Owner</dt><dd>Alex Morgan</dd><dt>Members</dt><dd>3</dd></dl><button @click=\"tab = 'Members'\">Manage members ↗</button></section><section class=\"v2-card v2-danger\"><h2>Danger zone</h2><p>Workspace deletion is disabled in this design preview.</p><button disabled>Delete workspace</button></section></div></div><section class=\"v2-card\" x-show=\"tab === 'Members'\" x-cloak><header><h2>Workspace members</h2><button @click=\"notice = 'Member invitations are a visual placeholder.'\">+ Add member</button></header><div class=\"v2-table-wrap\"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead><tbody>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "</div><div x-show=\"tab === 'General'\" class=\"v2-split\"><section class=\"v2-card\"><h2>Workspace details</h2><label>Workspace name<input value=\"Commerce API\"></label><label>Workspace slug<input value=\"commerce\"></label><p>Changing the slug would change all public mock URLs.</p><label>Public base URL<input value=\"http://localhost:18080/public/commerce\" readonly></label><label>Description<textarea>Mock APIs for storefront integration.</textarea></label><button class=\"v2-primary\" @click=\"notice = 'Preview only. No workspace changes were saved.'\">Save changes</button></section><div class=\"v2-stack\"><section class=\"v2-card\"><h2>Access summary</h2><dl><dt>Your role</dt><dd>Owner</dd><dt>Owner</dt><dd>Alex Morgan</dd><dt>Members</dt><dd>3</dd></dl><button @click=\"tab = 'Members'\">Manage members ↗</button></section><section class=\"v2-card v2-danger\"><h2>Danger zone</h2><p>Workspace deletion is disabled in this design preview.</p><button disabled>Delete workspace</button></section></div></div><section class=\"v2-card\" x-show=\"tab === 'Members'\" x-cloak><header><h2>Workspace members</h2><button @click=\"notice = 'Member invitations are a visual placeholder.'\">+ Add member</button></header><div class=\"v2-table-wrap\"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead><tbody>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, row := range [][]string{{"Alex Morgan", "alex@example.test", "Owner"}, {"Jamie Lee", "jamie@example.test", "Editor"}, {"Taylor Reed", "taylor@example.test", "Viewer"}} {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "<tr><td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "<tr><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var50 string
 			templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinStringErrs(row[0])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 159, Col: 17}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 164, Col: 17}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "</td><td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "</td><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var51 string
 			templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.JoinStringErrs(row[1])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 159, Col: 36}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 164, Col: 36}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var51))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "</td><td><span class=\"v2-sample\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "</td><td><span class=\"v2-sample\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var52 string
 			templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.JoinStringErrs(row[2])
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 159, Col: 79}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/v2.templ`, Line: 164, Col: 79}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var52))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "</span></td></tr>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "</span></td></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "</tbody></table></div></section><section class=\"v2-card v2-defaults\" x-show=\"tab === 'Mock defaults'\" x-cloak><h2>Mock defaults</h2><label>Default environment<select><option>Development</option><option>Staging</option><option>Production</option></select></label><label>Response format<select><option>JSON</option></select></label><label>Default latency (ms)<input type=\"number\" value=\"0\" min=\"0\"></label><button class=\"v2-primary\" @click=\"notice = 'Preview only. No mock defaults were saved.'\">Save defaults</button></section></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 95, "</tbody></table></div></section><section class=\"v2-card v2-defaults\" x-show=\"tab === 'Mock defaults'\" x-cloak><h2>Mock defaults</h2><label>Default environment<select><option>Development</option><option>Staging</option><option>Production</option></select></label><label>Response format<select><option>JSON</option></select></label><label>Default latency (ms)<input type=\"number\" value=\"0\" min=\"0\"></label><button class=\"v2-primary\" @click=\"notice = 'Preview only. No mock defaults were saved.'\">Save defaults</button></section></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1169,7 +1182,7 @@ func V2EndpointList() templ.Component {
 		}
 		ctx = templ.InitializeContext(ctx)
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "<section class=\"v2-endpoint-list\"><header><strong>Endpoints <small>3</small></strong><button @click=\"notice = 'Endpoint creation is a visual placeholder.'\" aria-label=\"Add sample endpoint\">+</button></header><input placeholder=\"Search endpoints…\" aria-label=\"Search sample endpoints\" @input=\"notice = 'Search is a visual placeholder in this template.'\"><button class=\"v2-endpoint-selected\"><b class=\"v2-method\">GET</b> /products/:id</button><button @click=\"notice = 'Sample endpoint · POST /products'\"><b class=\"v2-method v2-post\">POST</b> /products</button><button @click=\"notice = 'Sample endpoint · GET /orders'\"><b class=\"v2-method\">GET</b> /orders</button><div class=\"v2-list-bottom\">3 endpoints · Sample data</div></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "<section class=\"v2-endpoint-list\"><header><strong>Endpoints <small>3</small></strong><button @click=\"notice = 'Endpoint creation is a visual placeholder.'\" aria-label=\"Add sample endpoint\">+</button></header><input placeholder=\"Search endpoints…\" aria-label=\"Search sample endpoints\" @input=\"notice = 'Search is a visual placeholder in this template.'\"><button class=\"v2-endpoint-selected\"><b class=\"v2-method\">GET</b> /products/:id</button><button @click=\"notice = 'Sample endpoint · POST /products'\"><b class=\"v2-method v2-post\">POST</b> /products</button><button @click=\"notice = 'Sample endpoint · GET /orders'\"><b class=\"v2-method\">GET</b> /orders</button><div class=\"v2-list-bottom\">3 endpoints · Sample data</div></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

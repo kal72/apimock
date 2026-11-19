@@ -209,3 +209,56 @@ func (r Repository) ChangePassword(ctx context.Context, id, old, next string) er
 	}
 	return tx.Commit(ctx)
 }
+
+func (r Repository) APIKeys(ctx context.Context, userID string) ([]domain.APIKey, error) {
+	rows, err := r.Pool.Query(ctx, "SELECT id, user_id, name, prefix, created_at, last_used_at FROM app_api_keys WHERE user_id=$1 ORDER BY created_at DESC", userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := []domain.APIKey{}
+	for rows.Next() {
+		var k domain.APIKey
+		if err := rows.Scan(&k.ID, &k.UserID, &k.Name, &k.Prefix, &k.CreatedAt, &k.LastUsedAt); err != nil {
+			return nil, err
+		}
+		out = append(out, k)
+	}
+	return out, rows.Err()
+}
+
+func (r Repository) CreateAPIKey(ctx context.Context, k domain.APIKey) error {
+	_, err := r.Pool.Exec(ctx, "INSERT INTO app_api_keys(id, user_id, name, key_hash, prefix, created_at) VALUES($1, $2, $3, $4, $5, $6)",
+		k.ID, k.UserID, k.Name, k.KeyHash, k.Prefix, k.CreatedAt)
+	return dbError(err)
+}
+
+func (r Repository) DeleteAPIKey(ctx context.Context, userID, keyID string) error {
+	tag, err := r.Pool.Exec(ctx, "DELETE FROM app_api_keys WHERE id=$1 AND user_id=$2", keyID, userID)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return domain.ErrNotFound
+	}
+	return nil
+}
+
+func (r Repository) AuthenticateAPIKey(ctx context.Context, hash string) (domain.User, error) {
+	var u domain.User
+	var keyID string
+	err := r.Pool.QueryRow(ctx, `
+		SELECT u.id, u.username, u.name, u.role, u.active, u.password_hash, u.created_at, k.id
+		FROM app_users u
+		JOIN app_api_keys k ON u.id = k.user_id
+		WHERE k.key_hash = $1 AND u.active
+	`, hash).Scan(&u.ID, &u.Username, &u.Name, &u.Role, &u.Active, &u.PasswordHash, &u.CreatedAt, &keyID)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return domain.User{}, usecase.ErrUnauthorized
+	}
+	if err != nil {
+		return domain.User{}, err
+	}
+	_, _ = r.Pool.Exec(ctx, "UPDATE app_api_keys SET last_used_at = now() WHERE id = $1", keyID)
+	return u, nil
+}

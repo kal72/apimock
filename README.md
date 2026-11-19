@@ -1,12 +1,14 @@
 # Mocklab
 
+[![GitHub Repository](https://img.shields.io/badge/GitHub-kal72%2Fapimock-181717?logo=github&logoColor=white)](https://github.com/kal72/apimock)
+
 Mocklab is a web application for building and running REST API mocks. Organize endpoints in workspaces, design Incoming → Condition → Response flows in Node or Table mode, and return Static or Dynamic JSON through callable URLs at `/public/{workspace-slug}/...`.
 
 It includes request conditions, response generators, a testing Playground, login, and Viewer/Editor/Owner workspace access.
 
-## Screenshot
+## Screenshots
 
-![Mocklab workspace showing response scenarios and the request playground](docs/img/main-node-mode-full.jpg)
+![Mocklab workspace showing response scenarios and the request playground in Light theme](docs/img/v2-header-light.jpg)
 
 ## Tech stack and dependencies
 
@@ -32,6 +34,7 @@ internal/domain/            Entities, flow and template validation
 internal/usecase/           Application logic, matching and rendering
 internal/repository/        Persistence and embedded migrations
 internal/handler/           Routes, authentication and middleware
+internal/mcp/               Model Context Protocol (MCP) server & tools
 internal/web/               templ components and embedded assets
 web/src/                    Alpine state, editor helpers and styling
 ```
@@ -99,6 +102,25 @@ curl http://localhost:8080/public/demo-store/products/123
 ```
 
 Replace the origin/port and workspace slug as needed. Management pages require login; saved mock URLs are callable without a management session. Workspace owners can also enable a shareable **Public API Docs & Playground** portal at `/share/{workspace-slug}` from Workspace Settings so external viewers can browse endpoint documentation and test APIs interactively without logging in.
+
+### 5. Model Context Protocol (MCP) for AI Agents
+
+Mocklab provides an official **Model Context Protocol (MCP)** server over HTTP/SSE (`GET /api/mcp/sse` and `POST /api/mcp/messages`) allowing AI coding assistants (such as Cursor, Claude Desktop, and Antigravity) to autonomously inspect, create, configure, and test mock endpoints:
+
+```json
+{
+  "mcpServers": {
+    "mocklab": {
+      "url": "http://localhost:8080/api/mcp/sse",
+      "headers": {
+        "Authorization": "Bearer mlk_your_api_key_here"
+      }
+    }
+  }
+}
+```
+
+In development mode, connection is open without credentials. In production or managed environments, generate an API key (`mlk_...`) from the Mocklab Web UI by clicking your user profile dropdown in the top bar and choosing **MCP API Keys**. See [MCP Guide](docs/MCP.md) for tool references and setup details.
 
 For internal deployment, HTTPS ingress, and CORS, see [Deployment](docs/DEPLOYMENT.md). For automated deployment with Podman, see [CI/CD Guide](docs/CI_CD.md). For application workflows, see [Usage](docs/USAGE.md), [Dynamic JSON](docs/DYNAMIC_JSON.md), [Environments](docs/ENVIRONMENTS.md), and [Access control](docs/ACCESS_CONTROL.md). The in-app generator reference is available at `/docs/generators` after signing in.
 

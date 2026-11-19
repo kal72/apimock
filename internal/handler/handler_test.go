@@ -58,6 +58,8 @@ func TestTransport(t *testing.T) {
 		status                           int
 	}{
 		{"page", "GET", "/app", "", "", 200},
+		{"favicon ico", "GET", "/favicon.ico", "", "", 200},
+		{"favicon svg", "GET", "/favicon.svg", "", "", 200},
 		{"mock parameter", "GET", "/public/demo/products/123", "", "", 200},
 		{"missing workspace", "GET", "/public/missing/products/123", "", "", 404},
 		{"method mismatch", "POST", "/public/demo/products/123", `{}`, "", 404},

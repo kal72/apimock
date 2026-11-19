@@ -23,7 +23,6 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 - Added direct GitHub repository links (`https://github.com/kal72/apimock`) across the application interface featuring the official Octocat vector icon (`@V2Icon("github")`):
   - Primary application topbar (`Toolbar` in `internal/web/page.templ`, styled via `.v2-github-link` in `web/src/toolbar.css`) alongside the theme toggle switch.
-  - Sidebar navigation (`Sidebar` in `internal/web/page.templ`) as an external navigation item (`GitHub ↗`) within `.v2-nav`.
   - Public API documentation portal header (`PublicDocsPage` in `internal/web/public_docs.templ`) in `.apidoc-topbar-right`.
   - Documentation & Reference header (`GeneratorDocumentation` in `internal/web/generators.templ`) in `.docs-header`.
   - Authentication login and administrator setup card header (`AuthPage` in `internal/web/identity.templ`).
@@ -52,7 +51,8 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 - Simplified the Table mode Scenario View modal (`modal === 'view'`, `.path-view-modal` in `internal/web/page.templ` and `web/src/path-view.css`) into a clean, minimalist 1-page inspector without tabs or visual clutter:
   - Eliminated navigation tabs, multi-level toolbars, verbose explanatory banners, and extraneous request payload examples so users immediately see only the essential scenario details without fragmented clicks or sensory overload.
-  - Streamlined the layout into an intuitive single-page vertical flow: Method & Route with prominent HTTP Status badge (`HTTP 200 OK`, `HTTP 404 Not Found`, etc.) and delay indicator; 1-click Copy URL bar; compact condition summary (e.g. `Default fallback`, `Unconditional`, or concise rule chips); full-width Response Body with 1-click Copy button; and an optional compact Response Headers list when custom headers are configured.
+  - Standardized section headers with dedicated titles above each content block (excluding the top endpoint hero): `CONDITION` (displaying fallback badges or rule chips in a distinct container), `RESPONSE BODY` (with 1-click copy action), and `RESPONSE HEADERS` (when custom headers are configured).
+  - Streamlined the layout into an intuitive single-page vertical flow: Method & Route with prominent HTTP Status badge (`HTTP 200 OK`, `HTTP 404 Not Found`, etc.) and delay indicator; 1-click Copy URL bar; full-width Response Body; and compact Response Headers list.
   - Optimized dialog footprint (`width: min(740px, 94vw)`) with unified Light (Cloudline) and Night (Moonlight) high-contrast theme styling.
 
 ### Fixed
@@ -76,6 +76,8 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
   - Removed resetting rules (`.scenario-table th:first-child, .scenario-table th:last-child { width: auto; }`) and restored explicit, balanced column widths (Priority `95px`, Request path `240px`, Conditions `min-width: 240px`, Response `min-width: 280px`, and Actions `165px`).
 
 ### Removed
+
+- Removed the external GitHub link item (`GitHub ↗`) from the sidebar navigation menu (`Sidebar` in `internal/web/page.templ`), keeping the sidebar focused on workspace pages and documentation while preserving the GitHub repository icon button in the top application bar.
 
 - Removed the static `MCP_API_KEY` environment variable, `.env.example` entry, and application configuration field in favor of dynamic, user-generated API keys managed directly through the Mocklab Web UI profile popover.
 

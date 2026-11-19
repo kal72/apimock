@@ -96,33 +96,38 @@
   background: #2563eb18;
 }
 
-/* 3. Section Labels */
+/* 3. Common Section Layout & Labels */
+.path-view-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.path-view-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .path-view-label {
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 750;
   letter-spacing: 0.6px;
   color: var(--v2-muted, #64748b);
   text-transform: uppercase;
 }
 
-/* 4. Condition Row */
-.path-view-row {
+/* 4. Condition Box */
+.path-view-condition-box {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
-  padding: 8px 10px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
   background: var(--v2-soft, #f8fafc);
   border: 1px solid var(--v2-border, #e2e8f0);
   border-radius: 6px;
   flex-wrap: wrap;
-}
-
-.path-view-condition-val {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-  font-size: 12px;
+  min-height: 38px;
 }
 
 .path-view-chip {
@@ -204,18 +209,6 @@
 }
 
 /* 5. Response Body Section */
-.path-view-body-section {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.path-view-section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 .path-view-copy-btn {
   background: transparent;
   border: 1px solid var(--v2-border, #cbd5e1);
@@ -250,12 +243,6 @@
 }
 
 /* 6. Response Headers Section */
-.path-view-headers-section {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
 .path-view-headers-list {
   display: flex;
   flex-direction: column;
@@ -310,7 +297,7 @@
   background: #60a5fa24;
 }
 
-[data-theme=night] .path-view-row {
+[data-theme=night] .path-view-condition-box {
   background: #0d1624;
   border-color: #243750;
 }

@@ -62,7 +62,6 @@ templ Sidebar() {
 			<button type="button" class="v2-nav-item" :class="navPage === 'environments' && 'v2-active'" :aria-current="navPage === 'environments' ? 'page' : 'false'" @click="openPage('environments')"><span>◈</span>Environments</button>
 			<button type="button" class="v2-nav-item" x-show="workspace" x-cloak :class="navPage === 'settings' && 'v2-active'" :aria-current="navPage === 'settings' ? 'page' : 'false'" @click="openPage('settings')"><span>⚙</span>Settings</button>
 			<a class="v2-nav-item" href="/docs/generators" target="_blank" rel="noopener"><span>≡</span>Docs &amp; Reference ↗</a>
-			<a class="v2-nav-item" href="https://github.com/kal72/apimock" target="_blank" rel="noopener noreferrer" title="Mocklab on GitHub"><span>@V2Icon("github")</span>GitHub ↗</a>
 		</nav>
 		<section class="v2-endpoint-list">
 			<header>
@@ -406,10 +405,12 @@ templ Dialogs() {
       <button type="button" class="path-view-url-copy" @click="copyText(preview.url, 'Endpoint URL copied')">Copy URL</button>
      </div>
 
-     <!-- Condition (When does this scenario run) -->
-     <div class="path-view-row">
-      <span class="path-view-label">CONDITION</span>
-      <div class="path-view-condition-val">
+     <!-- Condition Section -->
+     <div class="path-view-section">
+      <div class="path-view-section-header">
+       <span class="path-view-label">CONDITION</span>
+      </div>
+      <div class="path-view-condition-box">
        <span class="path-view-chip is-default" x-show="preview.isDefault">Default fallback</span>
        <span class="path-view-chip is-unconditional" x-show="!preview.isDefault && !preview.conditions.length">Unconditional</span>
        <div class="path-view-rules-compact" x-show="preview.conditions.length">
@@ -431,7 +432,7 @@ templ Dialogs() {
      </div>
 
      <!-- Response Body -->
-     <div class="path-view-body-section">
+     <div class="path-view-section">
       <div class="path-view-section-header">
        <span class="path-view-label">RESPONSE BODY</span>
        <button type="button" class="path-view-copy-btn" @click="copyText(preview.body ? formatValue(preview.body) : '', 'Response body copied')">Copy</button>
@@ -440,7 +441,7 @@ templ Dialogs() {
      </div>
 
      <!-- Response Headers (Only shown if custom headers configured) -->
-     <div class="path-view-headers-section" x-show="preview.headers && Object.keys(preview.headers).length">
+     <div class="path-view-section" x-show="preview.headers && Object.keys(preview.headers).length">
       <div class="path-view-section-header">
        <span class="path-view-label">RESPONSE HEADERS</span>
       </div>

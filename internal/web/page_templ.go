@@ -127,7 +127,7 @@ func Sidebar() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<nav class=\"v2-nav\" aria-label=\"Workspace navigation\"><button type=\"button\" class=\"v2-nav-item\" :class=\"navPage === 'endpoints' && !modal && 'v2-active'\" :aria-current=\"navPage === 'endpoints' ? 'page' : 'false'\" @click=\"openPage('endpoints')\"><span>⌘</span>Endpoints</button> <button type=\"button\" class=\"v2-nav-item\" :class=\"navPage === 'environments' && 'v2-active'\" :aria-current=\"navPage === 'environments' ? 'page' : 'false'\" @click=\"openPage('environments')\"><span>◈</span>Environments</button> <button type=\"button\" class=\"v2-nav-item\" x-show=\"workspace\" x-cloak :class=\"navPage === 'settings' && 'v2-active'\" :aria-current=\"navPage === 'settings' ? 'page' : 'false'\" @click=\"openPage('settings')\"><span>⚙</span>Settings</button> <a class=\"v2-nav-item\" href=\"/docs/generators\" target=\"_blank\" rel=\"noopener\"><span>≡</span>Docs &amp; Reference ↗</a></nav><section class=\"v2-endpoint-list\"><header><strong>Endpoints <small class=\"sidebar-count\" :class=\"search?.trim() && 'is-filtered'\" x-text=\"search?.trim() ? filteredEndpoints.length + '/' + endpoints.length : endpoints.length\" :title=\"search?.trim() ? `${filteredEndpoints.length} of ${endpoints.length} endpoints shown` : `${endpoints.length} endpoints`\"></small></strong> <button type=\"button\" :disabled=\"!workspace || !canEditWorkspace\" @click=\"newEndpoint()\" aria-label=\"Add endpoint\" title=\"Add endpoint\">+</button></header><input class=\"search-input\" placeholder=\"Search endpoints…\" aria-label=\"Search endpoints\" x-model=\"search\"><nav class=\"endpoint-list\" aria-label=\"Endpoints\"><template x-for=\"e in filteredEndpoints\" :key=\"e.id\"><button type=\"button\" class=\"endpoint-link\" :class=\"navPage === 'endpoints' && endpoint?.id === e.id ? 'active v2-endpoint-selected' : ''\" @click=\"navPage = 'endpoints'; selectEndpoint(e)\"><b class=\"method v2-method\" :class=\"[e.method.toLowerCase(), 'v2-' + e.method.toLowerCase()]\" x-text=\"e.method\"></b> <span class=\"truncate\" x-text=\"e.path\"></span></button></template></nav></section><div class=\"sidebar-bottom v2-sidebar-note\"><span class=\"v2-kicker\">API WORKSPACE</span><p>Build before the backend.<br>One workspace. Endless possibilities.</p><div class=\"v2-sidebar-meta\" x-show=\"workspace\" x-cloak><span class=\"v2-sample\" x-text=\"(workspace?.role || 'viewer') + ' access'\"></span> <button type=\"button\" class=\"v2-copy-base-inline\" :title=\"baseURL\" @click=\"copyBaseURL()\">Copy base URL ↗</button></div></div></aside>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<nav class=\"v2-nav\" aria-label=\"Workspace navigation\"><button type=\"button\" class=\"v2-nav-item\" :class=\"navPage === 'endpoints' && !modal && 'v2-active'\" :aria-current=\"navPage === 'endpoints' ? 'page' : 'false'\" @click=\"openPage('endpoints')\"><span>⌘</span>Endpoints</button> <button type=\"button\" class=\"v2-nav-item\" :class=\"navPage === 'environments' && 'v2-active'\" :aria-current=\"navPage === 'environments' ? 'page' : 'false'\" @click=\"openPage('environments')\"><span>◈</span>Environments</button> <button type=\"button\" class=\"v2-nav-item\" x-show=\"workspace\" x-cloak :class=\"navPage === 'settings' && 'v2-active'\" :aria-current=\"navPage === 'settings' ? 'page' : 'false'\" @click=\"openPage('settings')\"><span>⚙</span>Settings</button></nav><section class=\"v2-endpoint-list\"><header><strong>Endpoints <small class=\"sidebar-count\" :class=\"search?.trim() && 'is-filtered'\" x-text=\"search?.trim() ? filteredEndpoints.length + '/' + endpoints.length : endpoints.length\" :title=\"search?.trim() ? `${filteredEndpoints.length} of ${endpoints.length} endpoints shown` : `${endpoints.length} endpoints`\"></small></strong> <button type=\"button\" :disabled=\"!workspace || !canEditWorkspace\" @click=\"newEndpoint()\" aria-label=\"Add endpoint\" title=\"Add endpoint\">+</button></header><input class=\"search-input\" placeholder=\"Search endpoints…\" aria-label=\"Search endpoints\" x-model=\"search\"><nav class=\"endpoint-list\" aria-label=\"Endpoints\"><template x-for=\"e in filteredEndpoints\" :key=\"e.id\"><button type=\"button\" class=\"endpoint-link\" :class=\"navPage === 'endpoints' && endpoint?.id === e.id ? 'active v2-endpoint-selected' : ''\" @click=\"navPage = 'endpoints'; selectEndpoint(e)\"><b class=\"method v2-method\" :class=\"[e.method.toLowerCase(), 'v2-' + e.method.toLowerCase()]\" x-text=\"e.method\"></b> <span class=\"truncate\" x-text=\"e.path\"></span></button></template></nav></section><div class=\"sidebar-bottom v2-sidebar-note\"><span class=\"v2-kicker\">API WORKSPACE</span> <a class=\"v2-sidebar-docs-link\" href=\"/docs/generators\" target=\"_blank\" rel=\"noopener\">Docs &amp; Reference ↗</a><div class=\"v2-sidebar-meta\" x-show=\"workspace\" x-cloak><span class=\"v2-sample\" x-text=\"(workspace?.role || 'viewer') + ' access'\"></span> <button type=\"button\" class=\"v2-copy-base-inline\" :title=\"baseURL\" @click=\"copyBaseURL()\">Copy base URL ↗</button></div></div></aside>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -505,7 +505,7 @@ func ScenarioHeaders(binding string) templ.Component {
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templruntime.NewAttributeExpression(binding + ".push({key:'',value:''})").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 710, Col: 174}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 709, Col: 174}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
 		if templ_7745c5c3_Err != nil {
@@ -518,7 +518,7 @@ func ScenarioHeaders(binding string) templ.Component {
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templruntime.NewAttributeExpression("(header, index) in " + binding).Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 710, Col: 249}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 709, Col: 249}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
 		if templ_7745c5c3_Err != nil {
@@ -531,7 +531,7 @@ func ScenarioHeaders(binding string) templ.Component {
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templruntime.NewAttributeExpression(binding + ".splice(index,1)").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 710, Col: 522}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 709, Col: 522}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
 		if templ_7745c5c3_Err != nil {
@@ -569,7 +569,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".label").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 716, Col: 76}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 715, Col: 76}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
 		if templ_7745c5c3_Err != nil {
@@ -582,7 +582,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".template").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 717, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 716, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var19)
 		if templ_7745c5c3_Err != nil {
@@ -595,7 +595,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templruntime.NewAttributeExpression("selectScenarioResponseTemplate('" + section + "', $event.target.value)").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 717, Col: 163}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 716, Col: 163}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var20)
 		if templ_7745c5c3_Err != nil {
@@ -608,7 +608,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".status").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 720, Col: 116}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 719, Col: 116}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var21)
 		if templ_7745c5c3_Err != nil {
@@ -621,7 +621,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".delay_ms").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 721, Col: 126}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 720, Col: 126}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var22)
 		if templ_7745c5c3_Err != nil {
@@ -634,7 +634,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".response_mode").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 722, Col: 112}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 721, Col: 112}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
 		if templ_7745c5c3_Err != nil {
@@ -647,7 +647,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".response_mode === 'static'").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 724, Col: 84}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 723, Col: 84}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
 		if templ_7745c5c3_Err != nil {
@@ -660,7 +660,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".response_mode === 'dynamic'").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 725, Col: 105}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 724, Col: 105}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
 		if templ_7745c5c3_Err != nil {
@@ -673,7 +673,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var26 string
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".response_seed").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 727, Col: 96}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 726, Col: 96}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 		if templ_7745c5c3_Err != nil {
@@ -686,7 +686,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templruntime.NewAttributeExpression("openResponseVariables('" + section + "')").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 729, Col: 89}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 728, Col: 89}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
 		if templ_7745c5c3_Err != nil {
@@ -699,7 +699,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var28 string
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templruntime.NewAttributeExpression("variablePicker === '" + section + "'").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 732, Col: 88}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 731, Col: 88}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
 		if templ_7745c5c3_Err != nil {
@@ -712,7 +712,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var29 string
 		templ_7745c5c3_Var29, templ_7745c5c3_Err = templruntime.NewAttributeExpression("insertResponseVariable('" + section + "')").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 738, Col: 386}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 737, Col: 386}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var29)
 		if templ_7745c5c3_Err != nil {
@@ -733,7 +733,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var30 string
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".body").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 742, Col: 125}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 741, Col: 125}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var30)
 		if templ_7745c5c3_Err != nil {
@@ -746,7 +746,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".previewBusy").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 744, Col: 91}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 743, Col: 91}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var31)
 		if templ_7745c5c3_Err != nil {
@@ -759,7 +759,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var32 string
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templruntime.NewAttributeExpression("previewResponse('" + section + "')").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 744, Col: 139}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 743, Col: 139}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var32)
 		if templ_7745c5c3_Err != nil {
@@ -772,7 +772,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var33 string
 		templ_7745c5c3_Var33, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".previewError").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 747, Col: 91}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 746, Col: 91}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var33)
 		if templ_7745c5c3_Err != nil {
@@ -785,7 +785,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var34 string
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".previewError").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 747, Col: 146}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 746, Col: 146}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var34)
 		if templ_7745c5c3_Err != nil {
@@ -798,7 +798,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var35 string
 		templ_7745c5c3_Var35, templ_7745c5c3_Err = templruntime.NewAttributeExpression("scenarioForm." + section + ".previewResult").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 748, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 747, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
 		if templ_7745c5c3_Err != nil {
@@ -811,7 +811,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var36 string
 		templ_7745c5c3_Var36, templ_7745c5c3_Err = templruntime.NewAttributeExpression("formatValue(scenarioForm." + section + ".previewResult.body)").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 748, Col: 232}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 747, Col: 232}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
 		if templ_7745c5c3_Err != nil {
@@ -824,7 +824,7 @@ func ScenarioResponse(section string, title string) templ.Component {
 		var templ_7745c5c3_Var37 string
 		templ_7745c5c3_Var37, templ_7745c5c3_Err = templruntime.NewAttributeExpression("formatValue(scenarioForm." + section + ".previewResult.headers)").Resolve(ctx)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 748, Col: 351}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 747, Col: 351}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var37)
 		if templ_7745c5c3_Err != nil {
@@ -887,7 +887,7 @@ func SettingsPage() templ.Component {
 		var templ_7745c5c3_Var40 string
 		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs("{{ environment.key }}")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 1154, Col: 136}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/page.templ`, Line: 1153, Col: 136}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 		if templ_7745c5c3_Err != nil {

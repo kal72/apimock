@@ -49,6 +49,8 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Changed
 
+- Moved the "Docs & Reference" link from the primary sidebar navigation menu (`.v2-nav`) down to the sidebar footer (`.sidebar-bottom.v2-sidebar-note` in `internal/web/page.templ` and `web/src/cloudline.css`) as a lightweight text link while retaining the "API WORKSPACE" header kicker and removing the placeholder marketing tagline ("Build before the backend. One workspace. Endless possibilities.") to keep the sidebar focused, compact, and clean.
+
 - Simplified the Table mode Scenario View modal (`modal === 'view'`, `.path-view-modal` in `internal/web/page.templ` and `web/src/path-view.css`) into a clean, minimalist 1-page inspector without tabs or visual clutter:
   - Eliminated navigation tabs, multi-level toolbars, verbose explanatory banners, and extraneous request payload examples so users immediately see only the essential scenario details without fragmented clicks or sensory overload.
   - Standardized section headers with dedicated titles above each content block (excluding the top endpoint hero): `CONDITION` (displaying fallback badges or rule chips in a distinct container), `RESPONSE BODY` (with 1-click copy action), and `RESPONSE HEADERS` (when custom headers are configured).

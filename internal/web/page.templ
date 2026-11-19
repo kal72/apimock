@@ -61,7 +61,6 @@ templ Sidebar() {
 			<button type="button" class="v2-nav-item" :class="navPage === 'endpoints' && !modal && 'v2-active'" :aria-current="navPage === 'endpoints' ? 'page' : 'false'" @click="openPage('endpoints')"><span>⌘</span>Endpoints</button>
 			<button type="button" class="v2-nav-item" :class="navPage === 'environments' && 'v2-active'" :aria-current="navPage === 'environments' ? 'page' : 'false'" @click="openPage('environments')"><span>◈</span>Environments</button>
 			<button type="button" class="v2-nav-item" x-show="workspace" x-cloak :class="navPage === 'settings' && 'v2-active'" :aria-current="navPage === 'settings' ? 'page' : 'false'" @click="openPage('settings')"><span>⚙</span>Settings</button>
-			<a class="v2-nav-item" href="/docs/generators" target="_blank" rel="noopener"><span>≡</span>Docs &amp; Reference ↗</a>
 		</nav>
 		<section class="v2-endpoint-list">
 			<header>
@@ -80,7 +79,7 @@ templ Sidebar() {
 		</section>
 		<div class="sidebar-bottom v2-sidebar-note">
 			<span class="v2-kicker">API WORKSPACE</span>
-			<p>Build before the backend.<br/>One workspace. Endless possibilities.</p>
+			<a class="v2-sidebar-docs-link" href="/docs/generators" target="_blank" rel="noopener">Docs &amp; Reference ↗</a>
 			<div class="v2-sidebar-meta" x-show="workspace" x-cloak>
 				<span class="v2-sample" x-text="(workspace?.role || 'viewer') + ' access'"></span>
 				<button type="button" class="v2-copy-base-inline" :title="baseURL" @click="copyBaseURL()">Copy base URL ↗</button>

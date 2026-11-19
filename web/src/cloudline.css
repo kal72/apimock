@@ -361,14 +361,14 @@ body {
   background: color-mix(in oklab, var(--v2-cyan) 12%, var(--v2-surface));
 }
 
-/* Sidebar Bottom Note */
+/* Sidebar Bottom Note & Docs Link */
 .sidebar .v2-sidebar-note {
   display: flex;
   flex-direction: column;
   gap: 6px;
   margin-top: auto;
   border-top: 1px solid var(--v2-border);
-  padding-top: 14px;
+  padding-top: 12px;
   font-size: 10px;
   color: var(--v2-muted);
 }
@@ -377,6 +377,22 @@ body {
   margin: 0;
   line-height: 1.45;
   color: var(--v2-muted);
+}
+
+.v2-sidebar-docs-link {
+  color: var(--v2-blue);
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 550;
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  transition: opacity 0.15s;
+}
+
+.v2-sidebar-docs-link:hover {
+  text-decoration: underline;
+  opacity: 0.85;
 }
 
 .v2-sidebar-meta {

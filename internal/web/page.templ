@@ -197,7 +197,7 @@ templ FlowValidation() {
 
 templ FlowCanvas() {
  <section class="canvas-section v2-canvas-panel" x-show="mode === 'node'">
-  <header class="canvas-toolbar v2-canvas-header"><div><strong>Visual flow <span class="first-match-note v2-sample" x-show="branchModel">First match wins</span><span class="first-match-note v2-sample" x-show="!branchModel">Legacy graph · connections preserved</span></strong><span class="v2-node-count" x-text="endpoint.flow.nodes.length + ' nodes'"></span></div><div class="canvas-actions"><button type="button" x-show="canEditWorkspace" class="v2-add-condition" @click="openAddScenario()">+ Add condition</button></div></header>
+  <header class="canvas-toolbar v2-canvas-header"><div><strong>Visual flow <span class="first-match-note v2-sample" x-show="branchModel">First match wins</span><span class="first-match-note v2-sample" x-show="!branchModel">Legacy graph · connections preserved</span></strong><span class="v2-node-count" x-text="endpoint.flow.nodes.length + ' nodes'"></span></div><div class="canvas-actions"><button type="button" x-show="canEditWorkspace" class="v2-add-condition" @click="openAddScenario()">+ Add scenario</button></div></header>
   <div class="canvas-scroll v2-canvas" :class="pan && 'is-panning'" @pointerdown="startCanvasPan($event)"><div class="canvas-extent" :style="`width:${canvasWidth * zoom}px;height:${canvasHeight * zoom}px`"><div class="flow-canvas v2-graph" :style="`width:${canvasWidth}px;height:${canvasHeight}px;transform:scale(${zoom})`" @pointermove.window="moveNode($event)" @pointerup.window="drag = null; pan = null" @pointercancel.window="drag = null; pan = null">
    <template x-for="edge in canvasEdges" :key="edge.from + ':' + (edge.branch || '')">
     <svg class="connections v2-connections" :width="canvasWidth" :height="canvasHeight" aria-label="Flow connections">
@@ -236,7 +236,7 @@ templ TableEditor() {
 				</div>
 				<p class="scenario-heading-desc">Independent execution paths evaluated from top to bottom. The first matching rule wins; default response acts as the terminal fallback.</p>
 			</div>
-			<button type="button" x-show="canEditWorkspace" class="v2-primary v2-add-condition-btn" @click="openAddScenario()">+ Add condition</button>
+			<button type="button" x-show="canEditWorkspace" class="v2-primary v2-add-condition-btn" @click="openAddScenario()">+ Add scenario</button>
 		</header>
 		<div class="table-overflow v2-table-wrap">
 			<table class="v2-table scenario-table">
@@ -305,9 +305,9 @@ templ TableEditor() {
 							</td>
 							<td class="scenario-actions-cell">
 								<div class="table-row-actions">
-									<button type="button" class="v2-btn-action scenario-view-btn" @click="viewScenario(row)" :aria-label="'View path ' + row.label" title="View path preview and execution trace">View</button>
-									<button type="button" x-show="canEditWorkspace" class="v2-btn-action primary scenario-edit-btn" @click="editScenario(row)" :aria-label="'Edit path ' + row.label" title="Edit scenario response, conditions, and headers"><span>Edit</span> <span class="v2-btn-arrow" aria-hidden="true">↗</span></button>
-									<button type="button" x-show="canEditWorkspace &amp;&amp; !row.isDefault" class="v2-btn-action danger scenario-delete-btn" @click="removeScenarioRow(row)" :aria-label="'Delete condition ' + row.label" title="Delete condition scenario">✕</button>
+									<button type="button" class="v2-btn-action scenario-view-btn" @click="viewScenario(row)" :aria-label="'View scenario ' + row.label" title="View scenario details and execution trace">View</button>
+									<button type="button" x-show="canEditWorkspace" class="v2-btn-action primary scenario-edit-btn" @click="editScenario(row)" :aria-label="'Edit scenario ' + row.label" title="Edit scenario response, conditions, and headers"><span>Edit</span> <span class="v2-btn-arrow" aria-hidden="true">↗</span></button>
+									<button type="button" x-show="canEditWorkspace &amp;&amp; !row.isDefault" class="v2-btn-action danger scenario-delete-btn" @click="removeScenarioRow(row)" :aria-label="'Delete scenario ' + row.label" title="Delete scenario">✕</button>
 								</div>
 							</td>
 						</tr>
@@ -404,10 +404,10 @@ templ Dialogs() {
       <button type="button" class="path-view-url-copy" @click="copyText(preview.url, 'Endpoint URL copied')">Copy URL</button>
      </div>
 
-     <!-- Condition Section -->
+     <!-- Scenario Section -->
      <div class="path-view-section">
       <div class="path-view-section-header">
-       <span class="path-view-label">CONDITION</span>
+       <span class="path-view-label">SCENARIO</span>
       </div>
       <div class="path-view-condition-box">
        <span class="path-view-chip is-default" x-show="preview.isDefault">Default fallback</span>
@@ -681,7 +681,7 @@ templ Dialogs() {
       <div class="condition-rules-scroll"><div class="condition-rules-head"><span>FIELD</span><span>OPERATOR</span><span>VALUE</span><span>REQUIRED</span><span></span></div><template x-for="(rule,index) in condition.config.rules" :key="index"><div class="condition-rule-row"><template x-if="condition.config.condition_type === 'path'"><select aria-label="Path parameter field" x-model="rule.field"><option value="">Select parameter</option><template x-for="field in availablePathFields" :key="field"><option :value="field" x-text="field"></option></template></select></template><template x-if="condition.config.condition_type !== 'path'"><input aria-label="Condition field" x-model="rule.field" :readonly="condition.config.condition_type === 'body' && condition.config.body_mode === 'raw' && condition.config.raw_format === 'text'" :placeholder="condition.config.condition_type === 'header' ? 'Authorization' : condition.config.condition_type === 'query' ? 'page' : 'user.email'"/></template><select aria-label="Condition operator" x-model="rule.operator"><option value="exists">Exists</option><option value="equals">Equals</option><option value="not_equals">Not equals</option><option value="contains">Contains</option><option value="empty">Empty / missing</option></select><input aria-label="Condition value" x-model="rule.value" :disabled="['exists','empty'].includes(rule.operator)" :placeholder="['exists','empty'].includes(rule.operator) ? 'Not needed' : 'Comparison value'"/><label class="required-check"><input type="checkbox" x-model="rule.required" aria-label="Field must not be empty"/><span>Required</span></label><button type="button" @click="condition.config.rules.splice(index,1)" :disabled="condition.config.rules.length === 1" aria-label="Delete condition field">✕</button></div></template></div>
       <p class="help">Required: the field must be present and nonempty for this rule to match. Null, whitespace, and empty objects/arrays are rejected; 0 and false remain valid. Exists without Required only checks presence. OR matches when any rule is satisfied.</p>
      </div></template>
-     <p class="help" x-show="!scenarioForm.conditions.length">Incoming requests go directly to the default response. Use Add condition if another scenario is needed.</p>
+     <p class="help" x-show="!scenarioForm.conditions.length">Incoming requests go directly to the default response. Use Add scenario if another scenario is needed.</p>
     </section>
     <template x-if="scenarioForm.response"><section x-show="scenarioTab === 'response'">
      <div class="default-rule-note" x-show="scenarioForm.isDefault && !scenarioScope">This default response is returned when no condition matches incoming requests.</div>
@@ -694,7 +694,7 @@ templ Dialogs() {
      <template x-for="block in scenarioForm.legacyHeaders" :key="block.id"><div class="scenario-condition-editor"><strong x-text="block.label"></strong>@ScenarioHeaders("block.headers")</div></template>
      <template x-for="block in scenarioForm.legacyDelays" :key="block.id"><label><span x-text="block.label + ' (ms)'"></span><input type="number" min="0" max="10000" x-model.number="block.delay_ms"/></label></template>
     </section>
-    <div class="scenario-popup-footer"><button type="button" class="btn" @click="modal=null">Cancel</button><button class="btn primary" x-text="scenarioScope ? 'Apply node to draft' : scenarioIsNew ? 'Add condition to draft' : scenarioForm.isDefault ? 'Apply default response' : 'Apply condition to draft'"></button></div>
+    <div class="scenario-popup-footer"><button type="button" class="btn" @click="modal=null">Cancel</button><button class="btn primary" x-text="scenarioScope ? 'Apply node to draft' : scenarioIsNew ? 'Add scenario to draft' : scenarioForm.isDefault ? 'Apply default response' : 'Apply scenario to draft'"></button></div>
    </form></template>
    <template x-if="modal === 'connection' && !branchModel"><form @submit.prevent="saveConnection()"><label>From step<select x-model="connectionForm.from" @change="connectionSourceChanged()"><template x-for="source in insertionSources" :key="source.id"><option :value="source.id" x-text="source.label"></option></template></select></label><label>Branch<select x-model="connectionForm.branch" @change="connectionBranchChanged()"><template x-for="branch in branchesFor(connectionForm.from)" :key="branch"><option :value="branch" x-text="branch === 'true' ? 'Yes / match' : branch === 'false' ? 'No / fallback' : 'Next'"></option></template></select></label><label>To step<select x-model="connectionForm.to"><option value="">Not connected</option><template x-for="target in orderedNodes.filter(node => node.id !== connectionForm.from && node.type !== 'request')" :key="target.id"><option :value="target.id" x-text="target.label"></option></template></select></label><p class="help">One destination per branch. Cycles are rejected. Connect every branch before saving the endpoint.</p><div class="modal-actions"><button type="button" class="btn danger-quiet" x-show="originalConnection" @click="removeConnection()">Delete connection</button><button class="btn primary">Save connection</button></div></form></template>
    <template x-if="modal === 'connection' && branchModel"><form @submit.prevent="saveConnection()"><p class="help" x-text="connectionForm.branch === 'default' ? 'Used only when no condition matches. Default always runs last.' : 'Used when this condition matches. A failed condition continues to the next priority.'"></p><label>Response<select x-model="connectionForm.to"><template x-for="response in responses" :key="response.id"><option :value="response.id" x-text="response.label + ' · ' + response.config.status"></option></template></select></label><p class="help">An unused response is removed from the draft when its last connection is replaced. You can undo the change.</p><button class="btn primary">Apply connection to draft</button></form></template>

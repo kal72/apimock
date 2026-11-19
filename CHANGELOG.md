@@ -49,6 +49,12 @@ Categories: **Added**, **Changed**, **Fixed**, **Refactored**, **Deprecated**, *
 
 ### Changed
 
+- Standardized UI terminology from "Condition" to "Scenario" across the application to align with the core mental model where adding an execution branch defines both matching criteria and its paired mock response:
+  - Renamed add buttons to `+ Add scenario` in both Visual Flow toolbar and Table Mode header.
+  - Updated dialog titles to `Add scenario` and `Edit scenario · <Name>` (and `Scenario details` for the read-only inspector).
+  - Renamed the inspector's condition rule section header from `CONDITION` to `SCENARIO`.
+  - Updated action tooltips and aria-labels across the scenario table to consistently refer to scenarios.
+
 - Moved the "Docs & Reference" link from the primary sidebar navigation menu (`.v2-nav`) down to the sidebar footer (`.sidebar-bottom.v2-sidebar-note` in `internal/web/page.templ` and `web/src/cloudline.css`) as a lightweight text link while retaining the "API WORKSPACE" header kicker and removing the placeholder marketing tagline ("Build before the backend. One workspace. Endless possibilities.") to keep the sidebar focused, compact, and clean.
 
 - Simplified the Table mode Scenario View modal (`modal === 'view'`, `.path-view-modal` in `internal/web/page.templ` and `web/src/path-view.css`) into a clean, minimalist 1-page inspector without tabs or visual clutter:
